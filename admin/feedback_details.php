@@ -217,6 +217,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     </div>
                                                 </div>
                                             </div>
+                                                            
+                                                            
+                                                            <a href="Filedownload.php?feedbackid=<?= $current_data['feedbackid'] ?>" 
+                                               class="btn btn_edit"><i class="fas fa-edit">view</i></a>
                                         </div>
                                     </form>
                                 </div>

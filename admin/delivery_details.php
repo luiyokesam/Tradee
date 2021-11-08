@@ -1,6 +1,17 @@
 <?php
 include 'navbar.php';
 
+
+$Array_delivery = array();
+$sql1 = "SELECT deliveryid FROM delivery";
+$result1 = $dbc->query($sql1);
+if ($result1->num_rows > 0) {
+    while ($row = mysqli_fetch_array($result1)) {
+        array_push($Array_delivery, $row["deliveryid"]);
+    }
+}
+echo '<script>var Array_email = ' . json_encode($Array_delivery) . ';</script>';
+
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $sql = "SELECT * FROM delivery d, payment p WHERE deliveryid = '$id' AND d.tradeid = p.tradeid LIMIT 1";
@@ -16,6 +27,7 @@ if (isset($_GET['id'])) {
         echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "delivery_list.php";</script>';
     }
 }
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_GET['id'])) {
@@ -44,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Delivery Details - Tradee</title>
+        <title> <?php echo $current_data['deliveryid'] ?> (Delivery Details) - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed" onload="addnew()">
         <div class="content-wrapper">
@@ -52,7 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h4 class="m-0 text-dark" style="font-weight: bold;"><?php echo $title; ?></h4>
+                            <h4 class="m-0 text-dark" style="font-weight: bold;">Delivery ID: <?php
+                                        if (isset($current_data)) {
+                                            echo $current_data["deliveryid"];
+                                        }
+                                        ?></h4>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -128,10 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Delivery date:</label>
-                                                            <input class="form-control" id="deliveryDate" name="deliveryDate" readonly value="<?php
+                                                            <label>Remarks :</label>
+                                                            <input class="form-control" id="remarks" name="remarks" readonly value="<?php
                                                             if (isset($current_data)) {
-                                                                echo $current_data["deliveryDate"];
+                                                                echo $current_data["remarks"];
                                                             }
                                                             ?>">
                                                         </div>
@@ -150,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                                     <div class="col-md-12">
                                                         <div class="form-group">
-                                                            <label>Pick address: </label>
+                                                            <label>Pickup address: </label>
                                                             <input class="form-control" id="pickAddress" name="pickAddress" readonly value="<?php
                                                             if (isset($current_data)) {
                                                                 echo $current_data["pickAddress"];
@@ -180,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                         echo "selected";
                                                                     }
                                                                 }
-                                                                ?> value="Picked">Picked</option>
+                                                                ?> value="Pick up">Pick up</option>
                                                                 <option <?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["deliveryStatus"] === "In Transit") {
@@ -249,25 +265,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <table id="orderlisttable" class="table table-bordered table-striped">
                                                     <tbody>
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Payment Type :</td>
-                                                            <td><?php
-                                                                if (isset($current_data)) {
-                                                                    echo $current_data["paytype"];
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 30%;text-align: right">Card Number :</td>
-                                                            <td><?php
-                                                                if (isset($current_data)) {
-                                                                    echo $current_data["cardname"];
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 30%;text-align: right">Card Number :</td>
+                                                            <td style="width: 30%;text-align: right">Card Number:</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
                                                                     echo $current_data["cardno"];
@@ -276,10 +274,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Package :</td>
+                                                            <td style="width: 30%;text-align: right">Card Name :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["cardname"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Package  :</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
                                                                     echo $current_data["package"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Net Amount(RM) :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["netAmount"];
                                                                 }
                                                                 ?>
                                                             </td>
@@ -294,20 +310,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Total Amount (RM) :</td>
+                                                            <td style="width: 30%;text-align: right">Total Amount(RM) :</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
-                                                                    echo $current_data["total"];
+                                                                    echo $current_data["totalAmount"];
                                                                 }
                                                                 ?>
                                                             </td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Card Name :</td>
+                                                            <td style="width: 30%;text-align: right">Payment Date :</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
-                                                                    echo $current_data["paymentdate"];
+                                                                    echo $current_data["paymentDate"];
                                                                 }
                                                                 ?>
                                                             </td>
@@ -344,7 +360,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 var message = "";
                 document.getElementById("name").style.borderColor = "";
                 document.getElementById("itemQuantity").style.borderColor = "";
-                document.getElementById("deliveryDate").style.borderColor = "";
+                document.getElementById("remarks").style.borderColor = "";
                 document.getElementById("receiveDate").style.borderColor = "";
                 document.getElementById("pickAddress").style.borderColor = "";
                 document.getElementById("destinationAddress").style.borderColor = "";
@@ -355,8 +371,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("name").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("deliveryDate").value || document.getElementById("deliveryDate").value === "") {
-                    document.getElementById("deliveryDate").style.borderColor = "red";
+                if (!document.getElementById("remarks").value || document.getElementById("remarks").value === "") {
+                    document.getElementById("remarks").style.borderColor = "red";
                     fullfill = false;
                 }
                 if (!document.getElementById("receiveDate").value || document.getElementById("receiveDate").value === "") {
@@ -389,7 +405,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         document.getElementById("tradeid").disabled = false;
                         document.getElementById("custid").disabled = false;
                         document.getElementById("name").disabled = false;
-                        document.getElementById("deliveryDate").disabled = false;
+                        document.getElementById("remarks").disabled = false;
                         document.getElementById("receiveDate").disabled = false;
                         document.getElementById("itemQuantity").disabled = false;
                         document.getElementById("pickAddress").disabled = false;
@@ -422,7 +438,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("btnsave").textContent = "Save";
             document.getElementById("btncancel").disabled = false;
             document.getElementById("name").readOnly = false;
-            document.getElementById("deliveryDate").readOnly = false;
+            document.getElementById("remarks").readOnly = false;
             document.getElementById("receiveDate").readOnly = false;
             document.getElementById("itemQuantity").readOnly = false;
             document.getElementById("pickAddress").readOnly = false;

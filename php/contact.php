@@ -16,7 +16,7 @@ if ($result->num_rows > 0) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $img = $_FILES['img']['name'];
     if ($img) {
-        $newimg = "../feedback/$img";
+        $newimg = "../item_img/$img";
     }
 
     $sql = "INSERT INTO feedback(feedbackid, custid, tradeid, position, enquirytype, email, comment, feedbackdate, img, status)VALUES("
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($dbc->query($sql)) {
         if ($img) {
-            move_uploaded_file($_FILES['img']['tmp_name'], "../feedback/$img");
+            move_uploaded_file($_FILES['img']['tmp_name'], "../item_img/$img");
         }
         echo '<script>alert("Successfuly insert !");window.location.href = "contact.php?id=' . $_POST['feedbackid'] . '";</script>';
     } else {
