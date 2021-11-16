@@ -1,4 +1,5 @@
 <?php
+
 require ('../include/config.inc.php');
 include '../include/header.php';
 $page_title = 'Activate Your Account';
@@ -14,9 +15,9 @@ if (isset($_GET['x'], $_GET['y']) && filter_var($_GET['x'], FILTER_VALIDATE_EMAI
 
     // Print a customized message:
     if (mysqli_affected_rows($dbc) == 1) {
-        echo "<h3>Your account is now active. You may now log in.</h3>";
+        echo '<script>alert("Your account is now active. You may now log in.");window.location.href="../user/logout.php";</script>';
     } else {
-        echo '<p class="error">Your account could not be activated. Please re-check the link or contact the system administrator.</p>';
+        echo '<script>alert("Your account could not be activated. Please re-check the link or contact the system administrator.");window.location.href="../user/logout.php";</script>';
     }
 
     mysqli_close($dbc);

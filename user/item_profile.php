@@ -8,10 +8,18 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            $Array_Image = array();
+            $sql2 = "SELECT `img` FROM `item_image` WHERE `itemid` = '$id'";
+            $result2 = $dbc->query($sql2);
+            if ($result2->num_rows > 0) {
+                while ($row = mysqli_fetch_array($result2)) {
+                    array_push($Array_Image, $row[0]);
+                }
+            }
             break;
         }
     } else {
-        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "product_detail.php";</script>';
+        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
 }
 
@@ -42,31 +50,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "'Pending',"
             . "NOW(),"
             . "'Pending')";
-
-    echo '<script>alert("' . $sql_trade . '");</script>';
+//    echo '<script>alert("' . $sql_trade . '");</script>';
 
     $my_items = $_POST['my_item'];
-    foreach ($my_items as $my_item_list) {
-        $sql_my_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+    foreach ($my_items as $myitems) {
+        $sql_mytrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
                 . "'" . $newid . "',"
                 . "'" . $_SESSION['loginuser']['custid'] . "',"
-                . "'" . $my_item_list . "')";
+                . "'" . $myitems . "')";
+        $dbc->query($sql_mytrade);
+//        echo '<script>alert("' . $sql_mytrade . '");</script>';
 
-        $dbc->query($sql_my_trade_details);
-    }
-    echo '<script>alert("' . $sql_my_trade_details . '");</script>';
-
-    foreach ($my_items as $update_my_item_list) {
-        $sql = "UPDATE item SET "
+        $sql_my_itemActive = "UPDATE item SET "
                 . "itemActive = 'Pending'"
                 . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $update_my_item_list . "'";
-
-        $dbc->query($sql);
-        echo '<script>alert("' . $sql . '");</script>';
+                . " itemid = '" . $myitems . "'";
+        $dbc->query($sql_my_itemActive);
+//        echo '<script>alert("' . $sql_my_itemActive . '");</script>';
     }
-
-    echo '<script>alert("' . $update_my_item_list . '");</script>';
+//    echo '<script>alert("' . $myitems . '");</script>';
 
     $his_items = $_POST['his_item'];
     foreach ($his_items as $his_item_list) {
@@ -77,10 +79,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $dbc->query($sql_his_trade_details);
     }
-    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
+//    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
 
     if (($dbc->query($sql_trade))) {
-        echo '<script>alert("Successfuly insert!");window.location.href="../php/index.php";</script>';
+        echo '<script>alert("Trade offer sent successfully!");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
     }
@@ -119,29 +121,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container-lg">
             <div class="row pb-3">
                 <div class="col-xxl-9 col-xl-8 col-lg-8 my-1">
-                    <div class="col-12 img-container">
-                        <img src="../bootstrap/dist/img/prod-5.jpg" class="active-image" alt="Product Image">
-                    </div>
-                    <div class="col-12 product-image-thumbs">
-                        <div class="product-image-thumb product-small-img"><img src="../img/test-shirt/test_shirt_5.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img"><img src="../img/test-shirt/test_shirt_6.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img"><img src="../img/test-shirt/test_shirt_7.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img"><img src="../img/test-shirt/test_shirt_8.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img active"><img src="../img/test-shirt/test_shirt_9.jpg" alt="Product Image"></div>
+                    <div class="col-12 img-container" style="width: 500px; height: 500px">
+                        <img src="<?php
+                        if (isset($Array_Image)) {
+                            echo $Array_Image[0];
+                        }
+                        ?>" class="active-image" style="max-width: 500px; max-height: 500px" alt="Product Image">
                     </div>
 
-                    <!--                                        <div class="product">
-                                                                <div class="col-12 img-container">
-                                                                    <img class="" src="../img/test-shirt/test_shirt_5.jpg" id="imageBox" onclick="imageGallery(this)">
-                                                                </div>
-                                        
-                                                                <div class="product-small-img mt-3">
-                                                                    <img class="mb-2" src="../img/test-shirt/test_shirt_5.jpg" onclick="imageGallery(this)">
-                                                                    <img class="mb-2" src="../img/test-shirt/test_shirt_6.jpg" onclick="imageGallery(this)">
-                                                                    <img class="mb-2" src="../img/test-shirt/test_shirt_7.jpg" onclick="imageGallery(this)">
-                                                                    <img class="mb-2" src="../img/test-shirt/test_shirt_8.jpg" onclick="imageGallery(this)">
-                                                                </div>
-                                                            </div>-->
+                    <div class="col-12 product-image-thumbs mt-3">
+                        <div class="product-image-thumb product-small-img mr-2 p-1 active" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[0];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[1];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[2];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[3];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[4];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-xxl-3 col-xl-4 col-lg-4 my-1">
@@ -150,49 +178,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-lg-12 col-sm-6">
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Brand</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
                                             echo $current_data['brand'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Condition</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
                                             echo $current_data['itemCondition'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
-                                <!--                                <div class="row">
-                                                                    <div class="col-lg-5 col-3 item-title">Size</div>
-                                                                    <div class="col item-value">L</div>
-                                                                </div>-->
-
                                 <div class="row">
-                                    <div class="col-lg-5 col-3 item-title">Quantity</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col-lg-5 col-3 item-title">Size</div>
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
-                                            echo $current_data['quantity'];
+                                            echo $current_data['size'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Value</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
                                             echo $current_data['value'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
-                                <!--                                <div class="row">
-                                                                    <div class="col-lg-5 col-3 item-title">Color</div>
-                                                                    <div class="col item-value">White</div>
-                                                                </div>-->
+                                <div class="row">
+                                    <div class="col-lg-5 col-3 item-title">Color</div>
+                                    <div class="col item-value">
+                                        <?php
+                                        if (isset($current_data)) {
+                                            echo $current_data['colour'];
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-lg-12 col-sm-6">
@@ -201,16 +238,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     echo "<div class='row pt-lg-2'>"
                                     . "<div class='col-lg-5 col-3 item-title'>Location</div>"
                                     . "<div class='col item-value'>" . ($current_data['state']) . ", " . ($current_data['country']) . "</div>"
-                                    . "<div class='col item-value'>"
-                                    . "</div>"
                                     . "</div>";
                                 }
                                 ?>
-
-                                <div class="row pt-lg-2">
-                                    <div class="col-lg-5 col-3 item-title">Location</div>
-                                    <div class="col item-value">Setapak, Selangor</div>
-                                </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Trade option</div>
@@ -218,38 +248,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($current_data)) {
                                             echo $current_data['tradeOption'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Uploaded</div>
-                                    <div class="col item-value">3 days ago</div>
+                                    <div class="col item-value" style="color: red;">3 days ago</div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Uploaded</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
                                             echo $current_data['postDate'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Trade Item</div>
-                                    <div class="col item-value"><?php
+                                    <div class="col item-value">
+                                        <?php
                                         if (isset($current_data)) {
                                             echo $current_data['tradeItem'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
+
+                                <?php
+                                if (isset($current_data)) {
+                                    if (($current_data['itemActive'] !== 'Available')) {
+                                        echo "<div class='row mt-2' style='font-weight: bolder;'>"
+                                        . "<div class='col-lg-5 col-3 item-title'>Item Status</div>"
+                                        . "<div class='col item-value' style='color: red;'>"
+                                        . "{$current_data['itemActive']}"
+                                        . "</div>"
+                                        . "</div>";
+                                    }
+                                }
+                                ?>
                             </div>
                         </div>
 
-                        <div class="pt-3 border-bottom"></div>
+                        <div class="mt-2 border-bottom"></div>
 
-                        <div class="row pt-3">
-                            <div class="col-lg-12 col-md-7">
+                        <div class="row mt-2">
+                            <div class="col-lg-12 col-md-7 mb-2">
                                 <div class="" style="font-size:1em;"><?php
                                     if (isset($current_data)) {
                                         echo $current_data['itemname'];
@@ -265,143 +313,162 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
 
                             <div class="col-lg-12 col-md-5">
+                                <?php
+                                if (isset($current_data)) {
+                                    if (($current_data['itemActive'] == 'Available')) {
+                                        if (isset($_SESSION['loginuser'])) {
+                                            if ($_SESSION['loginuser']['custid'] !== $current_data['custid']) {
+                                                echo "<div class='py-1'>"
+                                                . "<button class='btn btn-block btn-trade-now' data-toggle='modal' data-target='#modal-bid-item'>Trade now</button>"
+                                                . "</div>";
+                                            }
+                                        }
+                                    }
+                                }
+                                ?>
                                 <div class='py-1'>
-                                    <a class="btn btn-block btn-outline-primary" data-toggle="modal" data-target="#modal-bid-item">Trade now</a>
-                                </div>
-                                <div class='py-1'>
-                                    <a type="button" class="btn btn-outline-info btn-block" href=""><i class="far fa-heart"></i> Add to favourite</a>
+                                    <?php
+                                    if (isset($current_data)) {
+                                        if (isset($_SESSION['loginuser'])) {
+                                            if ($_SESSION['loginuser']['custid'] !== $current_data['custid']) {
+                                                echo "<button class='btn btn-block btn-add-fav btn-light' style='color: red;'><i class='far fa-heart'></i> Favorite</button>";
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    <!--<a type="button" class="btn btn-outline-info btn-block" href=""><i class="far fa-heart"></i> Add to favourite</a>-->
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card mt-3 border" style="box-shadow: none; border-radius: 0px;">
-                        <a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>
-                            <!--<a class="px-3 py-2 border-bottom align-items-center" href='../user/profile.php?id=" . $current_data["custid"] . "'">-->
-                            <?php echo "<a class='px-3 py-2 border-bottom align-items-center' href='../user/profile.php?id=" . $current_data["custid"] . "'>" ?>
-                            <div class="float-left">
-                                <img src="../img/header/user-icon.png" class="m-2" style="width: 35px;" alt="...">
-                            </div>
-                            <div class="align-items-center m-2">
-                                <div class="row align-items-center">
-                                    <div class="col-12" style="font-size:0.8em; text-decoration: none;"><?php
-                                        if (isset($current_data)) {
-                                            echo $current_data['username'];
-                                        }
-                                        ?></div>
-                                    <div class="col-12" style="font-size:0.9em;">
-                                        <span class="fa fa-star checked"></span>
-                                        <span class="fa fa-star checked"></span>
-                                        <span class="fa fa-star checked"></span>
-                                        <span class="fa fa-star"></span>
-                                        <span class="fa fa-star"></span>
-                                    </div>
+                        <?php echo "<a class='py-2 border-bottom align-items-center' href='../user/profile.php?id=" . $current_data["custid"] . "'>" ?>
+                        <div class="float-left">
+                            <img src="<?php
+                            if (isset($current_data)) {
+                                echo $current_data['avatar'];
+                            }
+                            ?>" class="mx-2 rounded-circle" style="width: 45px; height: 45px;" alt="Profile avatar">
+                        </div>
+                        <div class="align-items-center mx-2" style="color: black;">
+                            <div class="row align-items-center">
+                                <div class="col-12" style="font-size:0.85em; text-decoration: none;"><?php
+                                    if (isset($current_data)) {
+                                        echo $current_data['username'];
+                                    }
+                                    ?></div>
+                                <div class="col-12" style="font-size:0.8em;">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star"></span>
+                                    <span class="fa fa-star"></span>
                                 </div>
                             </div>
+                        </div>
                         </a>
 
                         <div class="card-body px-3 py-2">
                             <div class="row align-items-center">
                                 <div class="col-1">
-                                    <i class="fas fa-map-marker-alt" style="font-size:px;color:#AFEEEE"></i>
+                                    <i class="fas fa-map-marker-alt" style="color: #09B1BA;"></i>
                                     <!--<i class="material-icons" style="font-size:48px;color:#AFEEEE">location_on</i>-->
                                 </div>
-                                <div class="col" style="font-size:0.8em;">Kuala Lumpur, Malaysia</div>
+                                <div class="col" style="font-size: 0.85em;"><?php
+                                    if (isset($current_data)) {
+                                        echo "{$current_data['state']}, {$current_data['country']}";
+                                    }
+                                    ?>
+                                </div>
                             </div>
 
                             <div class ="row pt-2 align-items-center">
                                 <div class="col-1">
-                                    <i class="far fa-clock" style="color:#AFEEEE"></i>
+                                    <i class="far fa-clock" style="color: #09B1BA"></i>
                                     <!--<i class="material-icons" style="font-size:40px;padding-left:7px;color:#AFEEEE">rate_review</i>-->
                                 </div>
-                                <div class="col" style="font-size:0.8em;"><?php
+                                <div class="col" style="font-size: 0.85em;"><?php
                                     if (isset($current_data)) {
                                         echo $current_data['registration_date'];
                                     }
-                                    ?></div>
+                                    ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class='row'>
+            <div class='row mt-2'>
                 <div class='col-lg-9'>
-                    <div class="border-bottom" style="font-size:1.8em;">You may also like</div>
+                    <div class="border-bottom mb-2 pb-2" style="font-size:1.8em;">You may also like</div>
                     <div class="row row-cols-md-3 row-cols-sm-2">
-                        <div class="col px-1 py-2">
-                            <a href="../user/profile.php" style="text-decoration:none;">
-                                <ul class="list-inline mb-0 p-1">
-                                    <img src="../img/header/user-icon.png" class="" style="width: 22px;" alt="...">
-                                    <li class="list-inline-item" style="font-size:0.7em; color:#969696;">Username</li>
-                                </ul>
-                            </a>
-                            <div class="item-img-box">
-                                <a href="../user/item_portfolio.php">
-                                    <img src="../img/test-shirt/test_shirt_5.jpg" class="item-img" alt="...">
-                                </a>
-                            </div>
-                            <div class="d-flex bd-highlight align-items-center p-1 pb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.8em;">Item Name</div>
-                                <div class="d-flex bd-highlight align-items-center">
-                                    <i class="far fa-heart me-auto" style="font-size:0.9em;"></i>
-                                    <!--<i class="fas fa-heart me-auto" style="font-size:0.9em;"></i>-->
-                                    <div class="flex-grow-1 bd-highlight ps-1" style="font-size:0.8em;"> 2</div>
-                                </div>
-                            </div>
-                            <ul class="list-inline p-1 pt-0 mb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Size</div>
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Brand</div>
-                            </ul>
-                        </div>
-                        <div class="col px-1 py-2">
-                            <a href="../user/profile.php" style="text-decoration:none;">
-                                <ul class="list-inline mb-0 p-1">
-                                    <img src="../img/header/user-icon.png" class="" style="width: 22px;" alt="...">
-                                    <li class="list-inline-item" style="font-size:0.7em; color:#969696;">Username</li>
-                                </ul>
-                            </a>
-                            <div class="item-img-box">
-                                <a href="../user/item_portfolio.php">
-                                    <img src="../img/test-shirt/test_shirt_3.jpg" class="item-img" alt="...">
-                                </a>
-                            </div>
-                            <div class="d-flex bd-highlight align-items-center p-1 pb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.8em;">Item Name</div>
-                                <div class="d-flex bd-highlight align-items-center">
-                                    <i class="far fa-heart me-auto" style="font-size:0.9em;"></i>
-                                    <div class="flex-grow-1 bd-highlight ps-1" style="font-size:0.8em;"> 2</div>
-                                </div>
-                            </div>
-                            <ul class="list-inline p-1 pt-0 mb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Size</div>
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Brand</div>
-                            </ul>
-                        </div>
-                        <div class="col px-1 py-2">
-                            <a href="../user/profile.php" style="text-decoration:none;">
-                                <ul class="list-inline mb-0 p-1">
-                                    <img src="../img/header/user-icon.png" class="" style="width: 22px;" alt="...">
-                                    <li class="list-inline-item" style="font-size:0.7em; color:#969696;">Username</li>
-                                </ul>
-                            </a>
-                            <div class="item-img-box">
-                                <a href="../user/item_portfolio.php">
-                                    <img src="../img/test-shirt/test_shirt_4.jpg" class="item-img" alt="...">
-                                </a>
-                            </div>
-                            <div class="d-flex bd-highlight align-items-center p-1 pb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.8em;">Item Name</div>
-                                <div class="d-flex bd-highlight align-items-center">
-                                    <i class="far fa-heart me-auto" style="font-size:0.9em;"></i>
-                                    <div class="flex-grow-1 bd-highlight ps-1" style="font-size:0.8em;"> 2</div>
-                                </div>
-                            </div>
-                            <ul class="list-inline p-1 pt-0 mb-0">
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Size</div>
-                                <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Brand</div>
-                            </ul>
-                        </div>
+                        <?php
+                        if (isset($_SESSION['loginuser'])) {
+                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}' AND i.itemid <> '{$current_data['itemid']}'";
+                            $result = $dbc->query($get_inventory);
+                            if ($result->num_rows > 0) {
+                                while ($row = mysqli_fetch_array($result)) {
+                                    echo "<div class='col px-1 py-2'>"
+                                    . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
+                                    . "<ul class='list-inline mb-0 p-1'>"
+                                    . "<img src=" . $row["avatar"] . " class='rounded-pill mr-1' style='width: 23px; height: 23px;' alt='Avatar'>"
+                                    . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
+                                    . "</ul>"
+                                    . "</a>"
+                                    . "<div class='item-img-box overflow-hidden'>"
+                                    . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "'>"
+                                    . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                    . "</a>"
+                                    . "</div>"
+                                    . "<div class='d-flex bd-highlight align-items-center p-1 py-0'>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
+                                    . "<div class='d-flex bd-highlight align-items-center'>"
+                                    . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
+                                    . "</div>"
+                                    . "</div>"
+                                    . "<ul class='list-inline p-1 py-0 mb-0'>"
+//                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemActive"] . "</div>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
+                                    . "</ul>"
+                                    . "</div>";
+                                }
+                            }
+                        } else {
+                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available'";
+                            $result = $dbc->query($get_inventory);
+                            if ($result->num_rows > 0) {
+                                while ($row = mysqli_fetch_array($result)) {
+                                    echo "<div class='col px-1 py-2'>"
+                                    . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
+                                    . "<ul class='list-inline mb-0 p-1'>"
+                                    . "<img src=" . $row["avatar"] . " class='rounded-pill mr-1' style='width: 22px;' alt='Avatar'>"
+                                    . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
+                                    . "</ul>"
+                                    . "</a>"
+                                    . "<div class='item-img-box overflow-hidden'>"
+                                    . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "'>"
+                                    . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                    . "</a>"
+                                    . "</div>"
+                                    . "<div class='d-flex bd-highlight align-items-center p-1 pb-0'>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
+                                    . "<div class='d-flex bd-highlight align-items-center'>"
+                                    . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
+                                    . "</div>"
+                                    . "</div>"
+                                    . "<ul class='list-inline p-1 pt-0 mb-0'>"
+//                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemActive"] . "</div>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
+                                    . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
+                                    . "</ul>"
+                                    . "</div>";
+                                }
+                            }
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
@@ -421,51 +488,90 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-lg-3 profile-pic-box float-start align-items-center justify-content-center text-center">
-                                    <img src="../img/about/people-2.jpg" class="rounded-pill img-fluid profile-pic" alt="Profile picture">
+                                    <img src="<?php
+                                    if (isset($current_data)) {
+                                        echo $current_data['avatar'];
+                                    }
+                                    ?>" class="rounded-pill img-fluid profile-pic" alt="Profile picture">
                                 </div>
 
                                 <div class="col-lg-9">
-                                    <div class="col-12">
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo $current_data['username'];
-                                        }
-                                        ?>
-                                        <?php
-                                        if (isset($current_data) == null) {
-                                            echo "<div>{$current_data['review']}</div>";
-                                        } else {
-                                            echo "<div style='font-weight:bold;'>No reviews yet</div>";
-                                        }
-                                        ?>
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4 mb-1">
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo $current_data['username'];
+                                            }
+                                            ?>
+                                            <?php
+                                            if (isset($current_data) == null) {
+                                                echo "<div>- {$current_data['review']}</div>";
+                                            } else {
+                                                echo "<div style='font-weight:lighter;'>- No reviews yet</div>";
+                                            }
+                                            ?>
+                                        </div>
 
-                                    <div class="col">
-                                        <div>About</div>
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo "<div>{$current_data['registration_date']}</div>";
-                                        }
-                                        ?>
-                                        <div>Display location</div>
-                                        <?php
-                                        if (isset($current_data) == null) {
-                                            echo "<div>{$current_data['state']}</div>";
-                                        } else {
-                                            echo "<div style='font-weight:bold;'>No state shown</div>";
-                                        }
-                                        ?>
-                                    </div>
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Joined</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo "<div>- {$current_data['registration_date']}</div>";
+                                            }
+                                            ?>
+                                        </div>
 
-                                    <div class="col">
-                                        <div>Description here</div>
-                                        <?php
-                                        if (isset($current_data) == null) {
-                                            echo "<div>{$current_data['description']}</div>";
-                                        } else {
-                                            echo "<div>No description yet</div>";
-                                        }
-                                        ?>
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Location</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo "<div>- {$current_data['state']}, {$current_data['country']}</div>";
+                                            } else {
+                                                echo "<div style='font-weight:bold;'>No state shown</div>";
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Trade Count</div>
+                                            <?php
+                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE c.custid = '{$current_data['custid']}'";
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $current_offer = $row;
+                                                    echo "<div>- {$current_offer['NUMBER']}</div>";
+                                                    break;
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Last Trade</div>
+                                            <?php
+                                            $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE c.custid = '{$current_data['custid']}'";
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $current_offer = $row;
+                                                    echo "<div>- {$current_offer['DATE']}</div>";
+                                                    break;
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-12 mb-1">
+                                            <div style="font-weight: bolder;">Description</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo "<div style='font-weight: lighter;'>- {$current_data['description']}</div>";
+                                            } else {
+                                                echo "<div>No description yet</div>";
+                                            }
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -498,7 +604,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     echo '<option ' . $selected . ' selected="selected" value="' . $row['itemid'] . '">' . $row['itemname'] . '</option>';
                                                 }
                                             }
-                                            
+
                                             $get_item_available = "SELECT * FROM item WHERE itemActive = 'Available' AND custid = '{$current_data['custid']}' AND itemid != '{$current_data['itemid']}'";
                                             $result_item_available = $dbc->query($get_item_available);
                                             if ($result_item_available->num_rows > 0) {
@@ -549,51 +655,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </script>
     <script src="../bootstrap/plugins/select2/js/select2.full.min.js"></script>
     <style>
-        .product-image-thumb{
-            max-width: none;
-        }
-
-        .product-small-img img{
-            max-height: 120px;
-            max-width: 120px;
-            cursor: pointer;
-            opacity: 0.6;
-            /*display: block;*/
-        }
-
         .product-small-img img:hover{
             opacity: 1;
         }
 
-        .product-small-img{
-            /*float: left;*/
-        }
-
-        .product{
-            /*top: 30%;*/
-            /*left: 30%;*/
-            /*transform: translate(-50%, -50%);*/
-            /*position: absolute;*/
-        }
-
-        .img-container img{
-            max-height: 500px;
-            max-width: 600px;
-            width: 100%;
-        }
-
-        .img-container{
-            height: 500px;
-            /*width: 600px;*/
-            /*float: right;*/
-            /*padding: 10px;*/
-            text-align: center;
-            /*background-color: whitesmoke;*/
-        }
-
-        thead tr th, tfoot tr th{
-            text-align: center;
-        }
+        /*        .img-container img{
+                    max-height: 500px;
+                    max-width: 500px;
+                    width: 100%;
+                }
+        
+                .img-container{
+                    width: 600px;
+                    height: 600px;
+                    background-color: whitesmoke;
+                }*/
 
         .checked {
             color: orange;
@@ -602,24 +678,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .item-img-box{
             /*width: 192px;*/
             /*height: 192px;*/
-            /*            width: 142px;
-                        height: 142px;*/
-            background: #e8e8e8;
+            /*background: #e8e8e8;*/
+            /*max-width: 255px;*/
+            max-height: 370px;
+            background: whitesmoke;
             text-align: center;
+            background-size: cover;
             object-fit: cover;
         }
 
         .item-img{
-            /*            width: 230px;
-                        height: 350px*/
+            max-height: 300px;
+            min-height: 300px;
             /*width: 100%;*/
-            /*min-height: 370px;*/
-            /*max-height: 370px;*/
-            /*background-size: 100% 100%;*/
-            max-width: 238px;
-            /*min-height: 370px;*/
-            max-height: 370px;
-            background-size: 100% 100%;
+            /*height: 100%;*/
+            text-align: center;
+            background-size: contain;
+            background-repeat:   no-repeat;
+            background: whitesmoke;
         }
 
         .fa-heart:hover{
@@ -627,17 +703,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .item-title{
-            font-size:0.8em; 
+            font-size:0.85em; 
             color:#969696;
         }
 
         .item-value{
-            font-size:0.8em; 
+            font-size:0.85em; 
             color: #001226;
-        }
-
-        .profile-pic-box{
-            /*border-radius: 3996px;*/
         }
 
         .profile-pic{
@@ -663,12 +735,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         height: 142px;*/
             object-fit: cover;
         }
-        
+
         /*button*/
         .btn-offer{
             color: white;
             border-color: #7cf279;
             background-color: #7cf279;
+        }
+
+        .btn-trade-now{
+            color: #fff;
+            border-color: #7cf279;
+            background-color: #7cf279;
+            transition-duration: 0.2s;
+        }
+
+        .btn-trade-now:hover{
+            color: #fff;
+            border-color: #6ed66b;
+            background-color: #6ed66b;
+            transition-duration: 0.2s;
         }
     </style>
 </html>

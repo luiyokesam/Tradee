@@ -1,3 +1,38 @@
+<?php
+include '../include/header.php';
+
+$sql = "SELECT * FROM delivery WHERE deliveryid = '" . $_GET['id'] . "' LIMIT 1";
+$result = $dbc->query($sql);
+if ($result->num_rows > 0) {
+    while ($row = mysqli_fetch_array($result)) {
+        $deliveryid = $row;
+        break;
+    }
+} else {
+    echo '<script>alert("Extract data error !\nContact IT department for maintainence");</script>';
+}
+
+//        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//            $sql = "SELECT `feedbackid` FROM `feedback` ORDER BY `feedbackid` DESC LIMIT 1";
+//            $result = $dbc->query($sql);
+//            if ($result->num_rows > 0) {
+//                while ($row = mysqli_fetch_array($result)) {
+//                    $latestnum = ((int) substr($row['feedbackid'], 1)) + 1;
+//                    $New_Id = "F{$latestnum}";
+//                    break;
+//                }
+//            }
+//
+//            $sql = "INSERT INTO `feedback`(`feedbackid`, `custid`, `tradeid`, `comment`, `feedbackdate`, `status`) VALUES"
+//                    . " ('{$New_Id}','{$_SESSION["loginuser"]["custid"]}','{$deliveryid["tradeid"]}','{$_POST["comment"]}','{$_POST["DateTime"]}','Pending')";
+//            if ($dbc->query($sql)) {
+//                echo '<script>alert("Succesfully submit!");</script>';
+//                exit();
+//            }
+//        } else {
+//            echo '<script>alert("Update failed !\nContact IT department for maintainence")</script>';
+//        }
+?>
 <!doctype html>
 <html lang="en">
     <head>
@@ -9,43 +44,6 @@
         <title>Track delivery</title>
     </head>
     <body>
-        <?php
-        include '../include/header.php';
-
-
-
-        $sql = "SELECT * FROM delivery WHERE deliveryid = '" . $_GET['id'] . "' LIMIT 1";
-        $result = $dbc->query($sql);
-        if ($result->num_rows > 0) {
-            while ($row = mysqli_fetch_array($result)) {
-                $deliveryid = $row;
-                break;
-            }
-        } else {
-            echo '<script>alert("Extract data error !\nContact IT department for maintainence");window.location.href = "my_order_list.php";</script>';
-        }
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $sql = "SELECT `feedbackid` FROM `feedback` ORDER BY `feedbackid` DESC LIMIT 1";
-            $result = $dbc->query($sql);
-            if ($result->num_rows > 0) {
-                while ($row = mysqli_fetch_array($result)) {
-                    $latestnum = ((int) substr($row['feedbackid'], 1)) + 1;
-                    $New_Id = "F{$latestnum}";
-                    break;
-                }
-            }
-
-            $sql = "INSERT INTO `feedback`(`feedbackid`, `custid`, `tradeid`, `comment`, `feedbackdate`, `status`) VALUES"
-                    . " ('{$New_Id}','{$_SESSION["loginuser"]["custid"]}','{$deliveryid["tradeid"]}','{$_POST["comment"]}','{$_POST["DateTime"]}','Pending')";
-            if ($dbc->query($sql)) {
-                echo '<script>alert("Succesfully submit!");</script>';
-                exit();
-            }
-        } else {
-            echo '<script>alert("Update failed !\nContact IT department for maintainence")</script>';
-        }
-        ?>
 
         <div class="bg-navbar mb-3">
             <div class="container-lg">

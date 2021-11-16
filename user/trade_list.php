@@ -16,18 +16,20 @@ if (isset($_SESSION['loginuser']['userid'])) {
         <title>My Trade List - Tradee</title>
     </head>
     <body>
-        <div class="container-lg mt-3">
+        <div class="container-lg mt-3 mb-5">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link " id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
+                    <button class="nav-link active" id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
                     <button class="nav-link" id="nav-accept-tab" data-bs-toggle="tab" data-bs-target="#nav-accept" type="button" role="tab">Accept list</button>
-                    <button class="nav-link active" id="nav-delivery-tab" data-bs-toggle="tab" data-bs-target="#nav-delivery" type="button" role="tab">Delivery list</button>
+                    <button class="nav-link" id="nav-delivery-tab" data-bs-toggle="tab" data-bs-target="#nav-sender" type="button" role="tab">Send list</button>
+                    <button class="nav-link" id="nav-delivery-tab" data-bs-toggle="tab" data-bs-target="#nav-recipient" type="button" role="tab">Receive list</button>
+                    <button class="nav-link" id="nav-donation-tab" data-bs-toggle="tab" data-bs-target="#nav-donation" type="button" role="tab">Donation list</button>
                 </div>
             </nav>
 
-            <div class="tab-content" id="nav-tabContent">
-                <!--tab 3-->
-                <div class="tab-pane fade " id="nav-offer" role="tabpanel">
+            <div class="tab-content" id="nav-tabContent" style="margin-bottom: 75px;">
+                <!--tab 1-->
+                <div class="tab-pane fade show active" id="nav-offer" role="tabpanel">
                     <div class="container-lg mt-3">
                         <div class="content" style="padding-bottom:20%">
                             <div class="card">
@@ -40,11 +42,11 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                             <tr>
                                                 <th style="width: 12%;">Trade ID</th>
                                                 <th style="width: 12%;">Trader</th>
-                                                <th style="width: 15%;">His Payment</th>
+                                                <th style="width: 16%;">Trader's Payment</th>
                                                 <th style="width: 15%;">My Payment</th> 
                                                 <th style="width: 14%;">Date</th>
                                                 <th style="width: 12%;">Status</th>
-                                                <th style="width: 10%;"></th>
+                                                <th style="width: 8%;"></th>
                                                 <th style="width: auto;"></th>
                                             </tr>
                                         </thead>
@@ -54,44 +56,57 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                             $result = $dbc->query($sql);
                                             if ($result) {
                                                 while ($row = $result->fetch_assoc()) {
-                                                    if ($row["status"] === "Pending") {
+                                                    if ($row["status"] == "Pending") {
                                                         $color1 = "orange";
                                                         $disabled = "none";
-                                                    } else if ($row["status"] === "Completed") {
-                                                        $color1 = "green";
-                                                        $disabled = "auto";
-                                                    } else if ($row["status"] === "Trading") {
-                                                        $color1 = "blue";
-                                                        $disabled = "auto";
-                                                    } else {
+                                                    } else if ($row["status"] == "Completed") {
+                                                        $color1 = "limegreen";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "Trading") {
+                                                        $color1 = "skyblue";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "Rejected") {
                                                         $color1 = "red";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "To Pay") {
+                                                        $color1 = "slateblue";
                                                         $disabled = "auto";
-                                                    }
-
-                                                    if ($row["offerPayment"] === "Pending") {
-                                                        $color2 = "orange";
-                                                    } else if ($row["offerPayment"] === "Completed") {
-                                                        $color2 = "green";
+                                                    } else if ($row["status"] == "To Ship") {
+                                                        $color1 = "lightsalmon";
                                                         $disabled = "none";
                                                     } else {
-                                                        $color2 = "blue";
+                                                        $color1 = "red";
+                                                        $disabled = "none";
                                                     }
 
-                                                    if ($row["acceptPayment"] === "Pending") {
-                                                        $color3 = "orange";
-                                                    } else if ($row["offerPayment"] === "Completed") {
-                                                        $color3 = "green";
+                                                    if ($row["offerPayment"] == "Pending") {
+                                                        $color2 = "orange";
+                                                    } else if ($row["offerPayment"] == "Completed") {
+                                                        $color2 = "limegreen";
+                                                        $disabled = "none";
+                                                    } else if ($row["offerPayment"] == "Failed") {
+                                                        $color2 = "red";
                                                     } else {
-                                                        $color3 = "blue";
+                                                        $color2 = "skyblue";
+                                                    }
+
+                                                    if ($row["acceptPayment"] == "Pending") {
+                                                        $color3 = "orange";
+                                                    } else if ($row["acceptPayment"] == "Completed") {
+                                                        $color3 = "limegreen";
+                                                    } else if ($row["acceptPayment"] == "Failed") {
+                                                        $color3 = "red";
+                                                    } else {
+                                                        $color3 = "skyblue";
                                                     }
 
                                                     echo "<tr>"
-                                                    . "<td style='text-align: center'>" . $row["tradeid"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["username"] . "</td>"
-                                                    . "<td style='text-align: center; color: ". $color3 ."; font-weight: bolder;''>" . $row["acceptPayment"] . "</td>"
-                                                    . "<td style='text-align: center; color: ". $color2 ."; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["date"] . "</td>"
-                                                    . "<td style='text-align: center; font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
+                                                    . "<td>" . $row["tradeid"] . "</td>"
+                                                    . "<td>" . $row["username"] . "</td>"
+                                                    . "<td style='color: " . $color3 . "; font-weight: bolder;'>" . $row["acceptPayment"] . "</td>"
+                                                    . "<td style='color: " . $color2 . "; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
+                                                    . "<td>" . $row["date"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
                                                     . "<td>"
                                                     . "<a type='button' class='btn btn-block' style='pointer-events: " . $disabled . "' href='offer_delivery_shipping.php?id=" . $row["tradeid"] . "'>"
                                                     . "<i type='button' class='fas fa-truck' style='color:" . $color2 . ";font-size: 1.1em;'></i>"
@@ -113,7 +128,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                     </div>
                 </div>
 
-                <!--tab 4-->
+                <!--tab 2-->
                 <div class="tab-pane fade" id="nav-accept" role="tabpanel">
                     <div class="container-lg mt-3">
                         <div class="content" style="padding-bottom:20%">
@@ -127,7 +142,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                             <tr>
                                                 <th style="width: 12%;">Trade ID</th>
                                                 <th style="width: 12%;">Trader</th>
-                                                <th style="width: 15%;">His Payment</th>
+                                                <th style="width: 15%;">Trader's Payment</th>
                                                 <th style="width: 15%;">My Payment</th>
                                                 <th style="width: 14%;">Date</th>
                                                 <th style="width: 12%;">Status</th>
@@ -141,44 +156,58 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                             $result = $dbc->query($sql);
                                             if ($result) {
                                                 while ($row = $result->fetch_assoc()) {
-                                                    if ($row["status"] === "Pending") {
+                                                    if ($row["status"] == "Pending") {
                                                         $color1 = "orange";
                                                         $disabled = "none";
-                                                    } else if ($row["status"] === "Completed") {
-                                                        $color1 = "green";
-                                                        $disabled = "auto";
-                                                    } else if ($row["status"] === "Trading") {
-                                                        $color1 = "blue";
-                                                        $disabled = "auto";
-                                                    } else {
+                                                    } else if ($row["status"] == "Completed") {
+                                                        $color1 = "limegreen";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "Trading") {
+                                                        $color1 = "skyblue";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "Rejected") {
                                                         $color1 = "red";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "To Pay") {
+                                                        $color1 = "slateblue";
                                                         $disabled = "auto";
-                                                    }
-
-                                                    if ($row["acceptPayment"] === "Pending") {
-                                                        $color2 = "orange";
-                                                    } else if ($row["acceptPayment"] === "Completed") {
-                                                        $color2 = "green";
+                                                    } else if ($row["status"] == "To Ship") {
+                                                        $color1 = "lightsalmon";
                                                         $disabled = "none";
                                                     } else {
-                                                        $color2 = "red";
+                                                        $color1 = "red";
+                                                        $disabled = "none";
                                                     }
 
-                                                    if ($row["offerPayment"] === "Pending") {
-                                                        $color3 = "orange";
-                                                    } else if ($row["offerPayment"] === "Completed") {
-                                                        $color3 = "green";
+                                                    if ($row["acceptPayment"] == "Pending") {
+                                                        $color2 = "orange";
+                                                    } else if ($row["acceptPayment"] == "Completed") {
+                                                        $color2 = "limegreen";
+                                                        $disabled = "none";
+                                                    } else if ($row["acceptPayment"] == "Failed") {
+                                                        $color2 = "red";
+                                                        $disabled = "none";
                                                     } else {
-                                                        $color3 = "blue";
+                                                        $color2 = "skyblue";
+                                                    }
+
+                                                    if ($row["offerPayment"] == "Pending") {
+                                                        $color3 = "orange";
+                                                    } else if ($row["offerPayment"] == "Completed") {
+                                                        $color3 = "limegreen";
+                                                    } else if ($row["offerPayment"] == "Failed") {
+                                                        $color3 = "red";
+                                                    } else {
+                                                        $color3 = "skyblue";
                                                     }
 
                                                     echo "<tr>"
-                                                    . "<td style='text-align: center'>" . $row["tradeid"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["username"] . "</td>"
-                                                    . "<td style='text-align: center; color: ". $color3 ."; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
-                                                    . "<td style='text-align: center; color: ". $color2 ."; font-weight: bolder;'>" . $row["acceptPayment"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["date"] . "</td>"
-                                                    . "<td style='text-align: center; font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
+                                                    . "<td>" . $row["tradeid"] . "</td>"
+                                                    . "<td>" . $row["username"] . "</td>"
+                                                    . "<td style='color: " . $color3 . "; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
+                                                    . "<td style='color: " . $color2 . "; font-weight: bolder;'>" . $row["acceptPayment"] . "</td>"
+                                                    . "<td>" . $row["date"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
                                                     . "<td>"
                                                     . "<a class='btn btn-block' style='pointer-events: " . $disabled . "' href='accept_delivery_shipping.php?id=" . $row["tradeid"] . "'>"
                                                     . "<i class='fas fa-truck' style='color:" . $color2 . ";font-size: 1.1em;'></i>"
@@ -199,63 +228,260 @@ if (isset($_SESSION['loginuser']['userid'])) {
                         </div>
                     </div>
                 </div>
-                
-                <!--tab 5-->
-                <div class="tab-pane fade show active" id="nav-delivery" role="tabpanel">
+
+                <!--tab 3-->
+                <div class="tab-pane fade" id="nav-sender" role="tabpanel">
                     <div class="container-lg mt-3">
                         <div class="content" style="padding-bottom:20%">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Delivery List</h3>
+                                    <h3 class="card-title">Send List</h3>
                                 </div>
                                 <div class="card-body">
-                                    <table id="deliverytable" class="table table-striped table-bordered" style="width:100%">
+                                    <table id="sendertable" class="table table-striped table-bordered" style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th style="width: 12%;">Delivery ID</th>
-                                                <th style="width: 10%;">Trade ID</th>
-                                                <th style="width: 15%;">Package</th> 
-                                                <th style="width: 12%;">Total</th>
-                                                <th style="width: 14%;">Payment Date</th>
+                                                <th style="width: 13%;">Delivery ID</th>
+                                                <th style="width: 11%;">Trade ID</th>
+                                                <!--<th style="width: 13%;">Recipient</th>-->
+                                                <!--<th style="width: 17%;">Package</th>--> 
+                                                <th style="width: 10%;">Total</th>
+                                                <th style="width: 15%;">Payment Date</th>
                                                 <th style="width: 15%;">Received Date</th>
-                                                <th style="width: 10%;">Status</th>
+                                                <th style="width: 12%;">Status</th>
                                                 <th style="width: auto;"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM delivery WHERE custid = '" . $_SESSION['loginuser']['custid'] . "'";
+//                                            $sql = "SELECT * FROM delivery d, customer c WHERE d.senderid = c.custid AND d.senderid = '" . $_SESSION['loginuser']['custid'] . "'";
+                                            $sql = "SELECT * FROM delivery WHERE senderid = '" . $_SESSION['loginuser']['custid'] . "'";
                                             $result = $dbc->query($sql);
                                             if ($result) {
                                                 while ($row = $result->fetch_assoc()) {
 
                                                     if ($row["deliveryStatus"] == "Pending") {
                                                         $color1 = "orange";
-                                                    } else if ($row["deliveryStatus"] == "Completed") {
-                                                        $color1 = "green";
+                                                    } else if ($row["deliveryStatus"] == "In Transit") {
+                                                        $color1 = "lightsalmon";
+                                                    } else if ($row["deliveryStatus"] == "Shipping") {
+                                                        $color1 = "skyblue";
+                                                    } else if ($row["deliveryStatus"] == "Delivered") {
+                                                        $color1 = "limegreen";
                                                     } else {
-                                                        $color1 = "blue";
+                                                        $color1 = "red";
                                                     }
 
                                                     if ($row["receiveDate"] == '') {
                                                         $color2 = "orange";
-                                                        $status = "Delivering";
+                                                        $status = "On-Deliver";
+                                                    } else if ($row["receiveDate"] !== '') {
+                                                        $color2 = "limegreen";
+                                                        $status = "";
                                                     } else {
-                                                        $color2 = "blue";
-                                                        $status = "OK";
+                                                        $color2 = "red";
+                                                        $status = "red";
                                                     }
 
                                                     echo "<tr>"
-                                                    . "<td style='text-align: center'>" . $row["deliveryid"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["tradeid"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["package"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["totalAmount"] . "</td>"
-                                                    . "<td style='text-align: center'>" . $row["paymentDate"] . "</td>"
-                                                    . "<td style='text-align: center;  color:" . $color2 . "; font-weight: bolder;'>" . $status . "</td>"
-                                                    . "<td style='text-align: center; color:" . $color1 . "; font-weight: bolder;'>" . $row["deliveryStatus"] . "</td>"
+                                                    . "<td>" . $row["deliveryid"] . "</td>"
+                                                    . "<td>" . $row["tradeid"] . "</td>";
+
+//                                                    $sql1 = "SELECT c.username FROM customer c, delivery d WHERE d.recipientid = c.custid AND d.senderid = '" . $_SESSION['loginuser']['custid'] . "'";
+//                                                    $result1 = $dbc->query($sql1);
+//                                                    if ($result1->num_rows > 0) {
+//                                                        while ($row1 = mysqli_fetch_array($result1)) {
+//                                                            $recipient = "SELECT c.username FROM customer c WHERE c.custid <> '" . $_SESSION['loginuser']['custid'] . "'";
+//                                                            $result2 = $dbc->query($recipient);
+//                                                            if ($result2->num_rows > 0) {
+//                                                                while ($row2 = mysqli_fetch_array($result2)) {
+//                                                                    echo "<td>" . $row2[0] . "</td>";
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+
+//                                                    echo "<td>" . $row["package"] . "</td>"
+                                                    echo "<td>" . $row["totalAmount"] . "</td>"
+                                                    . "<td>" . $row["paymentDate"] . "</td>"
+                                                    . "<td style='color:" . $color2 . "; font-weight: bolder;'>" . $status . "" . $row["receiveDate"] . "</td>"
+                                                    . "<td style='color:" . $color1 . "; font-weight: bolder;'>" . $row["deliveryStatus"] . "</td>"
                                                     . "<td>"
-                                                    . "<a class='btn btn-info btn-block' href='delivery_details.php?id=" . $row["deliveryid"] . "'>"
+                                                    . "<a class='btn btn-info btn-block' href='send_list.php?id=" . $row["deliveryid"] . "'>"
                                                     . "<i class='fas fa-truck' style='font-size: 1.1em;'></i>"
+                                                    . "</a>"
+                                                    . "</td>";
+                                                }
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--tab 4-->
+                <div class="tab-pane fade" id="nav-recipient" role="tabpanel">
+                    <div class="container-lg mt-3">
+                        <div class="content" style="padding-bottom:20%">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Receive List</h3>
+                                </div>
+                                <div class="card-body">
+                                    <table id="recipienttable" class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 13%;">Delivery ID</th>
+                                                <th style="width: 11%;">Trade ID</th>
+                                                <!--<th style="width: 13%;">Sender</th>-->
+                                                <!--<th style="width: 17%;">Package</th>--> 
+                                                <th style="width: 10%;">Total</th>
+                                                <th style="width: 15%;">Payment Date</th>
+                                                <th style="width: 15%;">Received Date</th>
+                                                <th style="width: 12%;">Status</th>
+                                                <th style="width: auto;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $sql = "SELECT * FROM delivery WHERE recipientid = '" . $_SESSION['loginuser']['custid'] . "'";
+                                            $result = $dbc->query($sql);
+                                            if ($result) {
+                                                while ($row = $result->fetch_assoc()) {
+
+                                                    if ($row["deliveryStatus"] == "Pending") {
+                                                        $color1 = "orange";
+                                                    } else if ($row["deliveryStatus"] == "In Transit") {
+                                                        $color1 = "lightsalmon";
+                                                    } else if ($row["deliveryStatus"] == "Shipping") {
+                                                        $color1 = "skyblue";
+                                                    } else if ($row["deliveryStatus"] == "Delivered") {
+                                                        $color1 = "limegreen";
+                                                    } else {
+                                                        $color1 = "red";
+                                                    }
+
+                                                    if ($row["receiveDate"] == '') {
+                                                        $color2 = "orange";
+                                                        $status = "On-Deliver";
+                                                    } else if ($row["receiveDate"] !== '') {
+                                                        $color2 = "limegreen";
+                                                        $status = "";
+                                                    } else {
+                                                        $color2 = "red";
+                                                        $status = "red";
+                                                    }
+
+                                                    echo "<tr>"
+                                                    . "<td>" . $row["deliveryid"] . "</td>"
+                                                    . "<td>" . $row["tradeid"] . "</td>";
+
+//                                                    $sender = "SELECT c.username FROM customer c, delivery d WHERE d.senderid = c.custid AND d.recipientid = '" . $_SESSION['loginuser']['custid'] . "'";
+//                                                    $result = $dbc->query($sender);
+//                                                    if ($result->num_rows > 0) {
+//                                                        while ($row1 = mysqli_fetch_array($result)) {
+//                                                            echo "<td>" . $row1[0] . "</td>";
+//                                                        }
+//                                                    }
+
+//                                                    echo "<td>" . $row["package"] . "</td>"
+                                                    echo "<td>" . $row["totalAmount"] . "</td>"
+                                                    . "<td>" . $row["paymentDate"] . "</td>"
+                                                    . "<td style='color:" . $color2 . "; font-weight: bolder;'>" . $status . "" . $row["receiveDate"] . "</td>"
+                                                    . "<td style='color:" . $color1 . "; font-weight: bolder;'>" . $row["deliveryStatus"] . "</td>"
+                                                    . "<td>"
+                                                    . "<a class='btn btn-info btn-block' href='receive_list.php?id=" . $row["deliveryid"] . "'>"
+                                                    . "<i class='fas fa-truck' style='font-size: 1.1em;'></i>"
+                                                    . "</a>"
+                                                    . "</td>";
+                                                }
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--tab 5-->
+                <div class="tab-pane fade" id="nav-donation" role="tabpanel">
+                    <div class="container-lg mt-3">
+                        <div class="content" style="padding-bottom:20%">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Donation List</h3>
+                                </div>
+                                <div class="card-body">
+                                    <table id="donationtable" class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 12%;">Trade ID</th>
+                                                <th style="width: 12%;">Trader</th>
+                                                <th style="width: 15%;">His Payment</th>
+                                                <th style="width: 15%;">My Payment</th>
+                                                <th style="width: 14%;">Date</th>
+                                                <th style="width: 12%;">Status</th>
+                                                <th style="width: 10%;"></th>
+                                                <th style="width: auto;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND t.acceptCustID = '" . $_SESSION['loginuser']['custid'] . "'";
+                                            $result = $dbc->query($sql);
+                                            if ($result) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    if ($row["status"] == "Pending") {
+                                                        $color1 = "orange";
+                                                        $disabled = "none";
+                                                    } else if ($row["status"] == "Completed") {
+                                                        $color1 = "limegreen";
+                                                        $disabled = "auto";
+                                                    } else if ($row["status"] == "Trading") {
+                                                        $color1 = "skyblue";
+                                                        $disabled = "auto";
+                                                    } else {
+                                                        $color1 = "red";
+                                                        $disabled = "auto";
+                                                    }
+
+                                                    if ($row["acceptPayment"] == "Pending") {
+                                                        $color2 = "orange";
+                                                    } else if ($row["acceptPayment"] == "Completed") {
+                                                        $color2 = "limegreen";
+                                                        $disabled = "none";
+                                                    } else {
+                                                        $color2 = "red";
+                                                    }
+
+                                                    if ($row["offerPayment"] == "Pending") {
+                                                        $color3 = "orange";
+                                                    } else if ($row["offerPayment"] == "Completed") {
+                                                        $color3 = "limegreen";
+                                                    } else {
+                                                        $color3 = "skyblue";
+                                                    }
+
+                                                    echo "<tr>"
+                                                    . "<td>" . $row["tradeid"] . "</td>"
+                                                    . "<td>" . $row["username"] . "</td>"
+                                                    . "<td style='color: " . $color3 . "; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
+                                                    . "<td style='color: " . $color2 . "; font-weight: bolder;'>" . $row["acceptPayment"] . "</td>"
+                                                    . "<td>" . $row["date"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
+                                                    . "<td>"
+                                                    . "<a class='btn btn-block' style='pointer-events: " . $disabled . "' href='accept_delivery_shipping.php?id=" . $row["tradeid"] . "'>"
+                                                    . "<i class='fas fa-truck' style='color:" . $color2 . ";font-size: 1.1em;'></i>"
+                                                    . "</a>"
+                                                    . "</td>"
+                                                    . "<td>"
+                                                    . "<a class='btn btn-info btn-block' href='trade_accept.php?id=" . $row["tradeid"] . "'>"
+                                                    . "<i class='far fa-eye' style='font-size: 1.1em;'></i>"
                                                     . "</a>"
                                                     . "</td>";
                                                 }
@@ -304,7 +530,27 @@ if (isset($_SESSION['loginuser']['userid'])) {
             "responsive": true
         });
 
-        $('#deliverytable').DataTable({
+        $('#sendertable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": true,
+            "responsive": true
+        });
+
+        $('#recipienttable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": true,
+            "responsive": true
+        });
+
+        $('#donationtable').DataTable({
             "paging": true,
             "lengthChange": true,
             "searching": true,

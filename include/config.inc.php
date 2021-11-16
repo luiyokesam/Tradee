@@ -18,10 +18,10 @@ define('LIVE', FALSE);
 define('EMAIL', 'yokesamlui@gmail.com');
 
 // Site URL (base for all redirections):
-define ('BASE_URL', 'http://localhost/Final-Year-Project/');
+define ('BASE_URL', 'http://localhost/Tradee/');
 
 // Location of the MySQL connection script:
-define ('MYSQL', 'C:\xampp\htdocs\Final-Year-Project\include\mysqli_connect.php');
+define ('MYSQL', 'C:\xampp\htdocs\Tradee\include\mysqli_connect.php');
 
 // Adjust the time zone for PHP 5.1 and greater:
 date_default_timezone_set ('US/Eastern');

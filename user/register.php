@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Assume invalid values:
 //    $username = $contact = $email = $password = $gender = FALSE;
-    $username = $contact = $email = $password = FALSE;
+    $username = $contact = $email = $password = $state = $country = FALSE;
 
     $sql = "SELECT custid FROM customer ORDER BY custid DESC LIMIT 1";
     $result = $dbc->query($sql);
@@ -58,7 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo '<script>alert("Please enter a valid password!");</script>';
     }
 
-    if ($username && $contact && $email && $password) {
+    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['state'])) {
+        $state = mysqli_real_escape_string($dbc, $trimmed['state']);
+    } else {
+//        echo '<p class="error">Please enter your state!</p>';
+    }
+
+    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['country'])) {
+        $country = mysqli_real_escape_string($dbc, $trimmed['country']);
+    } else {
+//        echo '<p class="error">Please enter your country!</p>';
+    }
+
+    if ($username && $contact && $email && $password && $state && $country) {
         // Make sure the email address is available:
         $q = "SELECT custid FROM customer WHERE email='$email'";
         $r = mysqli_query($dbc, $q) or trigger_error("Query: $q\n<br />MySQL Error: " . mysqli_error($dbc));
@@ -67,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Create the activation code:
             $a = md5(uniqid(rand(), true));
 
-            $q = "INSERT INTO customer (custid, email, pass, username, contact, active, registration_date) VALUES ('$newid', '$email', SHA1('$password'), '$username', '$contact', '$a', NOW() )";
+            $q = "INSERT INTO customer (custid, email, pass, username, avatar, contact, state, country, active, registration_date) VALUES ('$newid', '$email', SHA1('$password'), '$username', '../avatar/default_profile.jpg', '$contact', '$state', '$country', '$a', NOW())";
             $r = mysqli_query($dbc, $q) or trigger_error("Query: $q\n<br />MySQL Error: " . mysqli_error($dbc));
 
             if (mysqli_affected_rows($dbc) == 1) {
@@ -76,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $body .= BASE_URL . 'user/activate.php?x=' . urlencode($email) . "&y=$a";
                 mail($trimmed['email'], 'Registration Confirmation', $body, 'From: admin@sitename.com');
 
-                echo '<script>alert("Thank you for registering!\nA confirmation email has been sent to your address. Please click on the link in that email in order to activate your account.");</script>';
+                echo '<script>alert("Thank you for registering!\nA confirmation email has been sent to your address. Please click on the link in that email in order to activate your account.");window.location.href="../user/logout.php";</script>';
 //                echo '<h3>Thank you for registering! A confirmation email has been sent to your address. Please click on the link in that email in order to activate your account.</h3>';
 //                include ('../include/footer.php');
                 exit();
@@ -149,6 +161,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <input type="password" name="password2" class="form-control" id="inputPassword2" placeholder="Retype password" value="<?php if (isset($trimmed['password2'])) echo $trimmed['password2']; ?>">
                                 </div>
 
+
+                                <label>Location</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="state" style="display: none;"></label>
+                                            <input type="text" name="state" class="form-control" id="state" placeholder="State" value="<?php if (isset($trimmed['state'])) echo $trimmed['state']; ?>">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="country" style="display: none;"></label>
+                                            <input type="text" name="country" class="form-control" id="country" placeholder="Country" value="<?php if (isset($trimmed['country'])) echo $trimmed['country']; ?>">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="form-check p-0">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" name="terms" class="custom-control-input" id="checkTerms">
@@ -201,6 +231,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         required: true,
                         minlength: 5
                     },
+                    state: {
+                        required: true,
+                        minlength: 5
+                    },
+                    country: {
+                        required: true,
+                        minlength: 5
+                    },
                     terms: {
                         required: true
                     },
@@ -227,6 +265,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     },
                     password2: {
                         required: "Please retype your password"
+                    },
+                    state: {
+                        required: "Please provide your state location",
+                        minlength: "Please provide a valid state"
+                    },
+                    country: {
+                        required: "Please provide your country",
+                        minlength: "Please provide a valid country"
+                    },
+                    terms: {
+                        required: "",
                     },
                     terms: "Please accept our terms"
                 },
@@ -272,6 +321,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             transition: 0.5s;
             color: #fff
         }
-
     </style>
 </html>

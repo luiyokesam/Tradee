@@ -24,7 +24,7 @@ require '../include/mysqli_connect.php';
         <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
         <link rel="stylesheet" href="../bootstrap/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
         <link rel="stylesheet" href="../bootstrap/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-        
+
         <link rel="shortcut icon" href="../img/icon/tradee_favicon.svg" type="image/x-icon">
 
         <!-- Google Font: Source Sans Pro -->
@@ -39,10 +39,9 @@ require '../include/mysqli_connect.php';
         <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>-->
         <!--<script src="../bootstrap/js/bootstrap.js"></script>-->
 
-        <nav class="navbar navbar-expand-lg navbar-light sticky-md-top bg-white align-items-center align-content-center p-0 pt-2 pb-1">
+        <nav class="navbar  navbar-expand-lg navbar-light sticky-md-top bg-white align-items-center align-content-center p-0 pt-2 pb-1">
             <div class="container-lg d-flex align-content-center align-items-center">
                 <div class="d-inline-flex flex-grow-1">
-                    <!--width:50px; height:20px;-->
                     <a class="navbar-brand p-0 m-0" href="../php/index.php">
                         <img src="../img/icon/tradee_logo.svg" alt="Logo" style="width:70px;" class="d-inline-block align-text-top">
                     </a>
@@ -95,40 +94,38 @@ require '../include/mysqli_connect.php';
 
                     <?php
                     if (isset($_SESSION['loginuser'])) {
-                        echo '<div class="float-right">
-                        <a class="me-1" href="../user/trade_list.php" role="button" style="text-decoration: none;">
-                         <img class="" style="width: 20px;" src="https://img.icons8.com/ios/50/000000/appointment-reminders.png"/>
-                        </a>
-                        <a class="me-1" href="" role="button" style="text-decoration: none;">
-                            <img class="" style="width: 22px;" src="https://img.icons8.com/ios/50/000000/love-circled.png"/>
-                        </a>
-
-                        <ul class="navbar-nav me-0" style="display: inline-block;">
-                            <li class="nav-item dropdown">
-                                <a class="me-1 nav-link dropdown-toggle p-0" href=""  id="navbarDropdown" role="button" style="text-decoration: none;"  data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img class="" style="width: 22px;" src="../img/header/user-icon.png" class="">
-                                </a>
-
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item nav-link-header" href="../user/my_profile.php">Profile</a></li>
-                                    <li><a class="dropdown-item nav-link-header" href="../user/setting_profile.php">Settings</a></li>
-                                    <li><a class="dropdown-item nav-link-header" href="../user/logout.php">Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-
-                        <a class="btn btn-trade-header me-1" href="../user/upload_item.php" role="button" style="font-size: 14px;">Trade now</a>
-                        <a class="btn-question" href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"><path d="M10.97 8.265a1.45 1.45 0 00-.487.57.75.75 0 01-1.341-.67c.2-.402.513-.826.997-1.148C10.627 6.69 11.244 6.5 12 6.5c.658 0 1.369.195 1.934.619a2.45 2.45 0 011.004 2.006c0 1.033-.513 1.72-1.027 2.215-.19.183-.399.358-.579.508l-.147.123a4.329 4.329 0 00-.435.409v1.37a.75.75 0 11-1.5 0v-1.473c0-.237.067-.504.247-.736.22-.28.486-.517.718-.714l.183-.153.001-.001c.172-.143.324-.27.47-.412.368-.355.569-.676.569-1.136a.953.953 0 00-.404-.806C12.766 8.118 12.384 8 12 8c-.494 0-.814.121-1.03.265zM13 17a1 1 0 11-2 0 1 1 0 012 0z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></svg>
-                        </a>
-                    </div>';
+                        echo "<div class='ml-auto'>"
+                        . "<a class='' href='../user/trade_list.php' role='button' style='color: #8791aa; margin-right: 5px;'>"
+                        . "<i class='far fa-bell' style='font-size: 1.1em;'></i>"
+                        . "</a>"
+                        . "<a class='' href='' role='button' style='text-decoration: none; color: #8791aa; margin-right: 5px;'>"
+                        . "<i class='far fa-heart' style='font-size: 1.1em;'></i>"
+                        . "</a>"
+                        . "<ul class='navbar-nav me-0' style='display: inline-block;'>"
+                        . "<li class='nav-item dropdown'>"
+                        . "<a class='nav-link dropdown-toggle p-0' href=''  id='navbarDropdown' role='button' style='margin-right: 5px;'  data-bs-toggle='dropdown' aria-expanded='false'>"
+                        . "<i class='far fa-user-circle' style='font-size: 1.2em;'></i>"
+                        . "</a>"
+                        . "<ul class='dropdown-menu' aria-labelledby='navbarDropdown'>"
+                        . "<li><a class='dropdown-item nav-link-header' href='../user/my_profile.php'>Profile</a></li>"
+                        . "<li><a class='dropdown-item nav-link-header' href='../user/setting_profile.php'>Settings</a></li>"
+                        . "<li><a class='dropdown-item nav-link-header' href='../user/logout.php'>Logout</a></li>"
+                        . "</ul>"
+                        . "</li>"
+                        . "</ul>"
+                        . "<a class='btn btn-trade-header mr-1' href='../user/upload_item.php' role='button' style='font-size: 14px;'>Upload now</a>"
+                        . "<a class='btn-question' href='#'>"
+//                        . "<i class='far fa-question-circle' style='color: #8791aa; font-size: 1.3em;'></i>"
+                        . "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22'><path d='M10.97 8.265a1.45 1.45 0 00-.487.57.75.75 0 01-1.341-.67c.2-.402.513-.826.997-1.148C10.627 6.69 11.244 6.5 12 6.5c.658 0 1.369.195 1.934.619a2.45 2.45 0 011.004 2.006c0 1.033-.513 1.72-1.027 2.215-.19.183-.399.358-.579.508l-.147.123a4.329 4.329 0 00-.435.409v1.37a.75.75 0 11-1.5 0v-1.473c0-.237.067-.504.247-.736.22-.28.486-.517.718-.714l.183-.153.001-.001c.172-.143.324-.27.47-.412.368-.355.569-.676.569-1.136a.953.953 0 00-.404-.806C12.766 8.118 12.384 8 12 8c-.494 0-.814.121-1.03.265zM13 17a1 1 0 11-2 0 1 1 0 012 0z'></path><path fill-rule='evenodd' d='M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z'></path></svg>"
+                        . "</a>"
+                        . "</div>";
                     } else {
-                        echo'<div class="float-right">
-                        <a class="btn btn-login-header me-1" href="../user/login.php" role="button" style="font-size: 14px;">Sign up | Log in</a>
-                        <a class="btn-question" href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"><path d="M10.97 8.265a1.45 1.45 0 00-.487.57.75.75 0 01-1.341-.67c.2-.402.513-.826.997-1.148C10.627 6.69 11.244 6.5 12 6.5c.658 0 1.369.195 1.934.619a2.45 2.45 0 011.004 2.006c0 1.033-.513 1.72-1.027 2.215-.19.183-.399.358-.579.508l-.147.123a4.329 4.329 0 00-.435.409v1.37a.75.75 0 11-1.5 0v-1.473c0-.237.067-.504.247-.736.22-.28.486-.517.718-.714l.183-.153.001-.001c.172-.143.324-.27.47-.412.368-.355.569-.676.569-1.136a.953.953 0 00-.404-.806C12.766 8.118 12.384 8 12 8c-.494 0-.814.121-1.03.265zM13 17a1 1 0 11-2 0 1 1 0 012 0z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></svg>
-                        </a>
-                    </div>';
+                        echo "<div class='float-right'>"
+                        . "<a class='btn btn-login-header me-1' href='../user/login.php' role='button' style='font-size: 14px;'>Sign up | Log in</a>"
+                        . "<a class='btn-question' href='#'>"
+                        . "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22'><path d='M10.97 8.265a1.45 1.45 0 00-.487.57.75.75 0 01-1.341-.67c.2-.402.513-.826.997-1.148C10.627 6.69 11.244 6.5 12 6.5c.658 0 1.369.195 1.934.619a2.45 2.45 0 011.004 2.006c0 1.033-.513 1.72-1.027 2.215-.19.183-.399.358-.579.508l-.147.123a4.329 4.329 0 00-.435.409v1.37a.75.75 0 11-1.5 0v-1.473c0-.237.067-.504.247-.736.22-.28.486-.517.718-.714l.183-.153.001-.001c.172-.143.324-.27.47-.412.368-.355.569-.676.569-1.136a.953.953 0 00-.404-.806C12.766 8.118 12.384 8 12 8c-.494 0-.814.121-1.03.265zM13 17a1 1 0 11-2 0 1 1 0 012 0z'></path><path fill-rule='evenodd' d='M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z'></path></svg>"
+                        . "</a>"
+                        . "</div>";
                     }
                     ?>
                 </div>
@@ -180,7 +177,7 @@ require '../include/mysqli_connect.php';
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Maison Neue", "Helvetica Neue", "Helvetica-Neue", "Arial", sans-serif;
+            /*font-family: "Maison Neue", "Helvetica Neue", "Helvetica-Neue", "Arial", sans-serif;*/
             /*font-family: "Bahnschrift Condensed", Georgia, serif;*/
             font-size: 100%;
         }

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 //                include ('../include/footer.php');
                 exit();
             } else {
-                echo '<script>alert("Your password was not changed. Make sure your new password is different than the current password.\nContact the system administrator if you think an error occurred.");</script>';
+                echo '<script>alert("Your password was not changed.\nMake sure your new password is different than the current password. Contact the system administrator if you think an error occurred.");</script>';
             }
         } else {
 //            echo '<p class="error">Please try again.</p>';
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['loginuser']['contact'] = $_POST['contact'];
             $_SESSION['loginuser']['gender'] = $_POST['gender'];
             $_SESSION['loginuser']['birth'] = $_POST['birth'];
-            echo '<script>alert("Update successfully!");var currentURL = window.location.href; window.location.href = currentURL;</script>';
+            echo '<script>alert("Your account details has been updated.");var currentURL = window.location.href; window.location.href = currentURL;</script>';
         } else {
             echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
         }
@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         </form>
 
-                        <div class="bd-highlight float-right">
+                        <div class="bd-highlight float-right" style="margin-bottom: 80px;">
                             <button class="btn btn-primary" type="button" id="btnsave" style="width: 70px" onclick="editorsave()">Edit</button>
                         </div>
                     </div>

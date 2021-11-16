@@ -63,7 +63,7 @@ include '../include/header.php';
                             <img src="../img/test-shirt/test_shirt_5.jpg" class="img-fluid item-img" alt="...">
                         </a>
                     </div>
-                    <div class="d-flex bd-highlight align-items-center p-1 pb-0">
+                    <div class="d-flex bd-highlight align-items-center pt-1 px-1">
                         <div class="flex-grow-1 bd-highlight" style="font-size:0.8em;">Item Name</div>
                         <div class="d-flex bd-highlight align-items-center">
                             <i class="far fa-heart me-auto" style="font-size:0.9em;"></i>
@@ -79,7 +79,7 @@ include '../include/header.php';
                                                 <div class="flex-grow-1 bd-highlight ps-1" style="font-size:0.8em;"> 2</div>
                                             </div>
                                         </div>-->
-                    <ul class="list-inline p-1 pt-0 mb-0">
+                    <ul class="list-inline px-1 mb-0">
                         <div class="float-right bd-highlight" style="font-size:0.7em; color:#969696;">Status</div>
                         <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Size</div>
                         <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Brand</div>
@@ -87,34 +87,67 @@ include '../include/header.php';
                 </div>
 
                 <?php
-                $get_inventory = "SELECT * FROM item i, customer c, item_image m WHERE i.custid = c.custid AND i.itemid = m.itemid AND itemActive = 'Available'";
-                $result = $dbc->query($get_inventory);
-                if ($result->num_rows > 0) {
-                    while ($row = mysqli_fetch_array($result)) {
-                        echo "<div class='col px-1 py-2'>"
-                        . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
-                        . "<ul class='list-inline mb-0 p-1'>"
-                        . "<img src=" . $row["avatar"] . " class='rounded-pill mr-1' style='width: 22px;' alt='Avatar'>"
-                        . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
-                        . "</ul>"
-                        . "</a>"
-                        . "<div class='item-img-box overflow-hidden'>"
-                        . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "'>"
-                        . "<img src=" . $row["img"] . " class='img-fluid item-img' alt='...'>"
-                        . "</a>"
-                        . "</div>"
-                        . "<div class='d-flex bd-highlight align-items-center p-1 pb-0'>"
-                        . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
-                        . "<div class='d-flex bd-highlight align-items-center'>"
-                        . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
-                        . "</div>"
-                        . "</div>"
-                        . "<ul class='list-inline p-1 pt-0 mb-0'>"
+                if (isset($_SESSION['loginuser'])) {
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}'";
+                    $result = $dbc->query($get_inventory);
+                    if ($result->num_rows > 0) {
+                        while ($row = mysqli_fetch_array($result)) {
+                            echo "<div class='col px-1 py-2'>"
+                            . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
+                            . "<ul class='list-inline mb-0 p-1'>"
+                            . "<img src=" . $row["avatar"] . " class='rounded-pill mr-1' style='width: 23px; height: 23px;' alt='Avatar'>"
+                            . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
+                            . "</ul>"
+                            . "</a>"
+                            . "<div class='item-img-box overflow-hidden'>"
+                            . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "'>"
+                            . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                            . "</a>"
+                            . "</div>"
+                            . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
+                            . "<div class='d-flex bd-highlight align-items-center'>"
+                            . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
+                            . "</div>"
+                            . "</div>"
+                            . "<ul class='list-inline px-1 mb-0'>"
 //                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemActive"] . "</div>"
-                        . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
-                        . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
-                        . "</ul>"
-                        . "</div>";
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
+                            . "</ul>"
+                            . "</div>";
+                        }
+                    }
+                } else {
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available'";
+                    $result = $dbc->query($get_inventory);
+                    if ($result->num_rows > 0) {
+                        while ($row = mysqli_fetch_array($result)) {
+                            echo "<div class='col px-1 py-2'>"
+                            . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
+                            . "<ul class='list-inline mb-0 p-1'>"
+                            . "<img src=" . $row["avatar"] . " class='rounded-pill mr-1' style='width: 23px; height: 23px;' alt='Avatar'>"
+                            . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
+                            . "</ul>"
+                            . "</a>"
+                            . "<div class='item-img-box overflow-hidden'>"
+                            . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "'>"
+                            . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                            . "</a>"
+                            . "</div>"
+                            . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
+                            . "<div class='d-flex bd-highlight align-items-center'>"
+                            . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
+                            . "</div>"
+                            . "</div>"
+                            . "<ul class='list-inline px-1 mb-0'>"
+//                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemActive"] . "</div>"
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
+                            . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
+                            . "</ul>"
+                            . "</div>";
+                        }
                     }
                 }
                 ?>
@@ -144,17 +177,18 @@ include '../include/header.php';
                 </div>
 
                 <?php
-                $get_event = "SELECT * FROM event e, event_image i WHERE e.eventid = i.eventid AND (e.status = 'Pending' OR e.status = 'In-Progress')";
+                $get_event = "SELECT * FROM event e WHERE (e.status = 'Pending' OR e.status = 'In-Progress')";
                 $result = $dbc->query($get_event);
                 if ($result->num_rows > 0) {
                     while ($row = mysqli_fetch_array($result)) {
+                        $address = "{$row['address1']}, {$row['address2']}, {$row['postcode']}, {$row['state']}, {$row['country']}";
                         echo "<div class='col'>"
                         . "<div class='card' style='border: none; border-radius: 0px; box-shadow: none;'>"
-                        . "<img class='' src=" . $row["img"] . ">"
+                        . "<img class='event-img' src='../data/event_img/" . $row['eventid'] . "_0'>"
                         . "<div class='card-body px-0'>"
                         . "<div class='' style='font-size: 1em; font-weight: bold;'>" . $row["endEvent"] . "</div>"
                         . "<div class='' style='font-size: 1em;'>" . $row["title"] . "</div>"
-                        . "<div class='card-text py-1' style='font-size: 0.9em;'>" . $row["address"] . "</div>"
+                        . "<div class='card-text py-1' style='font-size: 0.9em;'>" . $address . "</div>"
                         . "<div class='d-flex justify-content-between align-items-center'>"
                         . "<div class='btn-group'>"
                         . "<a href='../user/event_profile.php?id=" . $row["eventid"] . "' type='button' class='btn btn-sm btn-outline-secondary'>View</a>"
@@ -170,7 +204,7 @@ include '../include/header.php';
             </div>
         </div>
 
-        <div class="container-lg">
+<!--        <div class="container-lg">
             <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1">
                 <?php
 //                $get_inventory = "SELECT DISTINCT(a.auctionid), c.custid, c.username, c.avatar, i.itemid, m.img, a.endAuction, i.itemCondition, i.brand FROM item i, customer c, item_image m, auction a WHERE c.custid = a.auctioneerid AND i.custid = c.custid AND i.itemid = m.itemid AND a.auctionStatus = 'Active' AND i.itemActive = 'Auction'";
@@ -206,7 +240,7 @@ include '../include/header.php';
                 }
                 ?>
             </div>
-        </div>
+        </div>-->
         <?php include '../include/footer.php'; ?>
     </body>
     <style>
@@ -223,10 +257,21 @@ include '../include/header.php';
         }
 
         .item-img{
-            max-height: 370px;
-            min-height: 370px;
+            max-height: 300px;
+            min-height: 300px;
             /*width: 100%;*/
             /*height: 100%;*/
+            text-align: center;
+            background-size: contain;
+            background-repeat:   no-repeat;
+            background: whitesmoke;
+        }
+
+        .event-img{
+            max-height: 245px;
+            min-height: 245px;
+            width: 100%;
+            height: 100%;
             text-align: center;
             background-size: contain;
             background-repeat:   no-repeat;

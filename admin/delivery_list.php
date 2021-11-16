@@ -44,8 +44,8 @@ include 'navbar.php';
                                     <tr>
                                         <th style="width: 11%">Delivery ID</th>
                                         <th style="width: 10%">Trade ID</th>
-                                        <th style="width: 12%">Customer ID</th>
-                                        <th style="width: 15%">Name</th>
+                                        <th style="width: 12%">Sender ID</th>
+                                        <th style="width: 12%">Recipient ID</th>
                                         <th style="width: 15%">Delivery Date</th>
                                         <th style="width: 15%">Receive Date</th>
                                         <th style="width: 10%">Status</th>
@@ -53,15 +53,14 @@ include 'navbar.php';
                                     </tr>
                                 </thead>
                                 <tbody>
-
                                     <?php
                                     $sql = "SELECT * FROM delivery";
                                     $result = $dbc->query($sql);
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            if ($row["deliveryStatus"] === "Pick Up") {
+                                            if ($row["deliveryStatus"] === "Pending") {
                                                 $color = "orange";
-                                            } else if ($row["deliveryStatus"] === "In Transit") {
+                                            } else if ($row["deliveryStatus"] === "Pick Up") {
                                                 $color = "purple";
                                             } else if ($row["deliveryStatus"] === "Shipping") {
                                                 $color = "blue";
@@ -72,8 +71,8 @@ include 'navbar.php';
                                             echo "<tr>"
                                             . "<td><a>" . $row["deliveryid"] . "</a></td>"
                                             . "<td><a>" . $row["tradeid"] . "</a></td>"
-                                            . "<td><a>" . $row["custid"] . "</a></td>"
-                                            . "<td><a>" . $row["username"] . "</a></td>"
+                                            . "<td><a>" . $row["senderid"] . "</a></td>"
+                                            . "<td><a>" . $row["recipientid"] . "</a></td>"
                                             . "<td><a>" . $row["paymentDate"] . "</a></td>"
                                             . "<td><a>" . $row["receiveDate"] . "</a></td>"
                                             . "<td style='color:" . $color . "; font-weight: bolder;'><a>" . $row["deliveryStatus"] . "</a></td>"

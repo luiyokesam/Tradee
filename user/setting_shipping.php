@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['loginuser']['city'] = $_POST['city'];
         $_SESSION['loginuser']['state'] = $_POST['state'];
         $_SESSION['loginuser']['country'] = $_POST['country'];
-        echo '<script>alert("Successfuly update !");var currentURL = window.location.href;window.location.href = currentURL;</script>';
+        echo '<script>alert("Your shipping address has been updated.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
     } else {
         echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
     }
@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
-                            <div class="bd-highlight float-right">
+                            <div class="bd-highlight float-right mb-5">
                                 <button class="btn btn-primary" type="button" id="btnsave" style="width: 70px" onclick="editorsave()">Edit</button>
                             </div>
                         </div>

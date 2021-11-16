@@ -1,6 +1,10 @@
 <?php
 include '../include/header.php';
 
+if (!isset($_SESSION['loginuser'])) {
+    echo '<script>alert("Please login to Tradee.");window.location.href="../user/logout.php";</script>';
+}
+
 $category_array = array();
 $sql = "SELECT name FROM category";
 $result = $dbc->query($sql);
@@ -12,11 +16,19 @@ if ($result->num_rows > 0) {
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM item i, item_image m WHERE i.itemid = '$id' AND i.itemid = m.itemid LIMIT 1";
+    $sql = "SELECT * FROM item i WHERE i.itemid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            $Array_Image = array();
+            $sql2 = "SELECT `img` FROM `item_image` WHERE `itemid` = '$id'";
+            $result2 = $dbc->query($sql2);
+            if ($result2->num_rows > 0) {
+                while ($row = mysqli_fetch_array($result2)) {
+                    array_push($Array_Image, $row[0]);
+                }
+            }
             $title = "Item Details - {$current_data['itemid']}";
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
             break;
@@ -42,53 +54,67 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_GET['id'])) {
-        $img = $_FILES['img']['name'];
-        if ($img) {
-            $newimg = "../item_img/$img";
-        } else {
-            $newimg = $current_data["img"];
+
+        if (is_uploaded_file($_FILES["img"]["tmp_name"][0])) {
+            $length = count($Array_Image);
+            for ($x = 0; $x < $length; $x++) {
+                if (file_exists($Array_Image[$x])) {
+//                    echo '<script>alert("' . 1 . '");</script>';
+                    unlink($Array_Image[$x]);
+                }
+            }
+
+            $sql_Delete_Image = "DELETE FROM `item_image` WHERE `itemid` = '{$current_data["itemid"]}'";
+            if ($dbc->query($sql_Delete_Image)) {
+                $Count_Image = count($_FILES['img']['name']);
+                for ($i = 0; $i < $Count_Image; $i++) {
+                    $image_path = "../data/item_img/{$current_data["itemid"]}_{$i}";
+                    if (file_exists($image_path)) {
+                        unlink($image_path);
+                    }
+                    move_uploaded_file($_FILES["img"]["tmp_name"][$i], $image_path);
+                    $sql = "INSERT INTO `item_image`(`itemid`, `img`) VALUES ('{$current_data["itemid"]}','{$image_path}')";
+                    if (!$dbc->query($sql)) {
+                        echo '<script>console.log("Error Insert Image !");</script>';
+                    }
+                }
+            }
         }
 
         $sql_item = "UPDATE item SET"
-                . " itemname='" . $_POST['itemname'] . "',"
-                . "brand='" . $_POST['brand'] . "',"
-                . "catname='" . $_POST['catname'] . "',"
-                . "itemCondition='" . $_POST['itemCondition'] . "',"
-                . "colour='" . $_POST['colour'] . "',"
-                . "size='" . $_POST['size'] . "',"
-                . "quantity=" . $_POST['quantity'] . ","
-//                . "favour=" . $_POST['favour'] . ","
-                . "value=" . $_POST['value'] . ","
-                . "tradeItem='" . $_POST['tradeItem'] . "',"
-                . "tradeOption='" . $_POST['tradeOption'] . "',"
-                . "itemDescription='" . $_POST['itemDescription'] . "'"
-//                . "postDate=" . $_POST['postDate'] . ""
-//                . "itemActive=" . $_POST['active'] . ","
-                . " WHERE itemid ='" . $current_data["itemid"] . "'";
+                . " itemname='" . $_POST['itemname'] . "', "
+                . "brand='" . $_POST['brand'] . "', "
+                . "catname='" . $_POST['catname'] . "', "
+                . "itemCondition='" . $_POST['itemCondition'] . "', "
+                . "colour='" . $_POST['colour'] . "', "
+                . "size='" . $_POST['size'] . "', "
+                . "value=" . $_POST['value'] . ", "
+                . "tradeItem='" . $_POST['tradeItem'] . "', "
+                . "tradeOption='" . $_POST['tradeOption'] . "', "
+                . "itemDescription='" . $_POST['itemDescription'] . "' "
+//                . "postDate=" . $_POST['postDate'] . " "
+//                . "itemActive=" . $_POST['active'] . ", "
+                . " WHERE itemid ='" . $current_data["itemid"] . "' ";
 
-        echo '<script>alert("' . $sql_item . '");</script>';
+//        echo '<script>alert("' . $sql_item . '");</script>';
 
-        $sql_image = "UPDATE item_image SET"
-                . " img='" . $newimg . "'"
-                . " WHERE itemid ='" . $current_data["itemid"] . "'";
-
-        echo '<script>alert("' . $sql_image . '");</script>';
-
-        if (($dbc->query($sql_item)) AND ($dbc->query($sql_image))) {
-            if ($img) {
-                move_uploaded_file($_FILES['img']['tmp_name'], "../photo/$img");
-            }
-            echo '<script>alert("Successfuly update !");window.location.href="my_profile.php";</script>';
+        if ($dbc->query($sql_item)) {
+            echo '<script>alert("Item details has been updated successfully!");window.location.href="my_profile.php";</script>';
         } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Failed to update item details!\nPlease contact to our IT department for maintainence.")</script>';
         }
     } else {
-        $img = $_FILES['img']['name'];
-        if ($img) {
-            $newimg = "../item_img/$img";
+        $Count_Image = count($_FILES['img']['name']);
+        for ($i = 0; $i < $Count_Image; $i++) {
+            $image_path = "../data/item_img/{$newid}_$i";
+            move_uploaded_file($_FILES["img"]["tmp_name"][$i], $image_path);
+            $sql = "INSERT INTO `item_image`(`itemid`, `img`) VALUES ('$newid','{$image_path}')";
+            if (!$dbc->query($sql)) {
+                echo '<script>console.log("Error Insert Image !");</script>';
+            }
         }
 
-        $sql_item = "INSERT INTO item(itemid, custid, itemname, brand, catname, colour, size, itemCondition, quantity, favour, value, tradeItem, tradeOption, itemDescription, postDate, itemActive) VALUES ("
+        $sql_item = "INSERT INTO item(itemid, custid, itemname, brand, catname, colour, size, itemCondition, favour, value, tradeItem, tradeOption, itemDescription, postDate, itemActive) VALUES ("
                 . "'" . $newid . "',"
                 . "'" . $_SESSION['loginuser']['custid'] . "',"
                 . "'" . $_POST['itemname'] . "',"
@@ -97,8 +123,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 . "'" . $_POST['colour'] . "',"
                 . "'" . $_POST['size'] . "',"
                 . "'" . $_POST['itemCondition'] . "',"
-                . $_POST['quantity'] . ","
-//            . $_POST['favour'] . ","
                 . "0,"
                 . $_POST['value'] . ","
                 . "'" . $_POST['tradeItem'] . "',"
@@ -107,21 +131,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 . "'" . $_POST['postDate'] . "',"
                 . "'Available')";
 
-        echo '<script>alert("' . $sql_item . '");</script>';
-
-        $sql_image = "INSERT INTO item_image(itemid, img) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $newimg . "')";
-
-        echo '<script>alert("' . $sql_image . '");</script>';
-
-        if (($dbc->query($sql_item)) AND ($dbc->query($sql_image))) {
-            if ($img) {
-                move_uploaded_file($_FILES['img']['tmp_name'], "../item_img/$img");
-            }
-            echo '<script>alert("Successfuly insert!");window.location.href="my_profile.php";</script>';
+        if ($dbc->query($sql_item)) {
+            echo '<script>alert("New item has been added to your inventory!");window.location.href="my_profile.php";</script>';
         } else {
-            echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Failed to add the item into your inventory!\nPlease contact to our IT department for maintainence.")</script>';
         }
     }
 }
@@ -135,7 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (isset($current_data)) {
                 echo $current_data["itemid"];
             } else {
-                echo $newid;
+                echo "Upload New";
             }
             ?> Item - Tradee</title>
     </head>
@@ -159,18 +172,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 bg-white">
-                                <div class="row align-items-center border-bottom m-0 p-3">
-                                    <img class="img-fluid mb-12" src="<?php
-                                    if (isset($current_data)) {
-                                        echo $current_data["img"];
-                                    }
-                                    ?>" alt="Photo" style="width: 20%; height: auto; padding-top: 10px" id="img_display" name="img_display">
+
+                            <div class="row">
+                                <div class="col-3 product-image-thumbs d-flex flex-column mt-0">
+                                    <div class="product-image-thumb product-small-img mb-3 mr-0 p-1 active" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                        <img class="img-fluid" src="<?php
+                                        if (isset($Array_Image)) {
+                                            echo $Array_Image[0];
+                                        }
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display">
+                                    </div>
+
+                                    <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                        <img class="img-fluid" src="<?php
+                                        if (isset($Array_Image)) {
+                                            echo $Array_Image[1];
+                                        }
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display">
+                                    </div>
+
+                                    <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                        <img class="img-fluid" src="<?php
+                                        if (isset($Array_Image)) {
+                                            echo $Array_Image[2];
+                                        }
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display">
+                                    </div>
+
+                                    <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                        <img class="img-fluid" src="<?php
+                                        if (isset($Array_Image)) {
+                                            echo $Array_Image[3];
+                                        }
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display">
+                                    </div>
+
+                                    <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                        <img class="img-fluid" src="<?php
+                                        if (isset($Array_Image)) {
+                                            echo $Array_Image[4];
+                                        }
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display">
+                                    </div>
                                 </div>
+
+                                <div class="col-9 img-container" style="width: 500px; height: 500px">
+                                    <img src="../img/test-shirt/drop_img.png" class="active-image" style="max-width: 500px; max-height: 500px" alt="Product Image">
+                                </div>
+                            </div>
+
+                            <div class="mb-3 bg-white mt-2">
                                 <div class="col-md-12" >
                                     <div class="form-group py-3">
                                         <div class="custom-file">
-                                            <input type="file" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="img" name="img" disabled>
+                                            <input type="file" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="img" name="img[]" multiple disabled>
                                             <label class="custom-file-label" id="validate_img">Choose file</label>
                                         </div>
                                     </div>
@@ -219,11 +274,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="row align-items-center border-bottom m-0 p-3">
                                     <div class="col-md-6 p-2">Condition</div>
                                     <div class="col-md-6 p-2">
-                                        <input class="form-control" type="text" id="itemCondition" name="itemCondition" placeholder="e.g Gently used, with little signs of wear" readonly value="<?php
-                                        if (isset($current_data)) {
-                                            echo $current_data["itemCondition"];
-                                        }
-                                        ?>">
+                                        <select class="custom-select" id="itemCondition" name="itemCondition" disabled>
+                                            <option value="">-- Select --</option>
+                                            <option value="New With Tags" <?php
+                                            if (isset($current_data)) {
+                                                if ($current_data["itemCondition"] == "New With Tags") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>New With Tags</option>
+                                            <option value="Excellent Used Condition" <?php
+                                            if (isset($current_data)) {
+                                                if ($current_data["itemCondition"] == "Excellent Used Condition") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Excellent Used Condition</option>
+                                            <option value="Good Used Condition" <?php
+                                            if (isset($current_data)) {
+                                                if ($current_data["itemCondition"] == "Good Used Condition") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Good Used Condition</option>
+                                            <option value="Very Used Condition" <?php
+                                            if (isset($current_data)) {
+                                                if ($current_data["itemCondition"] == "Very Used Condition") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Very Used Condition</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -246,17 +327,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <input class="form-control" type="text" id="size" name="size" placeholder="e.g XL" readonly value="<?php
                                         if (isset($current_data)) {
                                             echo $current_data["size"];
-                                        }
-                                        ?>">
-                                    </div>
-                                </div>
-
-                                <div class="row align-items-center border-bottom m-0 p-3">
-                                    <div class="col-md-6 p-2">Quantity</div>
-                                    <div class="col-md-6 p-2">
-                                        <input class="form-control" type="text" id="quantity" name="quantity" onkeypress="return isNumberKey(event)" placeholder="e.g 1" readonly value="<?php
-                                        if (isset($current_data)) {
-                                            echo $current_data["quantity"];
                                         }
                                         ?>">
                                     </div>
@@ -337,7 +407,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="float-right p-2">
                                 <button type="button" class="btn btn-save btn-block" id="btnsave" onclick="editorsave()">Edit</button>
                             </div>
@@ -354,8 +424,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </body>
     <script>
         var loadFile = function (event) {
-            var image = document.getElementById('img_display');
-            image.src = URL.createObjectURL(event.target.files[0]);
+            for (i = 0; i < 5; i++) {
+                document.getElementById("img_display" + i + "").src = "";
+            }
+
+            if (event.target.files.length < 6) {
+                for (i = 0; i < event.target.files.length; i++) {
+                    document.getElementById("img_display" + i + "").src = URL.createObjectURL(event.target.files[i]);
+                }
+            }
         };
 
         var currentURL = window.location.href;
@@ -370,7 +447,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function editorsave() {
-            if (document.getElementById("btnsave").textContent === "Save") {
+            if (document.getElementById("btnsave").textContent === "Upload") {
                 var fullfill = true;
                 var message = "";
                 document.getElementById("validate_img").style.borderColor = "";
@@ -380,7 +457,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById("itemCondition").style.borderColor = "";
                 document.getElementById("colour").style.borderColor = "";
                 document.getElementById("size").style.borderColor = "";
-                document.getElementById("quantity").style.borderColor = "";
                 document.getElementById("value").style.borderColor = "";
                 document.getElementById("tradeItem").style.borderColor = "";
                 document.getElementById("tradeOption").style.borderColor = "";
@@ -418,10 +494,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("size").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("quantity").value || document.getElementById("quantity").value === "") {
-                    document.getElementById("quantity").style.borderColor = "red";
-                    fullfill = false;
-                }
                 if (!document.getElementById("value").value || document.getElementById("value").value === "") {
                     document.getElementById("value").style.borderColor = "red";
                     fullfill = false;
@@ -440,7 +512,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 if (fullfill) {
-                    if (confirm("Are you sure to upload the items?")) {
+                    if (confirm("Are you sure to upload the item?")) {
                         document.getElementById("form").submit();
                     }
                 } else {
@@ -464,16 +536,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function editable() {
-            document.getElementById("btnsave").textContent = "Save";
+            document.getElementById("btnsave").textContent = "Upload";
             document.getElementById("btncancel").disabled = false;
             document.getElementById("img").disabled = false;
             document.getElementById("itemname").readOnly = false;
             document.getElementById("brand").readOnly = false;
             document.getElementById("catname").disabled = false;
-            document.getElementById("itemCondition").readOnly = false;
+            document.getElementById("itemCondition").disabled = false;
             document.getElementById("colour").readOnly = false;
             document.getElementById("size").readOnly = false;
-            document.getElementById("quantity").readOnly = false;
             document.getElementById("value").readOnly = false;
             document.getElementById("tradeItem").disabled = false;
             document.getElementById("tradeOption").disabled = false;
@@ -487,6 +558,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 editable();
             }
         }
+
+        function imageGallery(smallImg) {
+            var fullImg = document.getElementById("imageBox");
+            fullImg.src = smallImg.src;
+        }
+
+        $(document).ready(function () {
+            $('.product-image-thumb').on('click', function () {
+                var $image_element = $(this).find('img')
+                $('.active-image').prop('src', $image_element.attr('src'))
+                $('.product-image-thumb.active').removeClass('active')
+                $(this).addClass('active')
+            })
+        })
 
         function isNumberKey(evt) {
             var charCode = (evt.which) ? evt.which : event.keyCode;
@@ -511,6 +596,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("postDate").value = dd + '/' + mm + '/' + yyyy;
     </script>
     <style>
+        .product-small-img img:hover{
+            opacity: 1;
+            transition-duration: 0.2s;
+        }
+        
         .btn-save{
             color: #fff;
             border-color: #7cf279;

@@ -22,9 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($img) {
             move_uploaded_file($_FILES['img']['tmp_name'], "../avatar/$img");
         }
-        echo '<script>alert("Update successfully!");var currentURL = window.location.href;window.location.href = currentURL;</script>';
+        echo '<script>alert("Your profile has been updated.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
     } else {
-        echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+        echo '<script>alert("Update fail!\nContact IT department for maintainence")</script>';
     }
 }
 ?>
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>My profile - Tradee</title>
     </head>
-    <body onload="loadform()">
+    <body class="layout-footer-fixed hold-transition">
         <div class="setting bg-light">
             <div class="container-lg py-3">
                 <form method="post" id="form" enctype="multipart/form-data">
@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
 
-                            <div class="bd-highlight float-right">
+                            <div class="bd-highlight float-right" style="margin-bottom: 220px;">
                                 <button class="btn btn-primary" type="button" style="width: 70px" id="btnsave" onclick="editorsave()">Edit</button>
                             </div>
                         </div>

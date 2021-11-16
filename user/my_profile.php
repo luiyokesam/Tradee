@@ -1,9 +1,8 @@
 <?php
 include '../include/header.php';
 
-if (isset($_SESSION['loginuser']['userid'])) {
-    echo '<script>window.location.href = "../user/profile.php";</script>';
-    exit();
+if (!isset($_SESSION['loginuser'])) {
+    echo '<script>alert("Please login to Tradee.");window.location.href="../user/logout.php";</script>';
 }
 
 //$q = "SELECT * FROM customer_address ca, customer c WHERE (ca.custid = $_SESSION['profile']['custid']) AND active IS NULL";
@@ -52,69 +51,103 @@ if (isset($_SESSION['loginuser']['userid'])) {
 
                 <div class="col-lg-9">
                     <div class="row">
-                        <div class="col-9 py-3">
+                        <div class="col py-3">
                             <?php
                             if ($_SESSION['loginuser']) {
                                 echo "<div>{$_SESSION['loginuser']['username']}</div>";
                             } else {
-                                echo "<div style='font-weight:bold;'>Username</div>";
+                                echo "<div style='font-weight: lighter;'>Username</div>";
                             }
                             ?>
                             <?php
                             if ($_SESSION['loginuser']['review'] !== null) {
-                                echo "<div>{$_SESSION['loginuser']['review']}</div>";
+                                echo "<div>- {$_SESSION['loginuser']['review']}</div>";
                             } else {
-                                echo "<div style='font-weight:bold;'>No reviews yet</div>";
+                                echo "<div style='font-weight: lighter;'>- No reviews yet</div>";
                             }
                             ?>
                         </div>
 
-                        <div class="col-3 py-3">
-                            <a class="btn btn-outline-primary" href="../user/setting_profile.php" role="button">Edit profile</a>
+                        <div class="col-auto float-right py-3">
+                            <button class="btn btn-profile" onclick="profile()" id="btnprofile">Edit profile</button>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-9">
-                            <div class="my-2">
-                                <div>Joined date</div>
-                                <?php
-                                if ($_SESSION['loginuser']) {
-                                    echo "<div>{$_SESSION['loginuser']['registration_date']}</div>";
-                                }
-                                ?>
-                            </div>
-
-                            <div class="my-2">
-                                <div>Location</div>
-                                <?php
-                                if (isset($_SESSION['loginuser'])) {
-                                    echo "<div>{$_SESSION['loginuser']['state']}, {$_SESSION['loginuser']['country']}</div>";
-                                    echo "<div>";
-                                    if ($_SESSION['loginuser']['state'] != null){
-                                        echo "{$_SESSION['loginuser']['state']}";
-                                        if ($_SESSION['loginuser']['country'] != null){
-                                            echo $_SESSION['loginuser']['country'];
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Joined</div>
+                                        <?php
+                                        if ($_SESSION['loginuser']) {
+                                            echo "<div>- {$_SESSION['loginuser']['registration_date']}</div>";
                                         }
-                                    }
-                                    echo "</div>";
-                                } else {
-                                    echo "<div style='font-weight:bold;'>No state shown</div>";
-                                }
-                                ?>
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Location</div>
+                                        <?php
+                                        if (isset($_SESSION['loginuser'])) {
+                                            echo "<div>- {$_SESSION['loginuser']['state']}, {$_SESSION['loginuser']['country']}</div>";
+                                        } else {
+                                            echo "<div style='font-weight: lighter;'>- No state shown</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Trade Count</div>
+                                        <?php
+                                        $sql = "SELECT COUNT(DISTINCT(t.tradeid)) NUMBER FROM trade_details t, customer c WHERE t.custid = '{$_SESSION['loginuser']['custid']}'";
+                                        $result = $dbc->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                $current_offer = $row;
+                                                echo "<div>- {$current_offer['NUMBER']}</div>";
+                                                break;
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Last Trade</div>
+                                        <?php
+                                        $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE (t.offerCustID = '{$_SESSION['loginuser']['custid']}') OR (t.acceptCustID = '{$_SESSION['loginuser']['custid']}')";
+                                        $result = $dbc->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                $current_offer = $row;
+                                                echo "<div>- {$current_offer['DATE']}</div>";
+                                                break;
+                                            }
+                                        } else {
+                                            echo "<div>- You haven't completed any trade yet.</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-3 py-3">
+                        <div class="col-auto float-right py-3">
                             <a class="btn btn-outline-primary" href="../user/upload_auction.php" role="button">Create Auction</a>
                         </div>
                     </div>
 
                     <div class="col py-3 px-0">
-                        <div>Description</div>
+                        <div style="font-weight: bolder;">Description</div>
                         <?php
-                        if ($_SESSION['loginuser']['description'] !== null) {
-                            echo "<div>{$_SESSION['loginuser']['description']}</div>";
+                        if (isset($_SESSION['loginuser'])) {
+                            echo "<div>- {$_SESSION['loginuser']['description']}</div>";
                         } else {
                             echo "<div>No description yet</div>";
                         }
@@ -134,7 +167,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 <!--tab 1-->
                 <div class="tab-pane fade show active" id="nav-inventory" role="tabpanel">
                     <?php
-                    $get_inventory = "SELECT * FROM item i, customer c, item_image m  WHERE c.custid = '{$_SESSION['loginuser']['custid']}' AND i.custid = c.custid AND i.itemid = m.itemid";
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE c.custid = '{$_SESSION['loginuser']['custid']}' AND i.custid = c.custid";
                     $result = $dbc->query($get_inventory);
                     if ($result->num_rows > 0) {
                         echo "<div class = 'container-lg'>"
@@ -149,18 +182,19 @@ if (isset($_SESSION['loginuser']['userid'])) {
 //                            . "</a>"
                             . "<div class='item-img-box overflow-hidden'>"
                             . "<a href='../user/upload_item.php?id=" . $row["itemid"] . "'>"
-                            . "<img src=" . $row["img"] . " class='img-fluid item-img' alt='...'>"
+                            . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                             . "</a>"
                             . "</div>"
-                            . "<div class='d-flex bd-highlight align-items-center p-1 pb-0'>"
+                            . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
                             . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
                             . "<div class='d-flex bd-highlight align-items-center'>"
                             . "<i class='far fa-heart me-auto' style='font-size:0.9em;'></i>"
                             . "</div>"
                             . "</div>"
-                            . "<ul class='list-inline p-1 pt-0 mb-0'>"
+                            . "<ul class='list-inline px-1 mb-0'>"
                             . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemActive"] . "</div>"
                             . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
+                            . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
                             . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
                             . "</ul>"
                             . "</div>";
@@ -189,15 +223,9 @@ if (isset($_SESSION['loginuser']['userid'])) {
     </body>
     <script src="../bootstrap/plugins/select2/js/select2.full.min.js"></script>
     <script>
-        $(function () {
-            //Initialize Select2 Elements
-            $('.select2').select2()
-
-            //Initialize Select2 Elements
-            $('.select2bs4').select2({
-                theme: 'bootstrap4'
-            })
-        })
+                                function profile() {
+                                    window.location.href = "setting_profile.php";
+                                }
     </script>
     <style>
         /*item*/
@@ -214,10 +242,11 @@ if (isset($_SESSION['loginuser']['userid'])) {
         }
 
         .item-img{
+            min-height: 300px;
             max-height: 300px;
             text-align: center;
             background-size: contain;
-            background-repeat:   no-repeat;
+            background-repeat: no-repeat;
             background: whitesmoke;
         }
 
@@ -247,6 +276,20 @@ if (isset($_SESSION['loginuser']['userid'])) {
             /*            width: 142px;
                         height: 142px;*/
             object-fit: cover;
+        }
+
+        .btn-profile{
+            color: #fff;
+            border-color: #7cf279;
+            background-color: #7cf279;
+            transition-duration: 0.2s;
+        }
+
+        .btn-profile:hover{
+            color: #fff;
+            border-color: #6ed66b;
+            background-color: #6ed66b;
+            transition-duration: 0.2s;
         }
     </style>
 </html>

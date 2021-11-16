@@ -3,15 +3,23 @@ include '../include/header.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM event e, event_image i WHERE e.eventid = i.eventid AND e.eventid = '$id' LIMIT 1";
+    $sql = "SELECT * FROM event e WHERE e.eventid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            $Array_Image = array();
+            $sql2 = "SELECT `img` FROM `event_image` WHERE `eventid` = '$id'";
+            $result2 = $dbc->query($sql2);
+            if ($result2->num_rows > 0) {
+                while ($row = mysqli_fetch_array($result2)) {
+                    array_push($Array_Image, $row[0]);
+                }
+            }
             break;
         }
     } else {
-        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "product_detail.php";</script>';
+        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
 }
 
@@ -21,7 +29,7 @@ if ($result->num_rows > 0) {
     while ($row = mysqli_fetch_array($result)) {
         $latestnum = ((int) substr($row['donateid'], 1)) + 1;
         $newid = "D{$latestnum}";
-        $title = "Trade ID - {$newid}";
+        $title = "Donation ID - {$newid}";
         echo '<script>var current_data = null;</script>';
         $view = false;
         break;
@@ -33,35 +41,35 @@ if ($result->num_rows > 0) {
     $view = false;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $my_items = $_POST['my_item'];
-    foreach ($my_items as $my_item_list) {
-        $sql = "INSERT INTO donation(donateid, eventid, donator, itemid, date) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $current_data['eventid'] . "',"
-                . "'" . $_SESSION['loginuser']['custid'] . "',"
-                . "'" . $my_item_list . "',"
-                . "NOW())";
-
-        $dbc->query($sql);
-//        echo '<script>alert("' . $sql . '");</script>';
-    }
-//    echo '<script>alert("' . $my_item_list . '");</script>';
-
-    foreach ($my_items as $update_my_item_list) {
-        $sql_update = "UPDATE item SET "
-                . "itemActive = 'Donation',"
-                . "custid = '$newid'"
-                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $update_my_item_list . "'";
-
-        $dbc->query($sql_update);
-//        echo '<script>alert("' . $sql_update . '");</script>';
-    }
-//    echo '<script>alert("' . $update_my_item_list . '");</script>';
-
-    echo '<script>alert("Thanks for your donation!");</script>';
-}
+//if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//    $my_items = $_POST['my_item'];
+//    foreach ($my_items as $my_item_list) {
+//        $sql = "INSERT INTO donation(donateid, eventid, donator, itemid, donationDate) VALUES ("
+//                . "'" . $newid . "',"
+//                . "'" . $current_data['eventid'] . "',"
+//                . "'" . $_SESSION['loginuser']['custid'] . "',"
+//                . "'" . $my_item_list . "',"
+//                . "'" . $_POST['donationDate'] . "')";
+//
+//        $dbc->query($sql);
+////        echo '<script>alert("' . $sql . '");</script>';
+//    }
+////    echo '<script>alert("' . $my_item_list . '");</script>';
+//
+//    foreach ($my_items as $update_my_item_list) {
+//        $sql_update = "UPDATE item SET "
+//                . "itemActive = 'Donation',"
+//                . "custid = '$newid'"
+//                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
+//                . " itemid = '" . $update_my_item_list . "'";
+//
+//        $dbc->query($sql_update);
+////        echo '<script>alert("' . $sql_update . '");</script>';
+//    }
+////    echo '<script>alert("' . $update_my_item_list . '");</script>';
+//
+//    echo '<script>alert("Thanks for your donation! Wishing you have a nice day.");window.location.href="../user/event_shipping.php?id=' . $newid . '";</script>';
+//}
 ?>
 <!doctype html>
 <html lang="en">
@@ -92,13 +100,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="row pb-3">
                 <div class="col-xxl-9 col-xl-8 col-lg-8 my-1">
                     <div class="col-12 img-container">
-                        <img src="../bootstrap/dist/img/prod-5.jpg" class="active-image" alt="Product Image">
+                        <img src="<?php
+                        if (isset($Array_Image)) {
+                            echo $Array_Image[0];
+                        }
+                        ?>" class="active-image" alt="Product Image">
                     </div>
-                    <div class="col-12 product-image-thumbs">
-                        <div class="product-image-thumb product-small-img"><img src="../img/event/event_1.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img"><img src="../img/event/event_2.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img"><img src="../img/event/event_3.jpg" alt="Product Image"></div>
-                        <div class="product-image-thumb product-small-img active"><img src="../img/event/event_4.jpg" alt="Product Image"></div>
+
+                    <div class="col-12 product-image-thumbs mt-3">
+                        <div class="product-image-thumb product-small-img mr-2 p-1 active" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[0];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[1];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[2];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[3];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display">
+                        </div>
+
+                        <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                            <img class="img-fluid" src="<?php
+                            if (isset($Array_Image)) {
+                                echo $Array_Image[4];
+                            }
+                            ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display">
+                        </div>
                     </div>
                 </div>
 
@@ -106,16 +154,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="bg-white px-3 py-2 border">
                         <div class="row">
                             <div class="col-lg-12 col-sm-6">
-                                <!--                                <div class="row">
-                                                                    <div class="col item-value">Rumah Charis</div>
-                                                                </div>-->
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Event type</div>
                                     <div class="col item-value"><?php
                                         if (isset($current_data)) {
                                             echo $current_data['type'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Receiver</div>
@@ -123,7 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($current_data)) {
                                             echo $current_data['receiver'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">End</div>
@@ -133,7 +180,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         } else {
                                             echo 'none';
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-lg-5 col-3 item-title">Person In-Charge</div>
+                                    <div class="col item-value"><?php
+                                        if (isset($current_data)) {
+                                            echo $current_data['principal'];
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Contact</div>
@@ -141,39 +198,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($current_data)) {
                                             echo $current_data['contact'];
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="row mt-1">
                                     <div class="col item-value"><?php
                                         if (isset($current_data)) {
-                                            echo $current_data['address'];
+                                            echo "{$current_data['address1']}, {$current_data['address2']}, {$current_data['postcode']}, {$current_data['state']}, {$current_data['country']}";
                                         }
-                                        ?></div>
+                                        ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="pt-3 border-bottom"></div>
+                        <div class="mt-2 border-bottom"></div>
 
-                        <div class="row pt-3">
+                        <div class="row mt-2">
                             <div class="col-lg-12 col-md-7">
                                 <div class="" style="font-size:1em;"><?php
                                     if (isset($current_data)) {
                                         echo $current_data['title'];
                                     }
-                                    ?></div> 
+                                    ?>
+                                </div> 
                                 <div class="text-justify item-value"><?php
                                     if (isset($current_data)) {
                                         echo $current_data['description'];
                                     }
-                                    ?></div>
+                                    ?>
+                                </div>
                             </div>
 
                             <div class="col-lg-12 col-md-5 mt-2">
                                 <div class='py-1'>
-                                    <a class="btn btn-block btn-donate-now" style="color: #09B1BA;" data-toggle="modal" data-target="#modal-bid-item">
-                                        <i class="far fa-heart" style="color: red;"></i> Donate now
-                                    </a>
+                                    <?php
+                                    echo "<a class='btn btn-block btn-donate-now' style='color: #09B1BA;' href='event_shipping.php?id=" . $current_data["eventid"] . "'>"
+                                    . "<i class='far fa-heart' style='color: red;'></i> Donate now"
+                                    . "</a>"
+                                    ?>
+                                    <!--<a class="btn btn-block btn-donate-now" style="color: #09B1BA;" data-toggle="modal" data-target="#modal-bid-item">-->
+<!--                                        <i class="far fa-heart" style="color: red;"></i> Donate now
+                                    </a>-->
                                 </div>
                             </div>
                         </div>
@@ -211,9 +277,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             . "<td class='project-actions text-right'>"
 //                                            . "<a class = "btn btn-block btn-donate-now" data-toggle = "modal" data-target = "#modal-bid-item">"
 //                                                    . "<a class='btn btn-info btn-block' href='event_details.php?id=" . $row["eventid"] . "'>"
-                                                    . "<a class='btn btn-info btn-block' data-toggle='modal' data-target='#".$row["donateid"] ."'>"
-                                                    . "<i class='far fa-eye'>"
-                                                    . "</i></a></td></tr>";
+                                            . "<a class='btn btn-info btn-block' data-toggle='modal' data-target='#" . $row["donateid"] . "'>"
+                                            . "<i class='far fa-eye'>"
+                                            . "</i></a></td></tr>";
                                         }
                                     }
                                     ?>
@@ -241,7 +307,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Your inventory</label>
-                                        <select class="select2bs4" name="my_item[]" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
+                                        <select class="select2bs4" name="my_item[]" id="myitem" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
                                             <?php
                                             $get_item = "SELECT * FROM item WHERE custid = '{$_SESSION['loginuser']['custid']}' AND itemActive = 'Available'";
                                             $result_item = $dbc->query($get_item);
@@ -253,12 +319,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             ?>
                                         </select>
                                     </div>
+
+                                    <div class="form-group" style="display: none;">
+                                        <label>Date</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="donationDate" maxlength="10" readOnly name="donationDate">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-donate" id="btnsave">Donate</button>
+                            <button type="button" class="btn btn-donate" id="btnsave" onclick="donation()">Donate</button>
                         </div>
                     </div>
                 </div>
@@ -303,6 +379,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "responsive": true
             });
         });
+
+        function donation() {
+            if (confirm("Are you sure to donate your item?\nRefund are not allowable.")) {
+                window.location.href = "event_shipping.php";
+            }
+        }
+
+//        function donation() {
+//            var fullfill = true;
+//            var message = "";
+//
+//            document.getElementById("myitem").style.borderColor = "";
+//
+//            if (!document.getElementById("myitem").value || document.getElementById("myitem").value === "") {
+//                document.getElementById("myitem").style.borderColor = "red";
+//                fullfill = false;
+//            }
+//
+//            if (fullfill) {
+//                if (confirm("Are you sure to donate your item?\nRefund are not allowable.")) {
+//                    document.getElementById("form").submit();
+//                }
+//            } else {
+//                alert("Please select an item from your inventory.\n" + message);
+//            }
+//        }
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        document.getElementById("donationDate").value = dd + '/' + mm + '/' + yyyy;
     </script>
     <script src="../bootstrap/plugins/select2/js/select2.full.min.js"></script>
     <style>
@@ -311,26 +419,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .product-small-img img{
-            max-height: 120px;
-            max-width: 120px;
             cursor: pointer;
-            opacity: 0.6;
-            /*display: block;*/
         }
 
         .product-small-img img:hover{
             opacity: 1;
-        }
-
-        .product-small-img{
-            /*float: left;*/
-        }
-
-        .product{
-            /*top: 30%;*/
-            /*left: 30%;*/
-            /*transform: translate(-50%, -50%);*/
-            /*position: absolute;*/
         }
 
         .img-container img{
@@ -339,7 +432,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .img-container{
-            height: 500px;
+            height: 450px;
             /*width: 600px;*/
             /*float: right;*/
             /*padding: 10px;*/

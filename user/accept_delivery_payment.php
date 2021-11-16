@@ -21,7 +21,7 @@ if (isset($_GET['id'])) {
             break;
         }
     } else {
-        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "../user/my_profile.php";</script>';
+        echo '<script>alert("Extract data fail!\nContact IT department for maintainence");window.location.href = "../user/trade_list.php";</script>';
     }
 }
 
@@ -40,17 +40,22 @@ if ($result->num_rows > 0) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql = "INSERT INTO delivery(deliveryid, tradeid, custid, username, address, itemQuantity, package, remarks, cardno, cardname, packagefee, subTotal, tax, totalAmount, paymentDate, deliveryStatus) VALUES ("
+    $address = "{$_SESSION['delivery_details']['address1']}, {$_SESSION['delivery_details']['address2']}, {$_SESSION['delivery_details']['city']}, {$_SESSION['delivery_details']['postcode']}, {$_SESSION['delivery_details']['state']}, {$_SESSION['delivery_details']['country']}";
+    $destination = "{$_SESSION['delivery_details']['deliveryaddress1']}, {$_SESSION['delivery_details']['deliveryaddress2']}, {$_SESSION['delivery_details']['deliverycity']}, {$_SESSION['delivery_details']['deliverypostcode']}, {$_SESSION['delivery_details']['deliverystate']}, {$_SESSION['delivery_details']['deliverycountry']}";
+    $sql = "INSERT INTO delivery(deliveryid, tradeid, senderid, recipientid, username, senderAddress, recipientAddress, itemQuantity, package, remarks, cardno, cardname, shippingfee, packagefee, subTotal, tax, totalAmount, paymentDate, deliveryStatus) VALUES ("
             . "'" . $newid . "',"
             . "'" . $_SESSION['delivery_details']['tradeid'] . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
+            . "'" . $_SESSION['delivery_details']['recipientid'] . "',"
             . "'" . $_SESSION['delivery_details']['username'] . "',"
-            . "'" . $_SESSION['delivery_details']['address1'] . "',"
+            . "'" . $address . "',"
+            . "'" . $destination . "',"
             . $_SESSION['delivery_details']['itemQuantity'] . ","
             . "'" . $_SESSION['delivery_details']['packaging'] . "',"
             . "'" . $_SESSION['delivery_details']['remarks'] . "',"
             . "'" . $_POST["cardno"] . "',"
             . "'" . $_POST["cardname"] . "',"
+            . $_POST["shippingfee"] . ","
             . $_POST["packagingfee"] . ","
             . $_POST["subTotal"] . ","
             . $_POST["tax"] . ","
@@ -64,9 +69,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "UPDATE trade SET"
                 . " acceptPayment = 'Completed'"
                 . " WHERE tradeid ='" . $_SESSION['delivery_details']['tradeid'] . "'";
-        
+
         if ($dbc->query($sql)) {
-            echo '<script>alert("Successfuly insert!");window.location.href="trade_list.php";</script>';
+            $sql_status = "SELECT * FROM trade WHERE offerPayment = 'Completed' AND tradeid = '" . $_SESSION['delivery_details']['tradeid'] . "'";
+            $result = $dbc->query($sql_status);
+            if ($result->num_rows > 0) {
+//                while ($row = mysqli_fetch_array($result)) {
+                    $sql_update = "UPDATE trade SET"
+                            . " status = 'To Ship'"
+                            . " WHERE tradeid ='" . $_SESSION['delivery_details']['tradeid'] . "'";
+                    $result = $dbc->query($sql_update);
+//                }
+            }
+            echo '<script>alert("Your trade payment has completed. Our delivery courier will be coming soon. Thank you.");window.location.href="trade_list.php";</script>';
         } else {
             echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
         }
@@ -103,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
-        <div class="container-lg">
+        <div class="container-lg mb-5">
             <form method="post" id="form">
                 <div class="row justify-content-center">
                     <div class="col-md-6">
@@ -115,13 +130,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <label for="cardno" class="form-label">Card number</label>
-                                            <input type="text" class="form-control" id="cardno" name="cardno" onkeypress="return isNumberKey(event)" maxlength="16" required>
-                                            <div class="invalid-feedback">
-                                                Please provide a valid card number.
+                                            <div class="col-md-12">
+                                                <label for="cardno" class="form-label">Card number</label>
+                                                <input type="text" class="form-control" id="cardno" name="cardno" onkeypress="return isNumberKey(event)" maxlength="16" required>
+                                                <div class="invalid-feedback">
+                                                    Please provide a valid card number.
+                                                </div>
                                             </div>
 
-                                            <div class="col-md-8 pt-3">
+                                            <div class="col-md-8 mt-3">
                                                 <label for="cardname" class="form-label">Cardholder's name</label>
                                                 <input type="text" class="form-control" id="cardname" name="cardname" required>
                                                 <div class="invalid-feedback">
@@ -129,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-4 pt-3">
+                                            <div class="col-md-4 mt-3">
                                                 <label for="cvv" class="form-label">CVV Code</label>
                                                 <input type="text" class="form-control" id="cvv" name="cvv" onkeypress="return isNumberKey(event)" maxlength="3" required>
                                                 <div class="invalid-feedback">
@@ -137,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 pt-3">
+                                            <div class="col-md-6 mt-3">
                                                 <label for="month" class="form-label">Expired Month</label>
                                                 <input type="text" class="form-control" placeholder="MM" maxlength="2" id="month" name="month" onkeypress="return isNumberKey(event)" required>
                                                 <div class="invalid-feedback">
@@ -145,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 pt-3">
+                                            <div class="col-md-6 mt-3">
                                                 <label for="year" class="form-label">Expired Year</label>
                                                 <input type="text" class="form-control" placeholder="YYYY" maxlength="4" id="year" name="year" onkeypress="return isNumberKey(event)" required>
                                                 <div class="invalid-feedback">
@@ -153,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 </div>
                                             </div>
 
-                                            <div class="row m-0 p-3">
+                                            <div class="col-md-6 mt-3">
                                                 <label for="paymentDate" class="form-label">Payment Date</label>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
@@ -162,71 +179,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="paymentDate" maxlength="10" readOnly name="paymentDate">
                                                 </div>
                                             </div>
-                                            <!--                                        <div class="col-sm-6 pt-3">
-                                                                                        <label class="form-label">Select packaging method</label>
-                                                                                        <div class="form-group">
-                                                                                            <div class="form-check">
-                                                                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="5" checked="">
-                                                                                                <label class="form-check-label">Plastic boxes</label>
-                                                                                            </div>
-                                                                                            <div class="form-check">
-                                                                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="8">
-                                                                                                <label class="form-check-label">Bubble wrap</label>
-                                                                                            </div>
-                                                                                            <div class="form-check">
-                                                                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="10">
-                                                                                                <label class="form-check-label">Seal boxes with tape</label>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                                                                    <div class="form-group">
-                                                                                                                                        <div class="form-check">
-                                                                                                                                            <input class="form-check-input" type="radio" name="radio1" checked="">
-                                                                                                                                            <label class="form-check-label">Plastic boxes</label>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="form-check">
-                                                                                                                                            <input class="form-check-input" type="radio">
-                                                                                                                                            <label class="form-check-label">Bubble wrap</label>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="form-check">
-                                                                                                                                            <input class="form-check-input" type="radio" name="radio1">
-                                                                                                                                            <label class="form-check-label">Seal boxes with tape</label>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                    </div>-->
-                                            <!--                                        <div class="col-md-12 pt-3">
-                                                                                        <label class="form-label">Deliver to</label>
-                                                                                        <div class="row">
-                                                                                            <div class="col-6">
-                                                                                                <input type="text" class="form-control" id="country" name="country" readonly="" value="<?php
-                                            $sql_deliver = "SELECT c.state FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
-                                            $result = $dbc->query($sql_deliver);
-                                            if ($result->num_rows > 0) {
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo $row['state'];
-                                                }
-                                            }
-                                            ?>">
-                                                                                            </div>
-                                                                                            <div class="col-6">
-                                                                                                <input type="text" class="form-control" id="country" name="country" readonly="" value="<?php
-                                            $sql_deliver = "SELECT c.country FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
-                                            $result = $dbc->query($sql_deliver);
-                                            if ($result->num_rows > 0) {
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo $row['country'];
-                                                }
-                                            }
-                                            ?>">
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>-->
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="row py-3">
-                                    <div class="col-auto">
-                                        <button class="btn btn-primary btn-block" type="submit" onclick="payment()">Confirm payment</button>
+                                <div class="row py-3 mb-5">
+                                    <div class="col-auto mb-2">
+                                        <a class="btn btn-warning btn-block" href="../user/accept_delivery_shipping.php?id=<?php echo $current_data['tradeid'] ?>" id="btnback">Back</a>
+                                    </div>
+
+                                    <div class="col-auto mb-2">
+                                        <button class="btn btn-primary btn-block" type="button" onclick="payment()">Confirm payment</button>
                                     </div>
                                 </div>
                             </div>
@@ -272,8 +235,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <div class="col-md-7 border-bottom">
                                                 <input type="text" class="form-control" id="shippingfee" name="shippingfee" required style="border-style: none;" value="<?php
                                                 $shipping_fee = 0;
-                                                if ($_SESSION['delivery_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
-                                                    if ($_SESSION['delivery_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
+                                                if ($_SESSION['delivery_details']['deliverycountry'] !== $_SESSION['loginuser']['country']) {
+                                                    if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
                                                         $shipping_fee = $shipping_fee + 10;
                                                     }
                                                     $shipping_fee = $shipping_fee + 20;
@@ -336,38 +299,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </div>
                                         </div>
 
-<!--                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" class="table-info">Fees</th>
-                                                <th scope="col" class="table-info">Total (RM)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody style="text-align: left">
-                                            <tr>
-                                                <td>Shipping fee</td>
-                                                <td>
-                                        <?php
-                                        $shipping_fee = 0;
-                                        if ($_SESSION['delivery_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
-                                            if ($_SESSION['delivery_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
-                                                $shipping_fee = $shipping_fee + 10;
-                                            }
-                                            $shipping_fee = $shipping_fee + 20;
-
-                                            $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                            echo $shipping_fee;
-                                        } else {
-                                            $shipping_fee = 10;
-                                            $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                            echo $shipping_fee;
-                                        }
-                                        ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Packaging fee</td>
-                                                <td>
+        <!--                                        <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="table-info">Fees</th>
+                                                            <th scope="col" class="table-info">Total (RM)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody style="text-align: left">
+                                                        <tr>
+                                                            <td>Shipping fee</td>
+                                                            <td>
+                                        <?php $totalamount ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Packaging fee</td>
+                                                            <td>
                                         <?php
                                         $packaging_fee = 0;
                                         if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
@@ -380,40 +328,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         $packaging_fee = number_format($packaging_fee, 2, '.', '');
                                         echo $packaging_fee;
                                         ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Sub Total</td>
-                                                <td>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Sub Total</td>
+                                                            <td>
                                         <?php
                                         $subtotal = 0;
                                         $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
                                         echo $subtotal;
                                         ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Tax (6%)</td>
-                                                <td>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Tax (6%)</td>
+                                                            <td>
                                         <?php
                                         $tax = 0;
                                         $tax = number_format($subtotal * 0.06, 2, '.', '');
                                         echo $tax;
                                         ?>
-                                                </td>
-                                            </tr>
-                                            <tr style="font-weight: bolder;">
-                                                <td>Total Amount</td>
-                                                <td>
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="font-weight: bolder;">
+                                                            <td>Total Amount</td>
+                                                            <td>
                                         <?php
                                         $totalamount = 0;
                                         $totalamount = number_format($subtotal + $tax, 2, '.', '');
                                         echo $totalamount;
                                         ?>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>-->
                                     </div>
                                 </div>
                             </div>
@@ -425,21 +373,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php include '../include/footer.php'; ?>
     </body>
     <script>
-//        $(document).ready(function () {
-//            $('#packagingForm i').on('change', function () {
-//                var packagingfee=$("[type='radio'] checked").val();
-//                $('#packagingfee').val($("[type='radio']:checked").val());
-//            });
-//        });
-
-//        function calPackaging(price) {
-//            var fee = 0;
-//            price.value = fee;
-////            alert(price.value);
-//            document.getElementById("packagingfee").innerHTML = fee;
-//            document.getElementById("packagingfee") = fee;
-//        }
-
         function payment() {
             var fulfill = true;
             var message = "";
@@ -453,60 +386,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (!document.getElementById("cardno").value || document.getElementById("cardno").value === "") {
                 fulfill = false;
-                message = "Card number is required field !\n";
+                message = "Card number is a required field.\n";
                 document.getElementById("cardno").style.borderColor = "red";
             } else {
                 if (document.getElementById("cardno").value.length < 16 || !pattern.test(document.getElementById("cardno").value)) {
                     fulfill = false;
-                    message = "Card number is invalid, 16 digit is required !\n";
+                    message = "Card number is invalid, 16 digit is required.\n";
                     document.getElementById("cardno").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("year").value || document.getElementById("year").value === "") {
                 fulfill = false;
-                message += "Expired year is required field !\n";
+                message += "Expired year is a required field.\n";
                 document.getElementById("year").style.borderColor = "red";
             } else {
                 if (document.getElementById("year").value.length < 4 || !pattern.test(document.getElementById("year").value)) {
                     fulfill = false;
-                    message += "Expired year is invalid , Example : 2020 !\n";
+                    message += "Expired year is invalid, example: 2020.\n";
                     document.getElementById("year").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("month").value || document.getElementById("month").value === "") {
                 fulfill = false;
-                message += "Expired month is required field !\n";
+                message += "Expired month is required field.\n";
                 document.getElementById("month").style.borderColor = "red";
             } else {
                 if (document.getElementById("month").value < 2 || !pattern.test(document.getElementById("month").value)) {
                     fulfill = false;
-                    message += "Expired month is invalid, Example: 03!\n";
+                    message += "Expired month is invalid, example: 03.\n";
                     document.getElementById("month").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("cvv").value || document.getElementById("cvv").value === "") {
                 fulfill = false;
-                message += "CVV code is required field !\n";
+                message += "CVV code is required field.\n";
                 document.getElementById("cvv").style.borderColor = "red";
             } else {
                 if (document.getElementById("cvv").value < 3 || !pattern.test(document.getElementById("cvv").value)) {
                     fulfill = false;
-                    message += "CVV code is invalid!\n";
+                    message += "CVV code is invalid.\n";
                     document.getElementById("cvv").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("cardname").value || document.getElementById("cardname").value === "") {
                 fulfill = false;
-                message += "Card holder name is required field !\n";
+                message += "Card holder name is required field.\n";
                 document.getElementById("cardname").style.borderColor = "red";
             }
 
             if (fulfill) {
-                if (confirm("Confirm to process payment ?")) {
+                if (confirm("Confirm to complete payment?")) {
                     document.getElementById("form").submit();
                 }
             } else {

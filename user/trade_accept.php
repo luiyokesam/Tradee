@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
             break;
         }
     } else {
-        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "../user/my_profile.php";</script>';
+        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
 }
 
@@ -22,55 +22,64 @@ if (isset($_POST['accept'])) {
         $sql_pending = "UPDATE trade_details t, item i SET "
                 . "i.itemActive='Trading' "
                 . "WHERE t.itemid = i.itemid AND tradeid ='" . $current_data['tradeid'] . "'";
+//        echo '<script>alert("' . $sql_pending . '");</script>';
 
-        echo '<script>alert("' . $sql_pending . '");</script>';
-
-        $sql_trading = "UPDATE trade SET "
-                . "status='Trading' "
-                . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
-
-        echo '<script>alert("' . $sql_trading . '");</script>';
-
-        if (($dbc->query($sql_trading)) AND ($dbc->query($sql_pending))) {
+        if ($dbc->query($sql_pending)) {
             $sql_delivery = "SELECT * FROM trade_details t, item i WHERE t.itemid = i.itemid AND t.tradeid ='" . $current_data['tradeid'] . "' AND i.tradeOption = 'On-Delivery'";
             $result = $dbc->query($sql_delivery);
 
-            echo '<script>alert("' . $sql_delivery . '");</script>';
-
             if ($result->num_rows > 0) {
-                echo "<script>alert('Successfuly delivery!');window.location.href='delivery_shipping.php?id=" . $current_data['tradeid'] . "' ;</script>";
+                $sql_delivery = "UPDATE trade SET "
+                        . "status='To Pay' "
+                        . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
+
+                if ($dbc->query($sql_delivery)) {
+                    echo "<script>alert('Proceed to delivery to complete the trading.');window.location.href='accept_delivery_shipping.php?id=" . $current_data['tradeid'] . "' ;</script>";
+                }
             } else {
-                $sql = "UPDATE trade SET "
+                $sql_ontrade = "UPDATE trade SET "
                         . "acceptPayment='On-Trade', "
                         . "offerPayment='On-Trade' "
                         . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
-                $result = $dbc->query($sql);
-                echo '<script>alert("Successfuly no delivery !");window.location.href="../user/my_profile.php";</script>';
+
+                $sql_trading = "UPDATE trade SET "
+                        . "status='Trading' "
+                        . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
+
+//                echo '<script>alert("' . $sql_trading . '");</script>';
+
+                if (($dbc->query($sql_ontrade)) AND ($dbc->query($sql_trading))) {
+                    echo '<script>alert("Trade confirmed and has been sent to the other trader.");window.location.href="../user/trade_list.php";</script>';
+                }
             }
         } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Update fail!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
         }
     }
 }
 
 if (isset($_POST['reject'])) {
     if (isset($_GET['id'])) {
-        $sql_available = "UPDATE trade_details t, item i SET "
-                . "i.itemActive='Available' "
-                . "WHERE t.itemid = i.itemid AND tradeid ='" . $current_data['tradeid'] . "'";
-
-        echo '<script>alert("' . $sql_available . '");</script>';
+        $sql = "SELECT * FROM trade_details WHERE tradeid = '" . $current_data['tradeid'] . "'";
+        $result = $dbc->query($sql);
+        if ($result->num_rows > 0) {
+            while ($row = mysqli_fetch_array($result)) {
+                $sql1 = "UPDATE item SET itemActive = 'Available' WHERE itemid = '" . $row['itemid'] . "'";
+                ($dbc->query($sql1));
+            }
+        }
 
         $sql_rejected = "UPDATE trade SET "
+                . "acceptPayment='Failed', "
+                . "offerPayment='Failed', "
                 . "status='Rejected' "
                 . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
+//        echo '<script>alert("' . $sql_rejected . '");</script>';
 
-        echo '<script>alert("' . $sql_rejected . '");</script>';
-
-        if (($dbc->query($sql_rejected)) AND ($dbc->query($sql_available))) {
-            echo '<script>alert("Successfuly update !");window.location.href = "../user/my_profile.php";</script>';
+        if ($dbc->query($sql_rejected)) {
+            echo '<script>alert("Trade rejected successfully.\nRejection notification also will be sent to the other trader.");window.location.href = "../user/trade_list.php";</script>';
         } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Update fail!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
         }
     }
 }
@@ -81,17 +90,17 @@ if (isset($_POST['complete'])) {
                 . "status='Completed' "
                 . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
 
-        echo '<script>alert("' . $sql . '");</script>';
+//        echo '<script>alert("' . $sql . '");</script>';
 
         if ($dbc->query($sql)) {
             $sql = "SELECT * FROM trade_details WHERE tradeid = '" . $current_data['tradeid'] . "' AND custid = '" . $current_data['offerCustID'] . "'";
             $result = $dbc->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = mysqli_fetch_array($result)) {
-                    $sql1 = "UPDATE item SET custid = '" . $current_data['acceptCustID'] . "', itemActive = 'Available'  WHERE itemid = '" . $row['itemid'] . "'";
+                    $sql1 = "UPDATE item SET custid = '" . $current_data['acceptCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $row['itemid'] . "'";
                     ($dbc->query($sql1));
 
-                    echo '<script>alert("' . $sql1 . '");</script>';
+//                    echo '<script>alert("' . $sql1 . '");</script>';
                 }
             }
 
@@ -102,88 +111,80 @@ if (isset($_POST['complete'])) {
                     $sql2 = "UPDATE item SET custid = '" . $current_data['offerCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $row['itemid'] . "'";
                     ($dbc->query($sql2));
 
-                    echo '<script>alert("' . $sql2 . '");</script>';
+//                    echo '<script>alert("' . $sql2 . '");</script>';
                 }
             }
         }
-        echo '<script>alert("Successfuly update !");window.location.href = "../user/my_profile.php";</script>';
+        echo '<script>alert("Congratulations!\nYou have successfully completed your trading.");window.location.href = "../user/trade_list.php";</script>';
     } else {
-        echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+        echo '<script>alert("Update fail!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
 }
 
 if (isset($_POST['change'])) {
     $my_items = $_POST['my_item'];
-    foreach ($my_items as $update_my_item_list_available) {
-        $item_available = "UPDATE item SET "
-                . "itemActive = 'Available'"
-                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $update_my_item_list_available . "'";
+    $his_items = $_POST['his_item'];
 
-        $dbc->query($item_available);
-        echo '<script>alert("' . $item_available . '");</script>';
+    $sql = "SELECT * FROM trade_details WHERE tradeid = '" . $current_data['tradeid'] . "'";
+    $result = $dbc->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = mysqli_fetch_array($result)) {
+            $my_item_available = "UPDATE item SET "
+                    . "itemActive = 'Available'"
+                    . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
+                    . " itemid = '" . $row['itemid'] . "'";
+            $dbc->query($my_item_available);
+
+            $his_item_available = "UPDATE item SET "
+                    . "itemActive = 'Available'"
+                    . " WHERE custid ='" . $current_data['offerCustID'] . "' AND"
+                    . " itemid = '" . $row['itemid'] . "'";
+            $dbc->query($his_item_available);
+
+            $sql_delete = "DELETE FROM trade_details WHERE tradeid = '" . $row["tradeid"] . "'";
+//            echo '<script>alert("' . $sql_delete . '");</script>';
+            ($dbc->query($sql_delete));
+        }
+//        echo '<script>alert("' . $my_item_available . '");</script>';
+//        echo '<script>alert("' . $his_item_available . '");</script>';
     }
 
-    $dbc->query($sql);
-    echo '<script>alert("' . $sql . '");</script>';
-
-    $sql_delete = "DELETE FROM trade_details WHERE tradeid = '" . $current_data["tradeid"] . "'";
-    echo '<script>alert("' . $sql_delete . '");</script>';
-
-    (($dbc->query($sql_delete)));
-//    if (($dbc->query($sql_delete))) {
-//        echo '<script>alert("Successfuly insert!");window.location.href="../user/my_profile.php";</script>';
-//    } else {
-//        echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
-//    }
-
     foreach ($my_items as $my_item_list) {
-        $sql_my_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+        $sql_mytrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
                 . "'" . $current_data["tradeid"] . "',"
                 . "'" . $_SESSION['loginuser']['custid'] . "',"
                 . "'" . $my_item_list . "')";
+        $dbc->query($sql_mytrade);
+//        echo '<script>alert("' . $sql_mytrade . '");</script>';
 
-        $dbc->query($sql_my_trade_details);
-    }
-    echo '<script>alert("' . $sql_my_trade_details . '");</script>';
-
-    foreach ($my_items as $update_my_item_list) {
-        $sql = "UPDATE item SET "
+        $sql_my_itemActive = "UPDATE item SET "
                 . "itemActive = 'Pending'"
                 . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $update_my_item_list . "'";
-
-        $dbc->query($sql);
-        echo '<script>alert("' . $sql . '");</script>';
+                . " itemid = '" . $my_item_list . "'";
+        $dbc->query($sql_my_itemActive);
+//        echo '<script>alert("' . $sql_my_itemActive . '");</script>';
     }
 
-    echo '<script>alert("' . $update_my_item_list . '");</script>';
-
-    $his_items = $_POST['his_item'];
     foreach ($his_items as $his_item_list) {
-        $sql_his_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+        $sql_histrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
                 . "'" . $current_data["tradeid"] . "',"
                 . "'" . $current_data['offerCustID'] . "',"
                 . "'" . $his_item_list . "')";
-
-        $dbc->query($sql_his_trade_details);
+        $dbc->query($sql_histrade);
+//        echo '<script>alert("' . $sql_histrade . '");</script>';
     }
-    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
 
-    $change_cust = "UPDATE trade SET "
+    $change_position = "UPDATE trade SET "
             . "acceptCustID = '" . $current_data['offerCustID'] . "', "
             . "offerCustID = '" . $_SESSION['loginuser']['custid'] . "' "
             . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
+//    echo '<script>alert("' . $change_position . '");</script>';
 
-    echo '<script>alert("' . $change_cust . '");</script>';
-
-    if ($dbc->query($change_cust)) {
-        echo '<script>alert("Successfuly update !");window.location.href = "../user/my_profile.php";</script>';
+    if ($dbc->query($change_position)) {
+        echo '<script>alert("Trade offer has been updated and sent to the other trader to confirm.");window.location.href = "../user/trade_list.php";</script>';
     } else {
-        echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+        echo '<script>alert("Update fail!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
-
-    echo '<script>alert("Successfuly insert!");window.location.href="../user/my_profile.php";</script>';
 }
 ?>
 <!doctype html>
@@ -193,10 +194,23 @@ if (isset($_POST['change'])) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="../bootstrap/plugins/select2/css/select2.min.css">
         <link rel="stylesheet" href="../bootstrap/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-        <title>Trade offer with Username</title>
+        <title>
+            <?php
+            $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+            $result = $dbc->query($sql);
+            if ($result->num_rows > 0) {
+                while ($row = mysqli_fetch_array($result)) {
+                    $current_offer = $row;
+                    break;
+                }
+            }
+            echo $current_offer['username'];
+            ?>
+            - Trade Offer - Tradee
+        </title>
     </head>
     <body>
-        <div class="bg-navbar mb-2">
+        <div class="bg-navbar mb-2 bg-light">
             <div class="container-lg">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
@@ -207,29 +221,86 @@ if (isset($_POST['change'])) {
             </div>
         </div>
 
-        <div class="container-lg pb-2 p-0 align-content-start align-items-start">
-            <div>
-                <div class="row">
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item me-0" style="font-size: 0.9em;">This trade: You are trading with</li>
-                        <li class="list-inline-item" style="font-size: 0.9em;">The Username</li>
-                    </ul>
-                    <div class="col-md-2 col-sm-6 col-12 align-content-center">
-                        <li class="list-inline-item me-0 trade-desc">Joined:</li>
-                        <li class="list-inline-item trade-desc">1/1/2021</li>
-                    </div>
-                    <div class="col-md-2 col-sm-6 col-12 align-content-center">
-                        <li class="list-inline-item me-0 trade-desc">Rating:</li>
-                        <li class="list-inline-item trade-desc">5.1</li>
-                    </div>
-                    <div class="col-md-2 col-sm-6 col-12 align-content-center">
-                        <li class="list-inline-item me-0 trade-desc">Trade count:</li>
-                        <li class="list-inline-item trade-desc">10</li>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-12 align-content-center p-0">
-                        <li class="list-inline-item me-0 trade-desc">Last trade:</li>
-                        <li class="list-inline-item trade-desc">28/6/2021</li>
-                    </div>
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6 col-12 align-content-center">
+                    <li class="list-inline-item me-0 trade-desc">You are trading with:
+                        <?php
+                        $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                $current_offer = $row;
+                                echo $current_offer['username'];
+                                break;
+                            }
+                        }
+                        ?>
+                    </li>
+                </div>
+
+                <div class="col-lg-3 col-sm-6 col-12 align-content-center">
+                    <li class="list-inline-item me-0 trade-desc">Location:
+                        <?php
+                        $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                $current_offer = $row;
+                                echo "{$current_offer['state']}, {$current_offer['country']}";
+                                break;
+                            }
+                        }
+                        ?>
+                    </li>
+                </div>
+
+                <div class="col-lg-2 col-sm-6 col-12 align-content-center">
+                    <li class="list-inline-item me-0 trade-desc">Joined: 
+                        <?php
+                        $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                $current_offer = $row;
+                                echo $current_offer['registration_date'];
+                                break;
+                            }
+                        }
+                        ?>
+                    </li>
+                </div>
+
+                <div class="col-lg-2 col-sm-6 col-12 align-content-center">
+                    <li class="list-inline-item me-0 trade-desc">Trade count:
+                        <?php
+                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE t.offerCustID = c.custid";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                $current_offer = $row;
+                                echo $current_offer['NUMBER'];
+                                break;
+                            }
+                        }
+                        ?>
+                    </li>
+                </div>
+
+                <div class="col-lg-2 col-sm-6 col-12 align-content-center">
+                    <li class="list-inline-item me-0 trade-desc">Last trade:
+                        <?php
+                        $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE t.offerCustID = c.custid";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                $current_offer = $row;
+                                echo $current_offer['DATE'];
+                                break;
+                            }
+                        }
+                        ?>
+                    </li>
                 </div>
             </div>
         </div>
@@ -240,7 +311,15 @@ if (isset($_POST['change'])) {
                     <div class="col-md-6">
                         <div class="border px-3 py-2">
                             <div class="row pb-2">
-                                <img src="../img/about/people-2.jpg" class="img-fluid profile-pic float-start" alt="Profile picture">
+                                <img src="<?php
+                                $sql = "SELECT avatar FROM customer WHERE custid = '{$current_data['acceptCustID']}'";
+                                $result = $dbc->query($sql);
+                                if ($result->num_rows > 0) {
+                                    while ($row = mysqli_fetch_array($result)) {
+                                        echo $row[0];
+                                    }
+                                }
+                                ?>" class="img-fluid profile-pic float-start rounded-pill m-1" alt="Profile picture">
                                 <div class="align-content-center ml-2 mt-2">
                                     <li class="" style="list-style-type:none;">Yours items:</li>
                                     <li class="" style="list-style-type:none; font-size:0.82em;">These are the items you will lose in the trade.</li>
@@ -250,7 +329,7 @@ if (isset($_POST['change'])) {
                             <div class="form-group">
                                 <select class="select2bs4" name="my_item[]" id="my_item" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
                                     <?php
-                                    $get_item = "SELECT * FROM item i, trade_details d WHERE i.itemid = d.itemid AND d.tradeid = '{$current_data['tradeid']}' AND d.custid = '{$_SESSION['loginuser']['custid']}'";
+                                    $get_item = "SELECT * FROM trade t, item i, trade_details d WHERE i.itemid = d.itemid AND t.acceptCustID = d.custid AND t.tradeid = d.tradeid AND d.tradeid = '{$current_data['tradeid']}'";
                                     $result_item = $dbc->query($get_item);
                                     if ($result_item->num_rows > 0) {
                                         while ($row = mysqli_fetch_array($result_item)) {
@@ -258,7 +337,7 @@ if (isset($_POST['change'])) {
                                         }
                                     }
 
-                                    $get_item_available = "SELECT * FROM item i WHERE i.custid = '{$_SESSION['loginuser']['custid']}' AND i.itemActive = 'Available' AND NOT EXISTS (SELECT * FROM trade_details d WHERE i.itemid = d.itemid AND d.tradeid = '{$current_data['tradeid']}')";
+                                    $get_item_available = "SELECT * FROM item i, trade t WHERE i.custid = t.acceptCustID AND i.itemActive = 'Available' AND t.tradeid = '{$current_data['tradeid']}' AND NOT EXISTS (SELECT * FROM trade_details d WHERE t.acceptCustID = d.custid AND i.itemid = d.itemid AND d.tradeid = '{$current_data['tradeid']}')";
                                     $result_item_available = $dbc->query($get_item_available);
                                     if ($result_item_available->num_rows > 0) {
                                         while ($row = mysqli_fetch_array($result_item_available)) {
@@ -269,25 +348,26 @@ if (isset($_POST['change'])) {
                                 </select>
                             </div>
 
-                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-3 row-cols-sm-2 row-cols-1">
+                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-2 row-cols-sm-2 row-cols-1">
                                 <?php
-                                $get_inventory = "SELECT * FROM trade_details d, item i, item_image m  WHERE d.itemid = i.itemid AND i.itemid = m.itemid AND d.custid = '{$current_data['acceptCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['acceptCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                 $result = $dbc->query($get_inventory);
                                 if ($result->num_rows > 0) {
                                     while ($row = mysqli_fetch_array($result)) {
                                         echo "<div class='col px-1 py-2'>"
                                         . "<div class='item-img-box overflow-hidden'>"
-                                        . "<a href=''>"
-                                        . "<img src=" . $row["img"] . " class='img-fluid item-img' alt='...'>"
+                                        . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "' target='_blank'>"
+                                        . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                                         . "</a>"
                                         . "</div>"
-                                        . "<div class='d-flex bd-highlight align-items-center p-1 pb-0'>"
+                                        . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
                                         . "<div class='d-flex bd-highlight align-items-center'>"
                                         . "<i class='far fa-heart me-auto' style='font-size:0.9em; display: none;'></i>"
                                         . "</div>"
                                         . "</div>"
-                                        . "<ul class='list-inline p-1 pt-0 mb-0'>"
+                                        . "<ul class='list-inline px-1 mb-0'>"
+                                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
                                         . "</ul>"
@@ -296,19 +376,34 @@ if (isset($_POST['change'])) {
                                 }
                                 ?>
                             </div>
-                            <div class="row py-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">Click here to confirm the trade content</label>
+                            <?php
+                            if ($current_data['status'] == 'Pending') {
+                                echo '<div class="row px-2">
+                                <div class="form-check p-0">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" name="terms1" class="custom-control-input" id="checkTerms1">
+                                        <label class="custom-control-label" for="checkTerms1" style="font-weight: lighter;">Click here to confirm the trade content</label>
+                                    </div>
                                 </div>
-                            </div>
+                            </div>';
+                            }
+                            ?>
+
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="border px-3 py-2">
                             <div class="row pb-2">
-                                <img src="../img/about/people-1.jpg" class="img-fluid profile-pic float-start" alt="Profile picture">
+                                <img src="<?php
+                                $sql = "SELECT avatar FROM customer WHERE custid = '{$current_data['offerCustID']}'";
+                                $result = $dbc->query($sql);
+                                if ($result->num_rows > 0) {
+                                    while ($row = mysqli_fetch_array($result)) {
+                                        echo $row[0];
+                                    }
+                                }
+                                ?>" class="img-fluid profile-pic float-start rounded-pill m-1" alt="Profile picture">
                                 <div class="align-content-center ml-2 mt-2">
                                     <li class="" style="list-style-type:none;">His items:</li>
                                     <li class="" style="list-style-type:none; font-size:0.82em;">These are the items you will receive in the trade.</li>
@@ -337,25 +432,26 @@ if (isset($_POST['change'])) {
                                 </select>
                             </div>
 
-                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-3 row-cols-sm-2 row-cols-1">
+                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-2 row-cols-sm-2 row-cols-1">
                                 <?php
-                                $get_inventory = "SELECT * FROM trade_details d, item i, item_image m  WHERE d.itemid = i.itemid AND i.itemid = m.itemid AND d.custid = '{$current_data['offerCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['offerCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                 $result = $dbc->query($get_inventory);
                                 if ($result->num_rows > 0) {
                                     while ($row = mysqli_fetch_array($result)) {
                                         echo "<div class='col px-1 py-2'>"
                                         . "<div class='item-img-box overflow-hidden'>"
-                                        . "<a href=''>"
-                                        . "<img src=" . $row["img"] . " class='img-fluid item-img' alt='...'>"
+                                        . "<a href='../user/item_profile.php?id=" . $row["itemid"] . "' target='_blank'>"
+                                        . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                                         . "</a>"
                                         . "</div>"
-                                        . "<div class='d-flex bd-highlight align-items-center p-1 pb-0'>"
+                                        . "<div class='d-flex bd-highlight align-items-center px-1 pt-1'>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
                                         . "<div class='d-flex bd-highlight align-items-center'>"
                                         . "<i class='far fa-heart me-auto' style='font-size:0.9em; display: none;'></i>"
                                         . "</div>"
                                         . "</div>"
-                                        . "<ul class='list-inline p-1 pt-0 mb-0'>"
+                                        . "<ul class='list-inline px-1 mb-0'>"
+                                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
                                         . "</ul>"
@@ -365,24 +461,28 @@ if (isset($_POST['change'])) {
                                 ?>
                             </div>
 
-                            <div class="row py-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">
-                                        Click here to confirm the trade content
-                                    </label>
+                            <?php
+                            if ($current_data['status'] == 'Pending') {
+                                echo '<div class="row px-2">
+                                <div class="form-check p-0">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" name="terms2" class="custom-control-input" id="checkTerms2">
+                                        <label class="custom-control-label" for="checkTerms2" style="font-weight: lighter;">Click here to confirm the trade content</label>
+                                    </div>
                                 </div>
-                            </div>
+                            </div>';
+                            }
+                            ?>
                         </div>
                     </div>
 
-                    <div class="col-auto py-2 float-right">
+                    <div class="col-auto my-3 float-right">
+                        <button type='button' class='btn btn-dark mr-2' id='btnback' onclick='back()'>Back</button>
                         <?php
                         if ($current_data['status'] == 'Pending') {
                             echo "<button type='submit' class='btn btn-danger mr-2' name='reject'>Reject</button>";
                             echo "<button type='submit' class='btn btn-success mr-2' name='accept'>Accept</button>";
                             echo "<button type='submit' class='btn btn-warning mr-2' name='change'>Change request</button>";
-//                            echo "<button type='button' class='btn btn-warning' id='btnchange' onclick='changeRequest()'>Change request</button>";
                         }
                         ?>
                         <?php
@@ -391,9 +491,9 @@ if (isset($_POST['change'])) {
                         }
                         ?>
                         <?php
-                        if ($current_data['status'] == 'Completed') {
-                            echo "<button type='button' class='btn btn-dark' id='btnback' onclick='back()'>Back</button>";
-                        }
+//                        if (($current_data['status'] == 'Completed') OR ($current_data['status'] == 'To Pay') OR ($current_data['status'] == 'Rejected')) {
+//                            echo "<button type='button' class='btn btn-dark' id='btnback' onclick='back()'>Back</button>";
+//                        }
                         ?>
                     </div>
                 </div>
@@ -433,25 +533,12 @@ if (isset($_POST['change'])) {
         })
 
         function back() {
-            window.location.href = "my_profile.php";
+            window.location.href = "../user/trade_list.php";
         }
     </script>
     <script src="../bootstrap/plugins/select2/js/select2.full.min.js"></script>
     <style>
-        .bg-navbar{
-            background: whitesmoke;
-        }
-
-        .item-pic-box{
-            /*border-radius: 3996px;*/
-        }
-
-        .item-pic{
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-        }
-
+        /*item*/
         .item-img-box{
             /*width: 192px;*/
             /*height: 192px;*/
@@ -465,26 +552,22 @@ if (isset($_POST['change'])) {
         }
 
         .item-img{
-            /*max-height: 300px;*/
-            /*height: 100%;*/
+            min-height: 300px;
+            max-height: 300px;
             text-align: center;
             background-size: contain;
-            background-repeat:   no-repeat;
+            background-repeat: no-repeat;
             background: whitesmoke;
         }
 
-        .profile-pic-box{
-            /*border-radius: 3996px;*/
-        }
-
         .profile-pic{
-            width: 70px;
-            height: 70px;
+            width: 55px;
+            height: 55px;
             object-fit: cover;
         }
 
         .trade-desc{
-            font-size: 0.82em;
+            font-size: 0.9em;
         }
     </style>
 </html>

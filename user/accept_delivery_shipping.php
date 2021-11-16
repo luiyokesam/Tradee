@@ -3,7 +3,7 @@ include '../include/header.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM trade t, trade_details d, customer c WHERE t.tradeid = d.tradeid AND d.custid = c.custid AND c.custid = '" . $_SESSION['loginuser']['custid'] . "' AND t.status = 'Trading' AND d.tradeid = '$id' LIMIT 1";
+    $sql = "SELECT * FROM trade t, trade_details d, customer c WHERE t.tradeid = d.tradeid AND d.custid = c.custid AND c.custid = '" . $_SESSION['loginuser']['custid'] . "' AND t.status = 'To Pay' AND d.tradeid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ?> Shipping Details - Tradee</title>
     </head>
     <body>
-        <div class="bg-navbar mb-3 bg-light">
+        <div class="bg-navbar mb-1 bg-light">
             <div class="container-lg">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
@@ -50,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="container-lg">
             <form id="form"  method="post">
-                <input id="detail" name="detail">
+                <input id="detail" name="detail" style="display: none;">
                 <div class="row justify-content-center pt-3 mb-5">
                     <div class="col-md-8">
-                        <div class="border-bottom border-3" style="font-size:1.5em;">Shipping</div>
+                        <div class="border-bottom border-3 pb-2" style="font-size:1.5em;">Shipping</div>
                         <div class="row justify-content-center pt-3">
                             <div class="col-md-7">
                                 <div class="">
@@ -146,45 +146,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label class="col-sm-12 p-0">Select packaging method</label>
                                         <div class="col-auto px-0 pr-2" style="width: 100%;">
                                             <select class="custom-select" id="packaging" name="packaging">
-                                                <option value="Plastic boxes">Plastic boxes</option>
-                                                <option value="Bubble wrap">Bubble wrap</option>
-                                                <option value="Seal boxes with tape">Seal boxes with tape</option>
+                                                <option value="Plastic boxes" <?php
+                                                if (isset($_SESSION['delivery_details'])) {
+                                                    if ($_SESSION['delivery_details']['packaging'] == "Plastic boxes") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Plastic boxes</option>
+
+                                                <option value="Bubble wrap"<?php
+                                                if (isset($_SESSION['delivery_details'])) {
+                                                    if ($_SESSION['delivery_details']['packaging'] == "Bubble wrap") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Bubble wrap</option>
+
+                                                <option value="Seal boxes with tape"<?php
+                                                if (isset($_SESSION['delivery_details'])) {
+                                                    if ($_SESSION['delivery_details']['packaging'] == "Seal boxes with tape") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Seal boxes with tape</option>
                                             </select>
                                         </div>
 
-<!--                                        <label class="col-sm-12 p-0">Select packaging method</label>
-                                        <div class="form-group mb-1">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Plastic boxes"<?php
-                                                if (isset($_SESSION['delivery_details'])) {
-                                                    if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                                                        echo 'checked';
-                                                    }
-                                                }
-                                                ?>">
-                                                <label class="form-check-label">Plastic boxes</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Bubble wrap"<?php
-                                                if (isset($_SESSION['delivery_details'])) {
-                                                    if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                                                        echo 'checked';
-                                                    }
-                                                }
-                                                ?>">
-                                                <label class="form-check-label">Bubble wrap</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Seal boxes with tape"<?php
-                                                if (isset($_SESSION['delivery_details'])) {
-                                                    if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                                                        echo 'checked';
-                                                    }
-                                                }
-                                                ?>>
-                                                <label class="form-check-label">Seal boxes with tape</label>
-                                            </div>
-                                        </div>-->
+                                        <!--                                        <label class="col-sm-12 p-0">Select packaging method</label>
+                                                                                <div class="form-group mb-1">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Plastic boxes"<?php
+                                        if (isset($_SESSION['delivery_details'])) {
+                                            if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
+                                                echo 'checked';
+                                            }
+                                        }
+                                        ?>">
+                                                                                        <label class="form-check-label">Plastic boxes</label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Bubble wrap"<?php
+                                        if (isset($_SESSION['delivery_details'])) {
+                                            if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
+                                                echo 'checked';
+                                            }
+                                        }
+                                        ?>">
+                                                                                        <label class="form-check-label">Bubble wrap</label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" type="radio" id="packaging" name="packaging" value="Seal boxes with tape"<?php
+                                        if (isset($_SESSION['delivery_details'])) {
+                                            if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
+                                                echo 'checked';
+                                            }
+                                        }
+                                        ?>>
+                                                                                        <label class="form-check-label">Seal boxes with tape</label>
+                                                                                    </div>
+                                                                                </div>-->
                                     </div>
 
                                     <div class="">
@@ -218,24 +238,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
 
                                 <div class="form-group row align-items-center">
-                                    <label for="state" class="col-sm-3 col-form-label align-items-center">State</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="state" name="state" required value="<?php
-                                        if (isset($_SESSION['delivery_details'])) {
-                                            echo $_SESSION['delivery_details']['state'];
-                                        } else {
-                                            if (isset($_SESSION['loginuser'])) {
-                                                echo $_SESSION['loginuser']['state'];
-                                            }
-                                        }
-                                        ?>">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid state.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row align-items-center">
                                     <label for="postcode" class="col-sm-3 col-form-label align-items-center">Postal</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" id="postcode" name="postcode" onkeypress="return isNumberKey(event)" maxlength="10" required value="<?php
@@ -249,6 +251,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         ?>">
                                         <div class="invalid-feedback">
                                             Please provide a valid postal code.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row align-items-center">
+                                    <label for="state" class="col-sm-3 col-form-label align-items-center">State</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="state" name="state" required value="<?php
+                                        if (isset($_SESSION['delivery_details'])) {
+                                            echo $_SESSION['delivery_details']['state'];
+                                        } else {
+                                            if (isset($_SESSION['loginuser'])) {
+                                                echo $_SESSION['loginuser']['state'];
+                                            }
+                                        }
+                                        ?>">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid state.
                                         </div>
                                     </div>
                                 </div>
@@ -287,11 +307,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                <div class="form-group row pl-2">
+                                <div class="form-group col-xl p-0">
                                     <label class="form-label">Deliver to</label>
                                     <div class="row">
+                                        <div class="col-12" style="width: 100%;">
+                                            <input type="text" class="form-control" readonly="" style="width: 100%;" value="<?php
+                                            $sql_deliver = "SELECT c.state, c.country FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}' LIMIT 1";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo "{$row['state']}, {$row['country']}";
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <input type="text" class="form-control" id="recipientid" name="recipientid" readonly="" style="display: none;" value="<?php
+                                            $sql_deliver = "SELECT DISTINCT(d.custid) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo $row['custid'];
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
                                         <div class="col-6">
-                                            <input type="text" class="form-control" id="deliveryState" name="deliveryState" readonly="" value="<?php
+                                            <input type="text" class="form-control" id="deliveryaddress1" name="deliveryaddress1" readonly="" style="display: none;" value="<?php
+                                            $sql_deliver = "SELECT DISTINCT(c.address1) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo $row['address1'];
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" id="deliveryaddress2" name="deliveryaddress2" readonly="" style="display: none;" value="<?php
+                                            $sql_deliver = "SELECT DISTINCT(c.address2) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo $row['address2'];
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" id="deliverycity" name="deliverycity" readonly="" style="display: none;" value="<?php
+                                            $sql_deliver = "SELECT DISTINCT(c.city) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo $row['city'];
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" id="deliverypostcode" name="deliverypostcode" style="display: none;" readonly="" value="<?php
+                                            $sql_deliver = "SELECT DISTINCT(c.postcode) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                            $result = $dbc->query($sql_deliver);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo $row['postcode'];
+                                                }
+                                            }
+                                            ?>">
+                                        </div>
+
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" id="deliverystate" name="deliverystate" style="display: none;" readonly="" value="<?php
                                             $sql_deliver = "SELECT DISTINCT(c.state) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                             $result = $dbc->query($sql_deliver);
                                             if ($result->num_rows > 0) {
@@ -301,8 +393,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             }
                                             ?>">
                                         </div>
+
                                         <div class="col-6">
-                                            <input type="text" class="form-control" id="deliveryCountry" name="deliveryCountry" readonly="" value="<?php
+                                            <input type="text" class="form-control" id="deliverycountry" name="deliverycountry" style="display: none;" readonly="" value="<?php
                                             $sql_deliver = "SELECT DISTINCT(c.country) FROM trade_details d, customer c WHERE d.custid = c.custid AND d.custid <> '{$_SESSION['loginuser']['custid']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                             $result = $dbc->query($sql_deliver);
                                             if ($result->num_rows > 0) {
@@ -315,7 +408,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                <div class="col-xl">
+                                <div class="col-xl" style="display: none;">
                                     <label class="form-label">Item Quantity</label>
                                     <input type="text" class="form-control" id="itemQuantity" name="itemQuantity" readonly="" value="<?php
                                     $count = "SELECT COUNT(t.itemid) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
@@ -352,7 +445,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="row">
                                             <div class="col-12" id="accordion">
                                                 <?php
-                                                $get_inventory = "SELECT * FROM trade_details d, item i, item_image m  WHERE d.itemid = i.itemid AND i.itemid = m.itemid AND d.custid = '{$current_data['acceptCustID']}'";
+                                                $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['acceptCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                                 $result = $dbc->query($get_inventory);
                                                 if ($result->num_rows > 0) {
                                                     while ($row = mysqli_fetch_array($result)) {
@@ -364,7 +457,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         . "</a>"
                                                         . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
                                                         . "<div class='card-body'>"
-                                                        . "<img src=" . $row["img"] . " class='img-fluid item-img' alt='...'>"
+                                                        . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                                                         . "</div>"
 //                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
 //                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
@@ -373,7 +466,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     }
                                                 }
                                                 ?>
-                                                
+
                                                 <!--card sameple-->
                                                 <!--                                            <div class="card card-primary card-outline">
                                                                                                 <a class="d-block w-100" data-toggle="collapse" href="#collapseOne" aria-expanded="true">
@@ -419,48 +512,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (!document.getElementById("username").value || document.getElementById("username").value === "") {
                 document.getElementById("username").style.borderColor = "red";
-                message = "Receiver is required field !\n";
+                message = "Sender is required field.\n";
                 fullfill = false;
             }
             if (!document.getElementById("contact").value || document.getElementById("contact").value === "") {
                 document.getElementById("contact").style.borderColor = "red";
-                message += "Contact is required field !\n";
+                message += "Contact is required field.\n";
                 fullfill = false;
+            } else {
+                if (document.getElementById("contact").value.length < 8 || document.getElementById("contact").value.length > 5) {
+                    fulfill = false;
+                    message += "Please enter a valid contact.\n";
+                    document.getElementById("contact").style.borderColor = "red";
+                }
             }
             if (!document.getElementById("address1").value || document.getElementById("address1").value === "") {
                 document.getElementById("address1").style.borderColor = "red";
-                message += "Address is required field !\n";
+                message += "Address is required field.\n";
                 fullfill = false;
             }
             if (!document.getElementById("city").value || document.getElementById("city").value === "") {
                 document.getElementById("city").style.borderColor = "red";
-                message += "City is required field !\n";
+                message += "City is required field.\n";
                 fullfill = false;
             }
             if (!document.getElementById("state").value || document.getElementById("state").value === "") {
                 document.getElementById("state").style.borderColor = "red";
-                message += "State is required field !\n";
+                message += "State is required field.\n";
                 fullfill = false;
             }
             if (!document.getElementById("postcode").value || document.getElementById("postcode").value === "") {
                 document.getElementById("postcode").style.borderColor = "red";
-                message += "Postcode is required field !\n";
+                message += "Postcode is required field.\n";
                 fullfill = false;
             } else {
                 if (document.getElementById("postcode").value.length < 5 || document.getElementById("postcode").value.length > 5) {
                     fulfill = false;
-                    message += "Postcode is invalid , must be 5 character !\n";
+                    message += "Postcode is invalid, must be 5 character.\n";
                     document.getElementById("postcode").style.borderColor = "red";
                 }
             }
             if (!document.getElementById("country").value || document.getElementById("country").value === "") {
                 document.getElementById("country").style.borderColor = "red";
-                message += "Country is required field !\n";
+                message += "Country is required field.\n";
                 fullfill = false;
             }
             if (!document.getElementById("packaging").value || document.getElementById("packaging").value === "") {
                 document.getElementById("packaging").style.borderColor = "red";
-                message += "Packaging is required field !\n";
+                message += "Packaging is required field.\n";
                 fullfill = false;
             }
 
@@ -477,8 +576,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     country: document.getElementById("country").value,
                     remarks: document.getElementById("remarks").value,
                     deliveryDate: document.getElementById("deliveryDate").value,
-                    deliveryState: document.getElementById("deliveryState").value,
-                    deliveryCountry: document.getElementById("deliveryCountry").value,
+                    recipientid: document.getElementById("recipientid").value,
+                    
+                    deliveryaddress1: document.getElementById("deliveryaddress1").value,
+                    deliveryaddress2: document.getElementById("deliveryaddress2").value,
+                    deliverycity: document.getElementById("deliverycity").value,
+                    deliverypostcode: document.getElementById("deliverypostcode").value,
+                    deliverystate: document.getElementById("deliverystate").value,
+                    deliverycountry: document.getElementById("deliverycountry").value,
+                    
                     itemQuantity: document.getElementById("itemQuantity").value,
                     packaging: document.getElementById("packaging").value
                 };
@@ -493,7 +599,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         function cancel() {
             if (confirm("Confirm to cancel the delivery process?")) {
-                window.location.href = "my_profile.php";
+                window.location.href = "trade_list.php";
             }
         }
 

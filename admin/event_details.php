@@ -26,6 +26,14 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            $Array_Image = array();
+            $sql2 = "SELECT `img` FROM `event_image` WHERE `eventid` = '$id'";
+            $result2 = $dbc->query($sql2);
+            if ($result2->num_rows > 0) {
+                while ($row = mysqli_fetch_array($result2)) {
+                    array_push($Array_Image, $row[0]);
+                }
+            }
             break;
         }
     } else {
@@ -48,48 +56,66 @@ if (isset($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_GET['id'])) {
 
-        $img = $_FILES['img']['name'];
-        if ($img) {
-            $newimg = "../event_img/$img";
-        } else {
-            $newimg = $current_data["img"];
-        }
+        if (is_uploaded_file($_FILES["img"]["tmp_name"][0])) {
+            $length = count($Array_Image);
+            for ($x = 0; $x < $length; $x++) {
+                if (file_exists($Array_Image[$x])) {
+//                    echo '<script>alert("' . 1 . '");</script>';
+                    unlink($Array_Image[$x]);
+                }
+            }
 
-        $sql1 = "UPDATE event_image"
-                . " SET img='" . $newimg . "' "
-                . "WHERE eventid ='" . $current_data["eventid"] . "'";
+            $sql_Delete_Image = "DELETE FROM `event_image` WHERE `eventid` = '{$current_data["eventid"]}'";
+            if ($dbc->query($sql_Delete_Image)) {
+                $Count_Image = count($_FILES['img']['name']);
+                for ($i = 0; $i < $Count_Image; $i++) {
+                    $image_path = "../data/event_img/{$current_data["eventid"]}_{$i}";
+                    if (file_exists($image_path)) {
+                        unlink($image_path);
+                    }
+                    move_uploaded_file($_FILES["img"]["tmp_name"][$i], $image_path);
+                    $sql = "INSERT INTO `event_image`(`eventid`, `img`) VALUES ('{$current_data["eventid"]}','{$image_path}')";
+                    if (!$dbc->query($sql)) {
+                        echo '<script>console.log("Error Insert Image !");</script>';
+                    }
+                }
+            }
+        }
 
         $sql2 = "UPDATE event"
                 . " SET title='" . $_POST['title'] . "', "
                 . "type='" . $_POST['type'] . "', "
                 . "receiver='" . $_POST['receiver'] . "', "
+                . "principal='" . $_POST['principal'] . "', "
                 . "contact='" . $_POST['contact'] . "', "
                 . "adminid='" . $_POST['adminid'] . "', "
-                . "address='" . $_POST['address'] . "', "
+                . "address1='" . $_POST['address1'] . "', "
+                . "address2='" . $_POST['address2'] . "', "
+                . "postcode='" . $_POST['postcode'] . "', "
+                . "state='" . $_POST['state'] . "', "
+                . "country='" . $_POST['country'] . "', "
                 . "endEvent='" . $_POST['endEvent'] . "', "
                 . "status='" . $_POST['status'] . "', "
                 . "description='" . $_POST['description'] . "' "
                 . "WHERE eventid ='" . $current_data["eventid"] . "'";
 
-        if (($dbc->query($sql1)) AND ($dbc->query($sql2))) {
-            if ($img) {
-                move_uploaded_file($_FILES['img']['tmp_name'], "../event_img/$img");
-            }
-            echo '<script>alert("Successfuly update !");var currentURL = window.location.href;window.location.href = currentURL;</script>';
+        if ($dbc->query($sql2)) {
+            echo '<script>alert("Event update successfuly!");var currentURL = window.location.href;window.location.href = currentURL;</script>';
         } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Failed to update event!\nPlease contact to our IT department for maintainence.")</script>';
         }
     } else {
-        $img = $_FILES['img']['name'];
-        if ($img) {
-            $newimg = "../event_img/$img";
+        $Count_Image = count($_FILES['img']['name']);
+        for ($i = 0; $i < $Count_Image; $i++) {
+            $image_path = "../data/event_img/{$newid}_$i";
+            move_uploaded_file($_FILES["img"]["tmp_name"][$i], $image_path);
+            $sql = "INSERT INTO `event_image`(`eventid`, `img`) VALUES ('$newid','{$image_path}')";
+            if (!$dbc->query($sql)) {
+                echo '<script>console.log("Error Insert Image !");</script>';
+            }
         }
 
-        $sql1 = "INSERT INTO event_image(eventid,img)VALUES("
-                . "'" . $newid . "',"
-                . "'" . $newimg . "')";
-
-        $sql2 = "INSERT INTO event(eventid,adminid,title,contact,description,type,receiver,address,endEvent,status)VALUES("
+        $sql2 = "INSERT INTO event(eventid,adminid,title,contact,description,type,receiver,principal,address1,address2,postcode,state,country,endEvent,status)VALUES("
                 . "'" . $newid . "',"
                 . "'" . $_POST['adminid'] . "',"
                 . "'" . $_POST['title'] . "',"
@@ -97,17 +123,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 . "'" . $_POST['description'] . "',"
                 . "'" . $_POST['type'] . "',"
                 . "'" . $_POST['receiver'] . "',"
-                . "'" . $_POST['address'] . "',"
+                . "'" . $_POST['principal'] . "',"
+                . "'" . $_POST['address1'] . "',"
+                . "'" . $_POST['address2'] . "',"
+                . "'" . $_POST['postcode'] . "',"
+                . "'" . $_POST['state'] . "',"
+                . "'" . $_POST['country'] . "',"
                 . "'" . $_POST['endEvent'] . "',"
                 . "'" . $_POST['status'] . "')";
 
-        if (($dbc->query($sql1)) AND ($dbc->query($sql2))) {
-            if ($img) {
-                move_uploaded_file($_FILES['img']['tmp_name'], "../event_img/$img");
-            }
-            echo '<script>alert("Successfuly insert !");window.location.href="event_details.php?id=' . $newid . '";</script>';
+        if ($dbc->query($sql2)) {
+            echo '<script>alert("New event added successfuly!");window.location.href="event_details.php?id=' . $newid . '";</script>';
         } else {
-            echo '<script>alert("Insert fail !\nContact IT department for maintainence")</script>';
+            echo '<script>alert("Failed to add new event!\nPlease contact to our IT department for maintainence.")</script>';
         }
     }
 }
@@ -119,11 +147,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?php
             if (isset($current_data)) {
-                echo $current_data["eventid"];
+                echo "{$current_data["eventid"]} Event";
             } else {
-                echo $newid;
+                echo "New Event";
             }
-            ?> (Event Details) - Tradee</title>
+            ?> - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed" onload="addnew()">
         <div class="wrapper">
@@ -160,31 +188,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="card-body">
                                     <form method="post" id="form" enctype="multipart/form-data">
                                         <div class="row">
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="col-md-12">
-                                                            <img class="img-fluid mb-12" src="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["img"];
-                                                            }
-                                                            ?>" alt="Photo" style="width: 100%; height: 500px; padding-top: 10px" id="img_display" name="img_display">
-                                                        </div>
-                                                        <div class="col-md-12" >
-                                                            <div class="form-group" style="padding-top: 15px">
-                                                                <div class="custom-file">
-                                                                    <input type="file" multiple="multiple" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="img" disabled name="img[]">
-                                                                    <label class="custom-file-label" id="validate_img">Choose file</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-9">
-                                                <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-6">  
                                                         <label>Title :</label>
                                                         <div class="form-group">                                             
                                                             <input class="form-control" id="title" name="title" readOnly value="<?php
@@ -195,28 +201,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
-                                                        <label>Type :</label>
-                                                        <div class="form-group">
-                                                            <select class="custom-select" id="type" name="type" disabled>
-                                                                <option value="">--Select--</option>
-                                                                <?php
-                                                                foreach ($category_array as $selection) {
-                                                                    $selected = ($current_data["type"] == $selection) ? "selected" : "";
-                                                                    echo '<option ' . $selected . ' value="' . $selection . '">' . $selection . '</option>';
-                                                                }
-                                                                echo '</select>';
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-6">
                                                         <label>Receiver :</label>
                                                         <div class="form-group">                                             
                                                             <input class="form-control" id="receiver" name="receiver" readOnly value="<?php
                                                             if (isset($current_data)) {
                                                                 echo $current_data["receiver"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <label>Person In-Charge :</label>
+                                                        <div class="form-group">                                             
+                                                            <input class="form-control" id="principal" name="principal" readOnly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["principal"];
                                                             }
                                                             ?>">
                                                         </div>
@@ -233,18 +234,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-12">
-                                                        <label>Full Address :</label>
+                                                    <div class="col-md-4">
+                                                        <label>Type :</label>
+                                                        <div class="form-group">
+                                                            <select class="custom-select" id="type" name="type" disabled>
+                                                                <option value="">--Select--</option>
+                                                                <?php
+                                                                foreach ($category_array as $selection) {
+                                                                    $selected = ($current_data["type"] == $selection) ? "selected" : "";
+                                                                    echo '<option ' . $selected . ' value="' . $selection . '">' . $selection . '</option>';
+                                                                }
+                                                                echo '</select>';
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12" style="font-weight: bolder; font-size: 1.1em;">Address</div>
+
+                                                    <div class="col-md-6">
+                                                        <label>Line 1 :</label>
                                                         <div class="form-group">                                             
-                                                            <input class="form-control" id="address" name="address" readOnly value="<?php
+                                                            <input class="form-control" id="address1" name="address1" readOnly value="<?php
                                                             if (isset($current_data)) {
-                                                                echo $current_data["address"];
+                                                                echo $current_data["address1"];
                                                             }
                                                             ?>">
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-6">
+                                                        <label>Line 2 :</label>
+                                                        <div class="form-group">                                             
+                                                            <input class="form-control" id="address2" name="address2" readOnly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["address2"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label>Postal Code :</label>
+                                                        <div class="form-group">                                             
+                                                            <input class="form-control" id="postcode" name="postcode" readOnly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["postcode"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label>State :</label>
+                                                        <div class="form-group">                                             
+                                                            <input class="form-control" id="state" name="state" readOnly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["state"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label>Country :</label>
+                                                        <div class="form-group">                                             
+                                                            <input class="form-control" id="country" name="country" readOnly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["country"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
                                                         <label>Staff Incharge :</label>
                                                         <div class="form-group">                                             
                                                             <select class="custom-select" id="adminid" name="adminid" disabled>
@@ -259,7 +322,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <label>End Date :</label>
                                                         <div class="input-group">
                                                             <div class="input-group-prepend">
@@ -273,7 +336,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <label>Status :</label>
                                                         <select class="custom-select" id="status" name="status" disabled>
                                                             <option value="Pending" <?php
@@ -294,7 +357,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </select>
                                                     </div>
 
-                                                    <div class="col-md-12 mt-3">
+                                                    <div class="col-md-12">
                                                         <label>Description :</label>
                                                         <div class="form-group">
                                                             <textarea class="form-control" rows="5" id="description" readOnly name="description"><?php
@@ -302,6 +365,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     echo $current_data["description"];
                                                                 }
                                                                 ?></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="col-12 img-container" style="width: 1000px; height: 400px">
+                                                            <img src="../img/event/drop_img.jpg" class="active-image" style="width: 100%; height: 400px;" alt="Product Image">
+                                                        </div>
+
+                                                        <div class="col-12 product-image-thumbs mt-3">
+                                                            <div class="product-image-thumb product-small-img mr-2 p-1 active" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                                                <img class="img-fluid" src="<?php
+                                                                if (isset($Array_Image)) {
+                                                                    echo $Array_Image[0];
+                                                                }
+                                                                ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display">
+                                                            </div>
+
+                                                            <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                                                <img class="img-fluid" src="<?php
+                                                                if (isset($Array_Image)) {
+                                                                    echo $Array_Image[1];
+                                                                }
+                                                                ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display">
+                                                            </div>
+
+                                                            <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                                                <img class="img-fluid" src="<?php
+                                                                if (isset($Array_Image)) {
+                                                                    echo $Array_Image[2];
+                                                                }
+                                                                ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display">
+                                                            </div>
+
+                                                            <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                                                <img class="img-fluid" src="<?php
+                                                                if (isset($Array_Image)) {
+                                                                    echo $Array_Image[3];
+                                                                }
+                                                                ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display">
+                                                            </div>
+
+                                                            <div class="product-image-thumb product-small-img mr-2 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
+                                                                <img class="img-fluid" src="<?php
+                                                                if (isset($Array_Image)) {
+                                                                    echo $Array_Image[4];
+                                                                }
+                                                                ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12" >
+                                                            <div class="form-group" style="padding-top: 15px">
+                                                                <div class="custom-file">
+                                                                    <input type="file" multiple="multiple" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="img" disabled name="img[]">
+                                                                    <label class="custom-file-label" id="validate_img">Choose file</label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -354,18 +477,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM donation WHERE eventid = '" . $current_data['eventid'] . "'";
-                                            $result = $dbc->query($sql);
-                                            if ($result) {
-                                                while ($row = $result->fetch_assoc()) {
-                                                    echo "<td><a>" . $row["donateid"] . "</a></td>"
-                                                    . "<td><a>" . $row["eventid"] . "</a></td>"
-                                                    . "<td><a>" . $row["donator"] . "</a></td>"
-                                                    . "<td><a>" . $row["itemid"] . "</a></td>"
-                                                    . "<td class='project-actions text-right'>"
-                                                    . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'item_details.php?id=" . $row["itemid"] . "'>"
-                                                    . "<i class=" . "'far fa-eye'" . ">"
-                                                    . "</i></a></td></tr>";
+                                            if (isset($current_data)) {
+                                                $sql = "SELECT * FROM donation WHERE eventid = '" . $current_data['eventid'] . "'";
+                                                $result = $dbc->query($sql);
+                                                if ($result) {
+                                                    while ($row = $result->fetch_assoc()) {
+                                                        echo "<td><a>" . $row["donateid"] . "</a></td>"
+                                                        . "<td><a>" . $row["eventid"] . "</a></td>"
+                                                        . "<td><a>" . $row["donator"] . "</a></td>"
+                                                        . "<td><a>" . $row["itemid"] . "</a></td>"
+                                                        . "<td class='project-actions text-right'>"
+                                                        . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'item_details.php?id=" . $row["itemid"] . "'>"
+                                                        . "<i class=" . "'far fa-eye'" . ">"
+                                                        . "</i></a></td></tr>";
+                                                    }
                                                 }
                                             }
                                             ?>
@@ -422,21 +547,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         dateInputMask(output);
 
-        function editable() {
-            document.getElementById("btnsave").textContent = "Save";
-            document.getElementById("btncancel").disabled = false;
-            document.getElementById("img").disabled = false;
-            document.getElementById("title").readOnly = false;
-            document.getElementById("type").disabled = false;
-            document.getElementById("receiver").readOnly = false;
-            document.getElementById("contact").readOnly = false;
-            document.getElementById("adminid").disabled = false;
-            document.getElementById("address").readOnly = false;
-            document.getElementById("endEvent").readOnly = false;
-            document.getElementById("description").readOnly = false;
-            document.getElementById("status").disabled = false;
-        }
-
         function addnew() {
             var params = new window.URLSearchParams(window.location.search);
             if (!params.get('id')) {
@@ -457,9 +567,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById("title").style.borderColor = "";
                 document.getElementById("type").style.borderColor = "";
                 document.getElementById("receiver").style.borderColor = "";
+                document.getElementById("principal").style.borderColor = "";
                 document.getElementById("contact").style.borderColor = "";
                 document.getElementById("adminid").style.borderColor = "";
-                document.getElementById("address").style.borderColor = "";
+                document.getElementById("address1").style.borderColor = "";
+                document.getElementById("address2").style.borderColor = "";
+                document.getElementById("postcode").style.borderColor = "";
+                document.getElementById("state").style.borderColor = "";
+                document.getElementById("country").style.borderColor = "";
                 document.getElementById("endEvent").style.borderColor = "";
                 document.getElementById("status").style.borderColor = "";
                 document.getElementById("description").style.borderColor = "";
@@ -485,8 +600,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("adminid").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("address").value || document.getElementById("address").value === "") {
-                    document.getElementById("address").style.borderColor = "red";
+                if (!document.getElementById("address1").value || document.getElementById("address1").value === "") {
+                    document.getElementById("address1").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("address2").value || document.getElementById("address2").value === "") {
+                    document.getElementById("address2").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("postcode").value || document.getElementById("postcode").value === "") {
+                    document.getElementById("postcode").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("state").value || document.getElementById("state").value === "") {
+                    document.getElementById("state").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("country").value || document.getElementById("country").value === "") {
+                    document.getElementById("country").style.borderColor = "red";
                     fullfill = false;
                 }
                 if (!document.getElementById("endEvent").value || document.getElementById("endEvent").value === "") {
@@ -522,6 +653,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
+        function editable() {
+            document.getElementById("btnsave").textContent = "Save";
+            document.getElementById("btncancel").disabled = false;
+            document.getElementById("img").disabled = false;
+            document.getElementById("title").readOnly = false;
+            document.getElementById("type").disabled = false;
+            document.getElementById("receiver").readOnly = false;
+            document.getElementById("principal").readOnly = false;
+            document.getElementById("contact").readOnly = false;
+            document.getElementById("adminid").disabled = false;
+            document.getElementById("address1").readOnly = false;
+            document.getElementById("address2").readOnly = false;
+            document.getElementById("postcode").readOnly = false;
+            document.getElementById("state").readOnly = false;
+            document.getElementById("country").readOnly = false;
+            document.getElementById("endEvent").readOnly = false;
+            document.getElementById("description").readOnly = false;
+            document.getElementById("status").disabled = false;
+        }
+
         function cancel() {
             if (confirm("Confirm to unsave current information!")) {
                 if (isnew) {
@@ -546,7 +697,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
             return true;
-
         }
 
         $('#donationtable').DataTable({
@@ -560,8 +710,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
 
         var loadFile = function (event) {
-            var image = document.getElementById('img_display');
-            image.src = URL.createObjectURL(event.target.files[0]);
+            for (i = 0; i < 5; i++) {
+                document.getElementById("img_display" + i + "").src = "";
+            }
+
+            if (event.target.files.length < 6) {
+                for (i = 0; i < event.target.files.length; i++) {
+                    document.getElementById("img_display" + i + "").src = URL.createObjectURL(event.target.files[i]);
+                }
+            }
         };
+
+        function imageGallery(smallImg) {
+            var fullImg = document.getElementById("imageBox");
+            fullImg.src = smallImg.src;
+        }
+
+        $(document).ready(function () {
+            $('.product-image-thumb').on('click', function () {
+                var $image_element = $(this).find('img')
+                $('.active-image').prop('src', $image_element.attr('src'))
+                $('.product-image-thumb.active').removeClass('active')
+                $(this).addClass('active')
+            })
+        })
     </script>
+    <style>
+        .product-small-img img:hover{
+            opacity: 1;
+            transition-duration: 0.2s;
+        }
+    </style>
 </html>

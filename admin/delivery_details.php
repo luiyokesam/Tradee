@@ -1,20 +1,9 @@
 <?php
 include 'navbar.php';
 
-
-$Array_delivery = array();
-$sql1 = "SELECT deliveryid FROM delivery";
-$result1 = $dbc->query($sql1);
-if ($result1->num_rows > 0) {
-    while ($row = mysqli_fetch_array($result1)) {
-        array_push($Array_delivery, $row["deliveryid"]);
-    }
-}
-echo '<script>var Array_email = ' . json_encode($Array_delivery) . ';</script>';
-
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM delivery d, payment p WHERE deliveryid = '$id' AND d.tradeid = p.tradeid LIMIT 1";
+    $sql = "SELECT * FROM delivery d, trade_details t WHERE d.tradeid = t.tradeid AND d.deliveryid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
@@ -30,24 +19,55 @@ if (isset($_GET['id'])) {
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_GET['id'])) {
+    $sql = "UPDATE delivery SET "
+            . "receiveDate='" . $_POST['receiveDate'] . "',"
+            . "senderAddress='" . $_POST['senderAddress'] . "',"
+            . "recipientAddress='" . $_POST['recipientAddress'] . "',"
+            . "deliveryStatus='" . $_POST['deliveryStatus'] . "' "
+            . "WHERE deliveryid ='" . $current_data['deliveryid'] . "'";
 
-        $sql = "UPDATE delivery SET "
-                . "custType='" . $_POST['custType'] . "',"
-                . "name='" . $_POST['name'] . "',"
-                . "deliveryDate='" . $_POST['deliveryDate'] . "',"
-                . "receiveDate='" . $_POST['receiveDate'] . "',"
-                . "itemQuantity='" . $_POST['itemQuantity'] . "',"
-                . "pickAddress='" . $_POST['pickAddress'] . "',"
-                . "destinationAddress='" . $_POST['destinationAddress'] . "',"
-                . "deliveryStatus='" . $_POST['deliveryStatus'] . "' "
-                . "WHERE deliveryid ='" . $current_data['deliveryid'] . "'";
+    if ($dbc->query($sql)) {
+        echo '<script>alert("Delivery details has been updated.")</script>';
+    } else {
+        echo '<script>alert("Update fail!\nContact IT department for maintainence")</script>';
+    }
 
-        if ($dbc->query($sql)) {
-            echo '<script>alert("Successfuly update !");var currentURL = window.location.href;window.location.href = currentURL;</script>';
-        } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
+    $sql1 = "SELECT * FROM delivery d, trade t WHERE d.tradeid = t.tradeid AND d.tradeid = '" . $current_data['tradeid'] . "' AND d.deliveryStatus = 'Delivered'";
+    $result1 = $dbc->query($sql1);
+
+    echo '<script>alert("' . $sql1 . '");</script>';
+
+    if ($result1->num_rows > 1) {
+        while ($row1 = mysqli_fetch_array($result)) {
+            $sql2 = "UPDATE trade SET status = 'Completed' WHERE tradeid = '" . $row1['tradeid'] . "'";
+            ($dbc->query($sql2));
+
+            $sqlx = "SELECT * FROM trade_details WHERE tradeid = '" . $row1['tradeid'] . "' AND custid = '" . $row1['offerCustID'] . "'";
+            $resultx = $dbc->query($sqlx);
+            if ($resultx->num_rows > 0) {
+                while ($rowx = mysqli_fetch_array($resultx)) {
+                    $sqlxy = "UPDATE item SET custid = '" . $row1['acceptCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $rowx['itemid'] . "'";
+                    ($dbc->query($sqlxy));
+
+                    echo '<script>alert("' . $sqlxy . '");</script>';
+                }
+            }
+
+            $sqly = "SELECT * FROM trade_details WHERE tradeid = '" . $row1['tradeid'] . "' AND custid = '" . $row1['acceptCustID'] . "'";
+            $resulty = $dbc->query($sqly);
+            if ($resulty->num_rows > 0) {
+                while ($rowy = mysqli_fetch_array($resulty)) {
+                    $sqlyx = "UPDATE item SET custid = '" . $row1['offerCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $rowy['itemid'] . "'";
+                    ($dbc->query($sqlyx));
+
+                    echo '<script>alert("' . $sqlyx . '");</script>';
+                }
+            }
+
+            echo '<script>alert("' . $current_data['tradeid'] . ' has been completed.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
         }
+    } else {
+        echo '<script>var currentURL = window.location.href;window.location.href=currentURL;</script>';
     }
 }
 ?>
@@ -56,19 +76,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title> <?php echo $current_data['deliveryid'] ?> (Delivery Details) - Tradee</title>
+        <title> <?php echo $current_data['deliveryid'] ?> - Tradee</title>
     </head>
-    <body class="hold-transition sidebar-mini layout-fixed" onload="addnew()">
+    <body class="hold-transition sidebar-mini layout-fixed">
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <h4 class="m-0 text-dark" style="font-weight: bold;">Delivery ID: <?php
-                                        if (isset($current_data)) {
-                                            echo $current_data["deliveryid"];
-                                        }
-                                        ?></h4>
+                                if (isset($current_data)) {
+                                    echo $current_data["deliveryid"];
+                                }
+                                ?></h4>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -88,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <div class="col-md-12">
                                         <div class="card card-primary" >
                                             <div class="card-header">
-                                                <h3 class="card-title">Deliver Details</h3>
+                                                <h3 class="card-title">Delivery Details</h3>
                                                 <div class="card-tools" style="padding-top:10px">
                                                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                                                         <i class="fas fa-minus"></i>
@@ -111,80 +131,110 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Customer ID:</label>
-                                                            <input class="form-control" id="custid" name="custid" readonly value="<?php
+                                                            <label>Username:</label>
+                                                            <input class="form-control" id="username" name="username" readonly value="<?php
                                                             if (isset($current_data)) {
-                                                                echo $current_data["custid"];
-                                                            }
-                                                            ?>">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-8">
-                                                        <div class="form-group">
-                                                            <label>Name:</label>
-                                                            <input class="form-control" id="name" name="name" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["name"];
-                                                            }
-                                                            ?>">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <label>Item quantity:</label>
-                                                            <input class="form-control" id="itemQuantity" name="itemQuantity" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["itemQuantity"];
+                                                                echo $current_data["username"];
                                                             }
                                                             ?>">
                                                         </div>
                                                     </div>
 
                                                     <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Sender ID:</label>
+                                                            <input class="form-control" id="senderid" name="senderid" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["senderid"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Recipient ID:</label>
+                                                            <input class="form-control" id="recipientid" name="recipientid" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["recipientid"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Sender Address :</label>
+                                                            <textarea class="form-control" id="senderAddress" name="senderAddress" rows="5" readonly value="" placeholder="Tell us more about yourself"><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["senderAddress"];
+                                                                }
+                                                                ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Recipient Address :</label>
+                                                            <textarea class="form-control" id="recipientAddress" name="recipientAddress" rows="5" readonly value="" placeholder="Tell us more about yourself"><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["recipientAddress"];
+                                                                }
+                                                                ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label>Remarks :</label>
-                                                            <input class="form-control" id="remarks" name="remarks" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["remarks"];
-                                                            }
-                                                            ?>">
+                                                            <textarea class="form-control" id="remarks" name="remarks" rows="5" readonly value="" placeholder="Tell us more about yourself"><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["remarks"];
+                                                                }
+                                                                ?></textarea>
                                                         </div>
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Receive Date:</label>
-                                                            <input class="form-control" id="receiveDate" name="receiveDate" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["receiveDate"];
-                                                            }
-                                                            ?>">
+                                                            <label>Receive date:</label>
+                                                            <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
+                                                                <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                </div>
+                                                                <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" value="<?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["receiveDate"];
+                                                                }
+                                                                ?>" readOnly name="receiveDate" id="receiveDate">
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label>Pickup address: </label>
-                                                            <input class="form-control" id="pickAddress" name="pickAddress" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["pickAddress"];
-                                                            }
-                                                            ?>">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label>Destination address:</label>
-                                                            <input class="form-control" id="destinationAddress" name="destinationAddress" readonly value="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["destinationAddress"];
-                                                            }
-                                                            ?>">
-                                                        </div>
-                                                    </div>
+                                                    <!--                                                    <div class="col-md-6">
+                                                                                                            <div class="form-group">
+                                                                                                                <label>Receive date:</label>
+                                                                                                                <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
+                                                                                                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime">
+                                                                                                                    <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                                                                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                    
+                                                                                                                <div class="input-group">
+                                                                                                                    <div class="input-group date" id="registrationdate" data-target-input="nearest">
+                                                                                                                        <div class="input-group-append" data-target="#receiveDate" data-toggle="datetimepicker">
+                                                                                                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                                                                                        </div>
+                                                                                                                        <input type="text" class="form-control datetimepicker-input" data-target="#receiveDate" value="<?php
+                                                    if (isset($current_data)) {
+                                                        echo $current_data["receiveDate"];
+                                                    }
+                                                    ?>" readOnly name="receiveDate" id="receiveDate">
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>-->
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -192,11 +242,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             <select class="custom-select" id="deliveryStatus" name="deliveryStatus" disabled>
                                                                 <option <?php
                                                                 if (isset($current_data)) {
-                                                                    if ($current_data["deliveryStatus"] === "Pick up") {
+                                                                    if ($current_data["deliveryStatus"] === "Pending") {
                                                                         echo "selected";
                                                                     }
                                                                 }
-                                                                ?> value="Pick up">Pick up</option>
+                                                                ?> value="Pick up">Pending</option>
+
                                                                 <option <?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["deliveryStatus"] === "In Transit") {
@@ -204,6 +255,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     }
                                                                 }
                                                                 ?> value="In Transit">In Transit</option>
+
                                                                 <option <?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["deliveryStatus"] === "Shipping") {
@@ -211,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     }
                                                                 }
                                                                 ?> value="Shipping">Shipping</option>
+
                                                                 <option <?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["deliveryStatus"] === "Delivered") {
@@ -218,27 +271,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     }
                                                                 }
                                                                 ?> value="Delivered">Delivered</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label>Customer type:</label>
-                                                            <select class="custom-select" id="custType" name="custType" disabled>
-                                                                <option <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["custType"] === "Buyer") {
-                                                                        echo "selected";
-                                                                    }
-                                                                }
-                                                                ?> value="Buyer">Buyer</option>
-                                                                <option <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["custType"] === "Seller") {
-                                                                        echo "selected";
-                                                                    }
-                                                                }
-                                                                ?> value="Seller">Seller</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -265,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <table id="orderlisttable" class="table table-bordered table-striped">
                                                     <tbody>
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Card Number:</td>
+                                                            <td style="width: 30%;text-align: right">Card Number :</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
                                                                     echo $current_data["cardno"];
@@ -283,37 +315,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="width: 30%;text-align: right">Package  :</td>
+                                                            <td style="width: 30%;text-align: right">Package :</td>
                                                             <td><?php
                                                                 if (isset($current_data)) {
                                                                     echo $current_data["package"];
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 30%;text-align: right">Net Amount(RM) :</td>
-                                                            <td><?php
-                                                                if (isset($current_data)) {
-                                                                    echo $current_data["netAmount"];
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 30%;text-align: right">Tax(RM) :</td>
-                                                            <td><?php
-                                                                if (isset($current_data)) {
-                                                                    echo $current_data["tax"];
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="width: 30%;text-align: right">Total Amount(RM) :</td>
-                                                            <td><?php
-                                                                if (isset($current_data)) {
-                                                                    echo $current_data["totalAmount"];
                                                                 }
                                                                 ?>
                                                             </td>
@@ -328,16 +333,114 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                 ?>
                                                             </td>
                                                         </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Shipping Fee :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["shippingfee"] = number_format($current_data["shippingfee"], 2, '.', '');
+                                                                    echo "RM  {$current_data["shippingfee"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Package Fee :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["packagefee"] = number_format($current_data["packagefee"], 2, '.', '');
+                                                                    echo "RM  {$current_data["packagefee"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Sub Total :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["subTotal"] = number_format($current_data["subTotal"], 2, '.', '');
+                                                                    echo "RM  {$current_data["subTotal"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Tax :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["tax"] = number_format($current_data["tax"], 2, '.', '');
+                                                                    echo "RM  {$current_data["tax"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="font-weight: bolder;">
+                                                            <td style="width: 30%;text-align: right">Total Amount :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["totalAmount"] = number_format($current_data["totalAmount"], 2, '.', '');
+                                                                    echo "RM  {$current_data["totalAmount"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
+
+                                        <div class="row float-left">
+                                            <div class="col-auto">
+                                                <button type="button" id="btnback" class="btn btn-dark" onclick="back()">Back</button>
+                                            </div>
+                                        </div>
+
                                         <div class="row float-md-right">
                                             <div class="col-md-auto">
                                                 <button type="button" class="btn btn-danger" onclick="cancel()" id="btncancel" disabled>Cancel</button>
                                             </div>
                                             <div class="col-md-auto">
                                                 <button type="button" class="btn btn-warning" style="color: whitesmoke;" onclick="editorsave()" id="btnsave">Edit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card collapsed-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title" >Order Summary</h3>
+                                        <div class="card-tools" style="padding-top:10px">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body pb-0">
+                                        <div class="row">
+                                            <div class="col-12" id="accordion">
+                                                <?php
+                                                $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['senderid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                                $result = $dbc->query($get_inventory);
+                                                if ($result->num_rows > 0) {
+                                                    while ($row = mysqli_fetch_array($result)) {
+                                                        echo "<div class='card card-primary card-outline'>"
+                                                        . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
+                                                        . "<div class='card-header'>"
+                                                        . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
+                                                        . "</div>"
+                                                        . "</a>"
+                                                        . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
+                                                        . "<div class='card-body'>"
+                                                        . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                                        . "</div>"
+//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
+//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
+                                                        . "</div>"
+                                                        . "</div>";
+                                                    }
+                                                }
+                                                ?>
                                             </div>
                                         </div>
                                     </div>
@@ -358,60 +461,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (document.getElementById("btnsave").textContent === "Save") {
                 var fullfill = true;
                 var message = "";
-                document.getElementById("name").style.borderColor = "";
-                document.getElementById("itemQuantity").style.borderColor = "";
-                document.getElementById("remarks").style.borderColor = "";
-                document.getElementById("receiveDate").style.borderColor = "";
-                document.getElementById("pickAddress").style.borderColor = "";
-                document.getElementById("destinationAddress").style.borderColor = "";
-                document.getElementById("deliveryStatus").style.borderColor = "";
-                document.getElementById("custType").style.borderColor = "";
 
-                if (!document.getElementById("name").value || document.getElementById("name").value === "") {
-                    document.getElementById("name").style.borderColor = "red";
+                document.getElementById("senderAddress").style.borderColor = "";
+                document.getElementById("recipientAddress").style.borderColor = "";
+                document.getElementById("receiveDate").style.borderColor = "";
+                document.getElementById("deliveryStatus").style.borderColor = "";
+
+                if (!document.getElementById("senderAddress").value || document.getElementById("senderAddress").value === "") {
+                    document.getElementById("senderAddress").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("remarks").value || document.getElementById("remarks").value === "") {
-                    document.getElementById("remarks").style.borderColor = "red";
+                if (!document.getElementById("recipientAddress").value || document.getElementById("recipientAddress").value === "") {
+                    document.getElementById("recipientAddress").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("receiveDate").value || document.getElementById("receiveDate").value === "") {
-                    document.getElementById("receiveDate").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("itemQuantity").value || document.getElementById("itemQuantity").value === "") {
-                    document.getElementById("itemQuantity").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("pickAddress").value || document.getElementById("pickAddress").value === "") {
-                    document.getElementById("pickAddress").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("destinationAddress").value || document.getElementById("destinationAddress").value === "") {
-                    document.getElementById("destinationAddress").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("deliveryStatus").value || document.getElementById("deliveryStatus").value === "") {
-                    document.getElementById("deliveryStatus").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("custType").value || document.getElementById("custType").value === "") {
-                    document.getElementById("custType").style.borderColor = "red";
-                    fullfill = false;
-                }
+//                if (!document.getElementById("receiveDate").value || document.getElementById("receiveDate").value === "") {
+//                    document.getElementById("receiveDate").style.borderColor = "red";
+//                    fullfill = false;
+//                }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save ?")) {
-                        document.getElementById("tradeid").disabled = false;
-                        document.getElementById("custid").disabled = false;
-                        document.getElementById("name").disabled = false;
-                        document.getElementById("remarks").disabled = false;
-                        document.getElementById("receiveDate").disabled = false;
-                        document.getElementById("itemQuantity").disabled = false;
-                        document.getElementById("pickAddress").disabled = false;
-                        document.getElementById("destinationAddress").disabled = false;
-                        document.getElementById("deliveryStatus").disabled = false;
-                        document.getElementById("custType").disabled = false;
+                    if (confirm("Are you confirm to update the delivery details?")) {
                         document.getElementById("form").submit();
                     }
                 } else {
@@ -437,14 +507,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         function editable() {
             document.getElementById("btnsave").textContent = "Save";
             document.getElementById("btncancel").disabled = false;
-            document.getElementById("name").readOnly = false;
-            document.getElementById("remarks").readOnly = false;
+            document.getElementById("senderAddress").readOnly = false;
+            document.getElementById("recipientAddress").readOnly = false;
             document.getElementById("receiveDate").readOnly = false;
-            document.getElementById("itemQuantity").readOnly = false;
-            document.getElementById("pickAddress").readOnly = false;
-            document.getElementById("destinationAddress").readOnly = false;
             document.getElementById("deliveryStatus").disabled = false;
-            document.getElementById("custType").disabled = false;
         }
+
+        function back() {
+            window.location.href = "delivery_list.php";
+        }
+
+        //Date picker
+        //        $('#registrationdate').datetimepicker({
+        //            format: 'L'
+        //        });
+
+        //Date and time picker
+        $('#reservationdatetime').datetimepicker({icons: {time: 'far fa-clock'}});
     </script>
 </html>
