@@ -239,12 +239,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
                                                         $shipping_fee = $shipping_fee + 10;
                                                     }
-                                                    $shipping_fee = $shipping_fee + 20;
+                                                    $shipping_fee = $shipping_fee + 15;
 
                                                     $shipping_fee = number_format($shipping_fee, 2, '.', '');
                                                     echo $shipping_fee;
                                                 } else {
-                                                    $shipping_fee = 10;
+                                                    $shipping_fee = 5;
                                                     $shipping_fee = number_format($shipping_fee, 2, '.', '');
                                                     echo $shipping_fee;
                                                 }
