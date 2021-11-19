@@ -88,7 +88,7 @@ include '../include/header.php';
 
                 <?php
                 if (isset($_SESSION['loginuser'])) {
-                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}'";
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}' ORDER BY (i.itemid) DESC";
                     $result = $dbc->query($get_inventory);
                     if ($result->num_rows > 0) {
                         while ($row = mysqli_fetch_array($result)) {
@@ -119,7 +119,7 @@ include '../include/header.php';
                         }
                     }
                 } else {
-                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available'";
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available' ORDER BY i.itemid DESC";
                     $result = $dbc->query($get_inventory);
                     if ($result->num_rows > 0) {
                         while ($row = mysqli_fetch_array($result)) {
@@ -249,7 +249,7 @@ include '../include/header.php';
             /*height: 192px;*/
             /*background: #e8e8e8;*/
             /*max-width: 255px;*/
-            max-height: 370px;
+            max-height: 250px;
             background: whitesmoke;
             text-align: center;
             background-size: cover;
@@ -257,8 +257,8 @@ include '../include/header.php';
         }
 
         .item-img{
-            max-height: 300px;
-            min-height: 300px;
+            max-height: 250px;
+            min-height: 250px;
             /*width: 100%;*/
             /*height: 100%;*/
             text-align: center;

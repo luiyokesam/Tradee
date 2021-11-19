@@ -42,46 +42,45 @@ if ($result->num_rows > 0) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql_trade = "INSERT INTO trade(tradeid, offerCustID, acceptCustID, acceptPayment, offerPayment, date, status) VALUES ("
+    $sql_trade = "INSERT INTO trade(tradeid, offerCustID, acceptCustID, acceptPayment, offerPayment, tradeDate, status) VALUES ("
             . "'" . $newid . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
             . "'" . $current_data['custid'] . "',"
             . "'Pending',"
             . "'Pending',"
-            . "NOW(),"
+            . "'" . $_POST['todaydate'] . "',"
             . "'Pending')";
 //    echo '<script>alert("' . $sql_trade . '");</script>';
 
-    $my_items = $_POST['my_item'];
-    foreach ($my_items as $myitems) {
-        $sql_mytrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $_SESSION['loginuser']['custid'] . "',"
-                . "'" . $myitems . "')";
-        $dbc->query($sql_mytrade);
+    if (($dbc->query($sql_trade))) {
+        $my_items = $_POST['my_item'];
+        foreach ($my_items as $myitems) {
+            $sql_mytrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+                    . "'" . $newid . "',"
+                    . "'" . $_SESSION['loginuser']['custid'] . "',"
+                    . "'" . $myitems . "')";
+            $dbc->query($sql_mytrade);
 //        echo '<script>alert("' . $sql_mytrade . '");</script>';
 
-        $sql_my_itemActive = "UPDATE item SET "
-                . "itemActive = 'Pending'"
-                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $myitems . "'";
-        $dbc->query($sql_my_itemActive);
+            $sql_my_itemActive = "UPDATE item SET "
+                    . "itemActive = 'Pending'"
+                    . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
+                    . " itemid = '" . $myitems . "'";
+            $dbc->query($sql_my_itemActive);
 //        echo '<script>alert("' . $sql_my_itemActive . '");</script>';
-    }
+        }
 //    echo '<script>alert("' . $myitems . '");</script>';
 
-    $his_items = $_POST['his_item'];
-    foreach ($his_items as $his_item_list) {
-        $sql_his_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $current_data['custid'] . "',"
-                . "'" . $his_item_list . "')";
+        $his_items = $_POST['his_item'];
+        foreach ($his_items as $his_item_list) {
+            $sql_his_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+                    . "'" . $newid . "',"
+                    . "'" . $current_data['custid'] . "',"
+                    . "'" . $his_item_list . "')";
 
-        $dbc->query($sql_his_trade_details);
-    }
+            $dbc->query($sql_his_trade_details);
+        }
 //    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
-
-    if (($dbc->query($sql_trade))) {
         echo '<script>alert("Trade offer sent successfully!");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
@@ -252,10 +251,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-lg-5 col-3 item-title">Uploaded</div>
-                                    <div class="col item-value" style="color: red;">3 days ago</div>
-                                </div>
+                                <!--                                <div class="row">
+                                                                    <div class="col-lg-5 col-3 item-title">Uploaded</div>
+                                                                    <div class="col item-value" style="color: red;">
+                                <?php
+//                                        if (isset($current_data)) {
+//                                            date_default_timezone_set('Etc/GMT+8');
+////                                            $today0 = new DateTime();
+////                                            $today = strtotime("d/m/Y", $today0);
+//
+//                                            $date1 = new DateTime($current_data['postDate']);
+//                                            $date2 = new DateTime();
+//                                            $interval = $date1->diff($date2);
+//                                            echo '<script>alert("' . $interval->d . '");</script>';
+//
+////                                            $postdate = new DateTime($current_data['postDate']);
+////                                            $time = strtotime("d/m/Y", $current_data['postDate']);
+////                                            echo '<script>alert("' . $today . '");</script>';
+////                                            $now = $today - $postdate;
+////                                            $day = $now / (1000 * 60 * 60 * 24);
+//                                            echo $day;
+//                                        }
+                                ?>
+                                                                    </div>
+                                                                </div>-->
 
                                 <div class="row">
                                     <div class="col-lg-5 col-3 item-title">Uploaded</div>
@@ -406,7 +425,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row row-cols-md-3 row-cols-sm-2">
                         <?php
                         if (isset($_SESSION['loginuser'])) {
-                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}' AND i.itemid <> '{$current_data['itemid']}'";
+                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}' AND i.itemid <> '{$current_data['itemid']}' ORDER BY i.itemid DESC";
                             $result = $dbc->query($get_inventory);
                             if ($result->num_rows > 0) {
                                 while ($row = mysqli_fetch_array($result)) {
@@ -437,7 +456,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 }
                             }
                         } else {
-                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available'";
+                            $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActive = 'Available' ORDER BY i.itemid DESC";
                             $result = $dbc->query($get_inventory);
                             if ($result->num_rows > 0) {
                                 while ($row = mysqli_fetch_array($result)) {
@@ -507,7 +526,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             if (isset($current_data) == null) {
                                                 echo "<div>- {$current_data['review']}</div>";
                                             } else {
-                                                echo "<div style='font-weight:lighter;'>- No reviews yet</div>";
+                                                echo "<div style='font-weight:lighter;'>- No reviews yet.</div>";
                                             }
                                             ?>
                                         </div>
@@ -527,7 +546,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             if (isset($current_data)) {
                                                 echo "<div>- {$current_data['state']}, {$current_data['country']}</div>";
                                             } else {
-                                                echo "<div style='font-weight:bold;'>No state shown</div>";
+                                                echo "<div style='font-weight: lighter;'>- Location no shown.</div>";
                                             }
                                             ?>
                                         </div>
@@ -535,7 +554,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col-lg-4 col-sm-6 mb-1">
                                             <div style="font-weight: bolder;">Trade Count</div>
                                             <?php
-                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE c.custid = '{$current_data['custid']}'";
+                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
                                             $result = $dbc->query($sql);
                                             if ($result->num_rows > 0) {
                                                 while ($row = mysqli_fetch_array($result)) {
@@ -550,7 +569,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col-lg-4 col-sm-6 mb-1">
                                             <div style="font-weight: bolder;">Last Trade</div>
                                             <?php
-                                            $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE c.custid = '{$current_data['custid']}'";
+                                            $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
                                             $result = $dbc->query($sql);
                                             if ($result->num_rows > 0) {
                                                 while ($row = mysqli_fetch_array($result)) {
@@ -566,11 +585,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <div style="font-weight: bolder;">Description</div>
                                             <?php
                                             if (isset($current_data)) {
-                                                echo "<div style='font-weight: lighter;'>- {$current_data['description']}</div>";
-                                            } else {
-                                                echo "<div>No description yet</div>";
+                                                if (($current_data['description'] != '')) {
+                                                    echo "<div>- {$current_data['description']}</div>";
+                                                } else {
+                                                    echo "<div style='font-weight: lighter;'>- No description yet.</div>";
+                                                }
                                             }
                                             ?>
+                                        </div>
+
+                                        <div class="col-12 mb-1" style="display: none;">
+                                            <div style="font-weight: bolder;">Today Date</div>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="todaydate" maxlength="10" readOnly name="todaydate">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -578,7 +609,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Your inventory</label>
-                                        <select class="select2bs4" name="my_item[]" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
+                                        <select class="select2bs4" name="my_item[]" id="myitem" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
                                             <?php
                                             $get_item = "SELECT * FROM item WHERE custid = '{$_SESSION['loginuser']['custid']}' AND itemActive = 'Available'";
                                             $result_item = $dbc->query($get_item);
@@ -595,7 +626,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>His/Her inventory</label>
-                                        <select class="select2bs4" name="his_item[]" multiple="multiple" data-placeholder="Select his/her item" style="width: 100%;">
+                                        <select class="select2bs4" name="his_item[]" id="hisitem" multiple="multiple" data-placeholder="Select his/her item" style="width: 100%;">
                                             <?php
                                             $get_item = "SELECT * FROM item WHERE custid = '{$current_data['custid']}' AND itemActive = 'Available' AND itemid = '{$current_data['itemid']}'";
                                             $result_item = $dbc->query($get_item);
@@ -620,7 +651,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-offer" id="btnsave">Send offer</button>
+                            <button type="button" class="btn btn-offer" id="btntrade" onclick="sendoffer()">Send offer</button>
                         </div>
                     </div>
                 </div>
@@ -638,6 +669,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 theme: 'bootstrap4'
             })
         })
+
+        function sendoffer() {
+            var fullfill = true;
+            var message = "Both trader must select at least an item to trade.";
+
+            document.getElementById("myitem").style.borderColor = "";
+            document.getElementById("hisitem").style.borderColor = "";
+
+            if (!document.getElementById("myitem").value || document.getElementById("myitem").value === "") {
+                document.getElementById("myitem").style.borderColor = "red";
+                fullfill = false;
+            }
+            if (!document.getElementById("hisitem").value || document.getElementById("hisitem").value === "") {
+                document.getElementById("hisitem").style.borderColor = "red";
+                fullfill = false;
+            }
+
+            if (fullfill) {
+                if (confirm("Are sure to trade the current item with <?php echo $current_data['username'] ?>?")) {
+                    document.getElementById("form").submit();
+                }
+            } else {
+                alert(message);
+            }
+        }
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        document.getElementById("todaydate").value = dd + '/' + mm + '/' + yyyy;
 
         function imageGallery(smallImg) {
             var fullImg = document.getElementById("imageBox");
@@ -680,7 +742,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             /*height: 192px;*/
             /*background: #e8e8e8;*/
             /*max-width: 255px;*/
-            max-height: 370px;
+            max-height: 250px;
             background: whitesmoke;
             text-align: center;
             background-size: cover;
@@ -688,8 +750,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .item-img{
-            max-height: 300px;
-            min-height: 300px;
+            max-height: 250px;
+            min-height: 250px;
             /*width: 100%;*/
             /*height: 100%;*/
             text-align: center;

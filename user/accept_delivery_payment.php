@@ -2,13 +2,9 @@
 include '../include/header.php';
 
 if (!isset($_SESSION["delivery_details"])) {
-    echo '<script>alert("You have not input your detail at check out/\nRedirect to Check out");window.location.href = "checkout.php";</script>';
+    echo '<script>alert("You have not input your details at shipping.\nRedirect to home page.");window.location.href = "../php/index.php";</script>';
     exit();
 }
-//else {
-//    $sql = "SELECT * FROM trade t, trade_details d, item i WHERE t.tradeid = d.tradeid AND d.itemid = i.itemid AND d.custid = '" . $_SESSION['loginuser']['custid'] . "' AND d.tradeid = '{$_SESSION['delivery_details']['tradeid']}' LIMIT 1";
-//    $result = $dbc->query($sql);
-//}
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -18,6 +14,32 @@ if (isset($_GET['id'])) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
+
+            if ($_SESSION['delivery_details']['deliverycountry'] !== $_SESSION['loginuser']['country']) {
+                if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
+                    $shipping_fee = $shipping_fee + 10;
+                }
+                $shipping_fee = $shipping_fee + 15;
+
+                $shipping_fee = number_format($shipping_fee, 2, '.', '');
+            } else {
+                $shipping_fee = 5;
+                $shipping_fee = number_format($shipping_fee, 2, '.', '');
+            }
+
+            if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
+                $packaging_fee = 5;
+            } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
+                $packaging_fee = 8;
+            } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
+                $packaging_fee = 10;
+            }
+            $packaging_fee = number_format($packaging_fee, 2, '.', '');
+
+            $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
+            $tax = number_format($subtotal * 0.06, 2, '.', '');
+            $totalamount = number_format($subtotal + $tax, 2, '.', '');
+
             break;
         }
     } else {
@@ -55,11 +77,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "'" . $_SESSION['delivery_details']['remarks'] . "',"
             . "'" . $_POST["cardno"] . "',"
             . "'" . $_POST["cardname"] . "',"
-            . $_POST["shippingfee"] . ","
-            . $_POST["packagingfee"] . ","
-            . $_POST["subTotal"] . ","
-            . $_POST["tax"] . ","
-            . $_POST["totalAmount"] . ","
+            . $shipping_fee . ","
+            . $packaging_fee . ","
+            . $subtotal . ","
+            . $tax . ","
+            . $totalamount . ","
             . "'" . $_POST["paymentDate"] . "',"
             . "'Pending')";
 
@@ -75,10 +97,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $result = $dbc->query($sql_status);
             if ($result->num_rows > 0) {
 //                while ($row = mysqli_fetch_array($result)) {
-                    $sql_update = "UPDATE trade SET"
-                            . " status = 'To Ship'"
-                            . " WHERE tradeid ='" . $_SESSION['delivery_details']['tradeid'] . "'";
-                    $result = $dbc->query($sql_update);
+                $sql_update = "UPDATE trade SET"
+                        . " status = 'To Ship'"
+                        . " WHERE tradeid ='" . $_SESSION['delivery_details']['tradeid'] . "'";
+                $result = $dbc->query($sql_update);
 //                }
             }
             echo '<script>alert("Your trade payment has completed. Our delivery courier will be coming soon. Thank you.");window.location.href="trade_list.php";</script>';
@@ -120,8 +142,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="container-lg mb-5">
             <form method="post" id="form">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
+                <div class="row justify-content-center px-md-0 px-3">
+                    <div class="col-xl-6 col-lg-7">
                         <div class="row">
                             <div class="container">
                                 <div class="card">
@@ -183,7 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                <div class="row py-3 mb-5">
+                                <div class="row py-3 mb-lg-5">
                                     <div class="col-auto mb-2">
                                         <a class="btn btn-warning btn-block" href="../user/accept_delivery_shipping.php?id=<?php echo $current_data['tradeid'] ?>" id="btnback">Back</a>
                                     </div>
@@ -196,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
 
-                    <div class="col-md-5">
+                    <div class="col-xl-4 col-lg-5">
                         <div class="row">
                             <div class="container">
                                 <div class="card">
@@ -229,139 +251,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     <th scope="col" class="table-info">Total (RM)</th>
                                                 </tr>
                                             </thead>
+                                            <tbody style="text-align: left">
+                                                <tr>
+                                                    <td>Shipping fee</td>
+                                                    <td>
+                                                        <?php
+                                                        echo $shipping_fee;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Packaging fee</td>
+                                                    <td>
+                                                        <?php
+                                                        echo $packaging_fee;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sub Total</td>
+                                                    <td>
+                                                        <?php
+                                                        echo $subtotal;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tax (6%)</td>
+                                                    <td>
+                                                        <?php
+                                                        echo $tax;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                                <tr style="font-weight: bolder;">
+                                                    <td>Total Amount</td>
+                                                    <td>
+                                                        <?php
+                                                        echo $totalamount;
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
-                                        <div class="form-group row py-1 px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Shipping Fee</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="shippingfee" name="shippingfee" required style="border-style: none;" value="<?php
-                                                $shipping_fee = 0;
-                                                if ($_SESSION['delivery_details']['deliverycountry'] !== $_SESSION['loginuser']['country']) {
-                                                    if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
-                                                        $shipping_fee = $shipping_fee + 10;
-                                                    }
-                                                    $shipping_fee = $shipping_fee + 15;
-
-                                                    $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                                    echo $shipping_fee;
-                                                } else {
-                                                    $shipping_fee = 5;
-                                                    $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                                    echo $shipping_fee;
-                                                }
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Packaging Fee</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="packagingfee" name="packagingfee" required style="border-style: none;" value="<?php
-                                                $packaging_fee = 0;
-                                                if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                                                    $packaging_fee = 5;
-                                                } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                                                    $packaging_fee = 8;
-                                                } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                                                    $packaging_fee = 10;
-                                                }
-                                                $packaging_fee = number_format($packaging_fee, 2, '.', '');
-                                                echo $packaging_fee;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Sub Total</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="subTotal" name="subTotal" required style="border-style: none;" value="<?php
-                                                $subtotal = 0;
-                                                $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
-                                                echo $subtotal;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Tax (6%)</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="tax" name="tax" required style="border-style: none;" value="<?php
-                                                $tax = 0;
-                                                $tax = number_format($subtotal * 0.06, 2, '.', '');
-                                                echo $tax;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-0">
-                                            <label class="col-sm-5 col-form-label">Total Amount</label>
-                                            <div class="col-md-7">
-                                                <input type="text" class="form-control" id="totalAmount" name="totalAmount" required style="border-style: none;" value="<?php
-                                                       $totalamount = 0;
-                                                       $totalamount = number_format($subtotal + $tax, 2, '.', '');
-                                                       echo $totalamount;
-                                                       ?>">
-                                            </div>
-                                        </div>
-
-        <!--                                        <table class="table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col" class="table-info">Fees</th>
-                                                            <th scope="col" class="table-info">Total (RM)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody style="text-align: left">
-                                                        <tr>
-                                                            <td>Shipping fee</td>
-                                                            <td>
-                                        <?php $totalamount ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Packaging fee</td>
-                                                            <td>
-                                        <?php
-                                        $packaging_fee = 0;
-                                        if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                                            $packaging_fee = 5;
-                                        } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                                            $packaging_fee = 8;
-                                        } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                                            $packaging_fee = 10;
-                                        }
-                                        $packaging_fee = number_format($packaging_fee, 2, '.', '');
-                                        echo $packaging_fee;
-                                        ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Sub Total</td>
-                                                            <td>
-                                        <?php
-                                        $subtotal = 0;
-                                        $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
-                                        echo $subtotal;
-                                        ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Tax (6%)</td>
-                                                            <td>
-                                        <?php
-                                        $tax = 0;
-                                        $tax = number_format($subtotal * 0.06, 2, '.', '');
-                                        echo $tax;
-                                        ?>
-                                                            </td>
-                                                        </tr>
-                                                        <tr style="font-weight: bolder;">
-                                                            <td>Total Amount</td>
-                                                            <td>
-                                        <?php
-                                        $totalamount = 0;
-                                        $totalamount = number_format($subtotal + $tax, 2, '.', '');
-                                        echo $totalamount;
-                                        ?>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>-->
                                     </div>
                                 </div>
                             </div>

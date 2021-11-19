@@ -67,8 +67,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <body>
         <div class="setting">
             <div class="container-lg py-3">
+                <input class="form-control" type="text" id="type" name="type" readonly style="display: none;">
                 <div class="row justify-content-center">
-                    <?php include '../include/sidenav.php'; ?>
+                    <?php
+                    $page = 'setting_account';
+                    include '../include/sidenav.php';
+                    ?>
                     <div class="col-lg-8 col-md-10">
                         <form method="post" id="form">
                             <div class="mb-1 bg-white">
@@ -90,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             <div class="d-flex flex-row-reverse py-2 mb-2">
                                 <button class="btn btn-warning" type="button" id="btnchange" name="btnchange" value="" onclick="changepassword()">Change</button>
-                                <input class="form-control" type="text" id="type" name="type" style="display: none;" readonly>
                             </div>
 
                             <div class="mb-3 bg-white">
@@ -240,7 +243,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         //Date picker
         $('#registrationdate').datetimepicker({
-            format: 'L'
+            format: 'DD/MM/YYYY'
+            
         });
     </script>
     <style>

@@ -5,6 +5,20 @@ if (!isset($_SESSION['loginuser'])) {
     echo '<script>alert("Please login to Tradee.");window.location.href="../user/logout.php";</script>';
 }
 
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $sql = "SELECT * FROM customer WHERE custid = '$id' LIMIT 1";
+    $result = $dbc->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = mysqli_fetch_array($result)) {
+            $current_data = $row;
+            break;
+        }
+    } else {
+        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
+    }
+}
+
 $sql = "SELECT * FROM trade ORDER BY tradeid DESC LIMIT 1";
 $result = $dbc->query($sql);
 if ($result->num_rows > 0) {
@@ -23,66 +37,47 @@ if ($result->num_rows > 0) {
     $view = false;
 }
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "SELECT * FROM customer WHERE custid = '$id' LIMIT 1";
-    $result = $dbc->query($sql);
-    if ($result->num_rows > 0) {
-        while ($row = mysqli_fetch_array($result)) {
-            $current_data = $row;
-            break;
-        }
-    } else {
-        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
-    }
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql_trade = "INSERT INTO trade(tradeid, offerCustID, acceptCustID, date, status) VALUES ("
+    $sql_trade = "INSERT INTO trade(tradeid, offerCustID, acceptCustID, acceptPayment, offerPayment, tradeDate, status) VALUES ("
             . "'" . $newid . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
             . "'" . $current_data['custid'] . "',"
-            . "NOW(),"
+            . "'Pending',"
+            . "'Pending',"
+            . "'" . $_POST['todaydate'] . "',"
             . "'Pending')";
-
 //    echo '<script>alert("' . $sql_trade . '");</script>';
 
-    $my_items = $_POST['my_item'];
-    foreach ($my_items as $my_item_list) {
-        $sql_my_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $_SESSION['loginuser']['custid'] . "',"
-                . "'" . $my_item_list . "')";
-
-        $dbc->query($sql_my_trade_details);
-    }
-//    echo '<script>alert("' . $sql_my_trade_details . '");</script>';
-
-    foreach ($my_items as $update_my_item_list) {
-        $sql = "UPDATE item SET "
-                . "itemActive = 'Pending'"
-                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-                . " itemid = '" . $update_my_item_list . "'";
-
-        $dbc->query($sql);
-//        echo '<script>alert("' . $sql . '");</script>';
-    }
-
-//    echo '<script>alert("' . $update_my_item_list . '");</script>';
-
-    $his_items = $_POST['his_item'];
-    foreach ($his_items as $his_item_list) {
-        $sql_his_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
-                . "'" . $newid . "',"
-                . "'" . $current_data['custid'] . "',"
-                . "'" . $his_item_list . "')";
-
-        $dbc->query($sql_his_trade_details);
-    }
-//    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
-
     if (($dbc->query($sql_trade))) {
-        echo '<script>alert("Successfuly insert!");window.location.href="../php/index.php";</script>';
+        $my_items = $_POST['my_item'];
+        foreach ($my_items as $myitems) {
+            $sql_mytrade = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+                    . "'" . $newid . "',"
+                    . "'" . $_SESSION['loginuser']['custid'] . "',"
+                    . "'" . $myitems . "')";
+            $dbc->query($sql_mytrade);
+//        echo '<script>alert("' . $sql_mytrade . '");</script>';
+
+            $sql_my_itemActive = "UPDATE item SET "
+                    . "itemActive = 'Pending'"
+                    . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
+                    . " itemid = '" . $myitems . "'";
+            $dbc->query($sql_my_itemActive);
+//        echo '<script>alert("' . $sql_my_itemActive . '");</script>';
+        }
+//    echo '<script>alert("' . $myitems . '");</script>';
+
+        $his_items = $_POST['his_item'];
+        foreach ($his_items as $his_item_list) {
+            $sql_his_trade_details = "INSERT INTO trade_details(tradeid, custid, itemid) VALUES ("
+                    . "'" . $newid . "',"
+                    . "'" . $current_data['custid'] . "',"
+                    . "'" . $his_item_list . "')";
+
+            $dbc->query($sql_his_trade_details);
+        }
+//    echo '<script>alert("' . $sql_his_trade_details . '");</script>';
+        echo '<script>alert("Trade offer sent successfully!");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
     }
@@ -110,9 +105,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ?>" class="rounded-pill img-fluid profile-pic" alt="Profile picture">
                 </div>
 
-                <div class="col-lg-9">
+                <div class="col-lg-9 px-3">
                     <div class="row">
-                        <div class="col-9 py-3">
+                        <div class="col py-3">
                             <?php
                             if (isset($current_data)) {
                                 echo "<div>{$current_data['username']}</div>";
@@ -121,54 +116,94 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             }
                             ?>
                             <?php
-                            if (isset($current_data['review'])) {
-                                echo "<div>{$current_data['review']}</div>";
-                            } else {
-                                echo "<div style='font-weight:bold;'>No reviews yet</div>";
+                            if (isset($current_data)) {
+                                if (isset($current_data['review'])) {
+                                    echo "<div>{$current_data['review']}</div>";
+                                } else {
+                                    echo "<div style='font-weight:lighter;'>- No reviews yet</div>";
+                                }
                             }
                             ?>
                         </div>
 
-                        <div class="col-3 py-3">
+                        <div class="col-auto float-right py-3">
                             <button class="btn btn-trade-now" data-toggle="modal" data-target="#modal-bid-item">Trade now</button>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-12">
-                            <div class="my-2">
-                                <div>Joined date</div>
-                                <?php
-                                if (isset($current_data)) {
-                                    echo "<div>{$current_data['registration_date']}</div>";
-                                }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Joined</div>
+                                        <?php
+                                        if (isset($current_data)) {
+                                            echo "<div>- {$current_data['registration_date']}</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
 
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="my-2">
-                                <div>Location</div>
-                                <?php
-                                if (isset($current_data)) {
-                                    echo "<div>{$current_data['state']}, {$current_data['country']}</div>";
-                                } else {
-                                    echo "<div style='font-weight:bold;'>No state shown</div>";
-                                }
-                                ?>
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Location</div>
+                                        <?php
+                                        if (isset($current_data)) {
+                                            echo "<div>- {$current_data['state']}, {$current_data['country']}</div>";
+                                        } else {
+                                            echo "<div style='font-weight: lighter;'>- No state shown</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Trade Count</div>
+                                        <?php
+                                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustid = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                        $result = $dbc->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                echo "<div>- {$row['NUMBER']}</div>";
+                                                break;
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
+                                        <div style="font-weight: bolder;">Last Trade</div>
+                                        <?php
+                                        $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                        $result = $dbc->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                echo "<div>- {$row['DATE']}</div>";
+                                                break;
+                                            }
+                                        } else {
+                                            echo "<div>- You haven't completed any trade yet.</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col py-3 px-0">
-                        <div>Description</div>
+                        <div style="font-weight: bolder;">Description</div>
                         <?php
                         if (isset($current_data)) {
-                            echo "<div>{$current_data['description']}</div>";
-                        } else {
-                            echo "<div>No description yet</div>";
+                            if (($current_data['description'] != '')) {
+                                echo "<div>- {$current_data['description']}</div>";
+                            } else {
+                                echo "<div style='font-weight: lighter;'>- No description yet</div>";
+                            }
                         }
                         ?>
                     </div>
@@ -182,11 +217,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <button class="nav-link" id="nav-history-tab" data-bs-toggle="tab" data-bs-target="#nav-history" type="button" role="tab">Trade history</button>
                 </div>
             </nav>
-            <div class="tab-content" id="nav-tabContent">
+            <div class="tab-content mb-3" id="nav-tabContent">
                 <!--tab 1-->
                 <div class="tab-pane fade show active" id="nav-inventory" role="tabpanel">
                     <?php
-                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.custid = '{$current_data['custid']}'";
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.custid = '{$current_data['custid']}' ORDER BY i.itemid DESC";
                     $result = $dbc->query($get_inventory);
                     if ($result->num_rows > 0) {
                         echo "<div class = 'container-lg'>"
@@ -326,57 +361,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
 
                                 <div class="col-lg-9">
-                                    <div class="col-12">
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo $current_data['username'];
-                                        }
-                                        ?>
-                                        <?php
-                                        if (isset($current_data) == null) {
-                                            echo "<div>{$current_data['review']}</div>";
-                                        } else {
-                                            echo "<div style='font-weight:bold;'>No reviews yet</div>";
-                                        }
-                                        ?>
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4 mb-1">
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo $current_data['username'];
+                                            }
+                                            ?>
+                                            <?php
+                                            if (isset($current_data) == null) {
+                                                echo "<div>- {$current_data['review']}</div>";
+                                            } else {
+                                                echo "<div style='font-weight:lighter;'>- No reviews yet</div>";
+                                            }
+                                            ?>
+                                        </div>
 
-                                    <div class="col mt-2">
-                                        <div>Joined date</div>
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo "<div>{$current_data['registration_date']}</div>";
-                                        }
-                                        ?>
-                                    </div>
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Joined</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo "<div>- {$current_data['registration_date']}</div>";
+                                            }
+                                            ?>
+                                        </div>
 
-                                    <div class="col mt-2">
-                                        <div>Location</div>
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo "<div>{$current_data['state']}, {$current_data['country']}</div>";
-                                        } else {
-                                            echo "<div style='font-weight:bold;'>No state shown</div>";
-                                        }
-                                        ?>
-                                    </div>
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Location</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                echo "<div>- {$current_data['state']}, {$current_data['country']}</div>";
+                                            } else {
+                                                echo "<div style='font-weight:lighter;'>- No location shown</div>";
+                                            }
+                                            ?>
+                                        </div>
 
-                                    <div class="col mt-2">
-                                        <div>Description here</div>
-                                        <?php
-                                        if (isset($current_data)) {
-                                            echo "<div>{$current_data['description']}</div>";
-                                        } else {
-                                            echo "<div>No description yet</div>";
-                                        }
-                                        ?>
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Trade Count</div>
+                                            <?php
+                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.acceptCustID = c.custid OR t.offerCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $current_offer = $row;
+                                                    echo "<div>- {$current_offer['NUMBER']}</div>";
+                                                    break;
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-lg-4 col-sm-6 mb-1">
+                                            <div style="font-weight: bolder;">Last Trade</div>
+                                            <?php
+                                            $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE (t.acceptCustID = c.custid OR t.offerCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $current_offer = $row;
+                                                    echo "<div>- {$current_offer['DATE']}</div>";
+                                                    break;
+                                                }
+                                            } else {
+                                                echo "<div style='font-weight:lighter;'>- This user haven't conduct any trade yet.</div>";
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-12 mb-1">
+                                            <div style="font-weight: bolder;">Description</div>
+                                            <?php
+                                            if (isset($current_data)) {
+                                                if (($current_data['description'] != '')) {
+                                                    echo "<div>- {$current_data['description']}</div>";
+                                                } else {
+                                                    echo "<div style='font-weight:lighter;'>- No description yet.</div>";
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <div class="col-12 mb-1" style="display: none;">
+                                            <div style="font-weight: bolder;">Today Date</div>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="todaydate" maxlength="10" readOnly name="todaydate">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Your inventory</label>
-                                        <select class="select2bs4" name="my_item[]" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
+                                        <select class="select2bs4" name="my_item[]" id="myitem" multiple="multiple" data-placeholder="Select your item" style="width: 100%;">
                                             <?php
                                             $get_item = "SELECT * FROM item WHERE custid = '{$_SESSION['loginuser']['custid']}' AND itemActive = 'Available'";
                                             $result_item = $dbc->query($get_item);
@@ -393,7 +474,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>His/Her inventory</label>
-                                        <select class="select2bs4" name="his_item[]" multiple="multiple" data-placeholder="Select his/her item" style="width: 100%;">
+                                        <select class="select2bs4" name="his_item[]" id="hisitem" multiple="multiple" data-placeholder="Select his/her item" style="width: 100%;">
                                             <?php
                                             $get_item = "SELECT * FROM item WHERE custid = '{$current_data['custid']}' AND itemActive = 'Available'";
                                             $result_item = $dbc->query($get_item);
@@ -410,7 +491,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" id="btnsave">Save</button>
+                            <button type="button" class="btn btn-offer" id="btntrade" onclick="sendoffer()">Send offer</button>
                         </div>
                     </div>
                 </div>
@@ -428,6 +509,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             "autoWidth": false,
             "responsive": true
         });
+
+        function sendoffer() {
+            var fullfill = true;
+            var message = "Both trader must select at least an item to trade.";
+
+            document.getElementById("myitem").style.borderColor = "";
+            document.getElementById("hisitem").style.borderColor = "";
+
+            if (!document.getElementById("myitem").value || document.getElementById("myitem").value === "") {
+                document.getElementById("myitem").style.borderColor = "red";
+                fullfill = false;
+            }
+            if (!document.getElementById("hisitem").value || document.getElementById("hisitem").value === "") {
+                document.getElementById("hisitem").style.borderColor = "red";
+                fullfill = false;
+            }
+
+            if (fullfill) {
+                if (confirm("Are sure to trade the current item with <?php echo $current_data['username'] ?>?")) {
+                    document.getElementById("form").submit();
+                }
+            } else {
+                alert(message);
+            }
+        }
 
         $(function () {
             //Initialize Select2 Elements
@@ -447,7 +553,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             /*height: 192px;*/
             /*background: #e8e8e8;*/
             /*max-width: 255px;*/
-            max-height: 370px;
+            max-height: 250px;
             background: whitesmoke;
             text-align: center;
             background-size: cover;
@@ -455,8 +561,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .item-img{
-            min-height: 300px;
-            max-height: 300px;
+            min-height: 250px;
+            max-height: 250px;
             text-align: center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -485,6 +591,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             /*            width: 142px;
                         height: 142px;*/
             object-fit: cover;
+        }
+
+        /*button*/
+        .btn-offer{
+            color: white;
+            border-color: #7cf279;
+            background-color: #7cf279;
         }
 
         .btn-trade-now{

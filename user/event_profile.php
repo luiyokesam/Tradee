@@ -8,6 +8,7 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            echo '<script>var End_Date_Time = ' . json_encode($current_data['endEvent']) . ';</script>';
             $Array_Image = array();
             $sql2 = "SELECT `img` FROM `event_image` WHERE `eventid` = '$id'";
             $result2 = $dbc->query($sql2);
@@ -28,17 +29,15 @@ $result = $dbc->query($sql);
 if ($result->num_rows > 0) {
     while ($row = mysqli_fetch_array($result)) {
         $latestnum = ((int) substr($row['donateid'], 1)) + 1;
-        $newid = "D{$latestnum}";
+        $newid = "DO{$latestnum}";
         $title = "Donation ID - {$newid}";
         echo '<script>var current_data = null;</script>';
-        $view = false;
         break;
     }
 } else {
-    $newid = "D10001";
-    $title = "Donate ID - D10001";
+    $newid = "DO10001";
+    $title = "Donate ID - DO10001";
     echo '<script>var current_data = null;</script>';
-    $view = false;
 }
 
 //if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -172,16 +171,20 @@ if ($result->num_rows > 0) {
                                         ?>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-5 col-3 item-title">End</div>
+                                <div class="row mt-2">
+                                    <div class="col-lg-5 col-3 item-title">End Date</div>
                                     <div class="col item-value"><?php
                                         if (isset($current_data)) {
-                                            echo $current_data['endEvent'];
+                                            echo "{$current_data['endEvent']}";
                                         } else {
                                             echo 'none';
                                         }
                                         ?>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-3 item-title">End In</div>
+                                    <div class="col item-value" style="font-weight:bolder;" id="Time"></div>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-lg-5 col-3 item-title">Person In-Charge</div>
@@ -233,7 +236,7 @@ if ($result->num_rows > 0) {
                             <div class="col-lg-12 col-md-5 mt-2">
                                 <div class='py-1'>
                                     <?php
-                                    echo "<a class='btn btn-block btn-donate-now' style='color: #09B1BA;' href='event_shipping.php?id=" . $current_data["eventid"] . "'>"
+                                    echo "<a class='btn btn-block btn-donate-now' style='color: #09B1BA;' href='event_shipping.php?eventid=" . $current_data["eventid"] . "&donateid=".$newid."'>"
                                     . "<i class='far fa-heart' style='color: red;'></i> Donate now"
                                     . "</a>"
                                     ?>
@@ -344,6 +347,31 @@ if ($result->num_rows > 0) {
         <?php include '../include/footer.php'; ?>
     </body>
     <script>
+        var x = setInterval(function () {
+            var day = End_Date_Time.substring(0, 2);
+            var month = End_Date_Time.substring(3, 5);
+            var year = End_Date_Time.substring(6, 10);
+            var date = year + "-" + month + "-" + day + " 00:00:00";
+//            console.log(date);
+
+            var now = new Date().getTime();
+            var enddate = new Date(date).getTime();
+//            console.log(now);
+//            console.log(enddate);
+
+            var distance = enddate - now;
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("Time").innerHTML = days + "d " + hours + "h "
+                    + minutes + "m " + seconds + "s ";
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("Time").innerHTML = "END";
+            }
+        }, 1000);
+
         $(function () {
             //Initialize Select2 Elements
             $('.select2').select2()
@@ -432,7 +460,8 @@ if ($result->num_rows > 0) {
         }
 
         .img-container{
-            height: 450px;
+            min-height: 500px;
+            max-height: 500px;
             /*width: 600px;*/
             /*float: right;*/
             /*padding: 10px;*/

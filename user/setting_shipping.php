@@ -36,7 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="container-lg py-3">
                 <form method="post" id="form">
                     <div class="row justify-content-center">
-                        <?php include '../include/sidenav.php'; ?>
+                        <?php
+                        $page = 'setting_shipping';
+                        include '../include/sidenav.php';
+                        ?>
                         <div class="col-lg-8 col-md-10">
                             <div class="mb-3 bg-white">
                                 <!--<div class="row p-4 m-0 border-bottom">Address</div>-->
@@ -107,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
-                            <div class="bd-highlight float-right mb-5">
+                            <div class="bd-highlight float-right" style="margin-bottom: 2.3rem;">
                                 <button class="btn btn-primary" type="button" id="btnsave" style="width: 70px" onclick="editorsave()">Edit</button>
                             </div>
                         </div>

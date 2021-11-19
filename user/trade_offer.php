@@ -120,7 +120,7 @@ if (isset($_GET['id'])) {
                 <div class="col-lg-2 col-sm-6 col-12 align-content-center">
                     <li class="list-inline-item me-0 trade-desc">Last trade:
                         <?php
-                        $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE t.acceptCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+                        $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE t.acceptCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
                         $result = $dbc->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = mysqli_fetch_array($result)) {
@@ -179,7 +179,7 @@ if (isset($_GET['id'])) {
                                 </select>
                             </div>
 
-                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-3 row-cols-sm-2 row-cols-1">
+                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-1 row-cols-sm-2 row-cols-1">
                                 <?php
                                 $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['offerCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                 $result = $dbc->query($get_inventory);
@@ -198,6 +198,7 @@ if (isset($_GET['id'])) {
                                         . "</div>"
                                         . "</div>"
                                         . "<ul class='list-inline px-1 mb-0'>"
+                                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
                                         . "</ul>"
@@ -249,7 +250,7 @@ if (isset($_GET['id'])) {
                                 </select>
                             </div>
 
-                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-3 row-cols-sm-2 row-cols-1">
+                            <div class="row row-cols-xl-2 row-cols-lg-2 row-cols-md-1 row-cols-sm-2 row-cols-1">
                                 <?php
                                 $get_inventory = "SELECT * FROM trade_details d, item i  WHERE d.itemid = i.itemid AND d.custid = '{$current_data['acceptCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                 $result = $dbc->query($get_inventory);
@@ -268,6 +269,7 @@ if (isset($_GET['id'])) {
                                         . "</div>"
                                         . "</div>"
                                         . "<ul class='list-inline px-1 mb-0'>"
+                                        . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
                                         . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
                                         . "</ul>"
@@ -279,7 +281,7 @@ if (isset($_GET['id'])) {
                         </div>
                     </div>
 
-                    <div class="col-auto py-2 float-right">
+                    <div class="col-auto py-2 float-right mt-1 mb-5">
                         <button type='button' class='btn btn-dark' id='btnback' onclick='back()'>Back</button>
                     </div>
                 </div>
@@ -330,7 +332,7 @@ if (isset($_GET['id'])) {
             /*height: 192px;*/
             /*background: #e8e8e8;*/
             /*max-width: 255px;*/
-            max-height: 370px;
+            max-height: 250px;
             background: whitesmoke;
             text-align: center;
             background-size: cover;
@@ -338,8 +340,8 @@ if (isset($_GET['id'])) {
         }
 
         .item-img{
-            min-height: 300px;
-            max-height: 300px;
+            min-height: 250px;
+            max-height: 250px;
             text-align: center;
             background-size: contain;
             background-repeat: no-repeat;

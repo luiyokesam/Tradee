@@ -175,15 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
 
                                     <div class="col-xl">
-                                        <div class="">Items: <?php
-                                            $count = "SELECT COUNT(t.itemid) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
-                                            $result = $dbc->query($count);
-                                            if ($result->num_rows > 0) {
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo $row['itemQuantity'];
-                                                }
-                                            }
-                                            ?></div>
+                                        <div class="">Trade ID: <?php echo $current_data['tradeid'] ?></div>
                                     </div>
                                 </div>
 
@@ -242,7 +234,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <div class="card card-olive collapsed-card">
                             <div class="card-header">
-                                <div class="card-title" style="font-size:1.2em;">Order Summary</div>
+                                <div class="card-title" style="font-size:1.2em;">Delivery Summary</div>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                                         <i class="fas fa-plus"></i>

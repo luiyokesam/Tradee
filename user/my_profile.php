@@ -49,7 +49,7 @@ if (!isset($_SESSION['loginuser'])) {
                     ?>
                 </div>
 
-                <div class="col-lg-9">
+                <div class="col-lg-9 px-3">
                     <div class="row">
                         <div class="col py-3">
                             <?php
@@ -63,7 +63,7 @@ if (!isset($_SESSION['loginuser'])) {
                             if ($_SESSION['loginuser']['review'] !== null) {
                                 echo "<div>- {$_SESSION['loginuser']['review']}</div>";
                             } else {
-                                echo "<div style='font-weight: lighter;'>- No reviews yet</div>";
+                                echo "<div style='font-weight: lighter;'>- No reviews yet.</div>";
                             }
                             ?>
                         </div>
@@ -94,7 +94,7 @@ if (!isset($_SESSION['loginuser'])) {
                                         if (isset($_SESSION['loginuser'])) {
                                             echo "<div>- {$_SESSION['loginuser']['state']}, {$_SESSION['loginuser']['country']}</div>";
                                         } else {
-                                            echo "<div style='font-weight: lighter;'>- No state shown</div>";
+                                            echo "<div style='font-weight: lighter;'>- Location not shown.</div>";
                                         }
                                         ?>
                                     </div>
@@ -121,7 +121,7 @@ if (!isset($_SESSION['loginuser'])) {
                                     <div class="my-2">
                                         <div style="font-weight: bolder;">Last Trade</div>
                                         <?php
-                                        $sql = "SELECT MAX(t.date) DATE FROM trade t, customer c WHERE (t.offerCustID = '{$_SESSION['loginuser']['custid']}') OR (t.acceptCustID = '{$_SESSION['loginuser']['custid']}')";
+                                        $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE (t.offerCustID = '{$_SESSION['loginuser']['custid']}') OR (t.acceptCustID = '{$_SESSION['loginuser']['custid']}')";
                                         $result = $dbc->query($sql);
                                         if ($result->num_rows > 0) {
                                             while ($row = mysqli_fetch_array($result)) {
@@ -130,7 +130,7 @@ if (!isset($_SESSION['loginuser'])) {
                                                 break;
                                             }
                                         } else {
-                                            echo "<div>- You haven't completed any trade yet.</div>";
+                                            echo "<div style='font-weight: lighter;'>- You haven't offer any trade yet.</div>";
                                         }
                                         ?>
                                     </div>
@@ -147,9 +147,11 @@ if (!isset($_SESSION['loginuser'])) {
                         <div style="font-weight: bolder;">Description</div>
                         <?php
                         if (isset($_SESSION['loginuser'])) {
-                            echo "<div>- {$_SESSION['loginuser']['description']}</div>";
-                        } else {
-                            echo "<div>No description yet</div>";
+                            if (($_SESSION['loginuser']['description'] !== '')) {
+                                echo "<div>- {$_SESSION['loginuser']['description']}</div>";
+                            } else {
+                                echo "<div style='font-weight: lighter;'>- No description yet.</div>";
+                            }
                         }
                         ?>
                     </div>
@@ -163,11 +165,11 @@ if (!isset($_SESSION['loginuser'])) {
                 </div>
             </nav>
 
-            <div class="tab-content" id="nav-tabContent">
+            <div class="tab-content mb-3" id="nav-tabContent">
                 <!--tab 1-->
                 <div class="tab-pane fade show active" id="nav-inventory" role="tabpanel">
                     <?php
-                    $get_inventory = "SELECT * FROM item i, customer c WHERE c.custid = '{$_SESSION['loginuser']['custid']}' AND i.custid = c.custid";
+                    $get_inventory = "SELECT * FROM item i, customer c WHERE c.custid = '{$_SESSION['loginuser']['custid']}' AND i.custid = c.custid ORDER BY i.itemid";
                     $result = $dbc->query($get_inventory);
                     if ($result->num_rows > 0) {
                         echo "<div class = 'container-lg'>"
@@ -175,13 +177,15 @@ if (!isset($_SESSION['loginuser'])) {
                         while ($row = mysqli_fetch_array($result)) {
                             echo "<div class='col px-1 py-2'>"
 //                            . "<a href='../user/profile.php?id=" . $row["custid"] . "' style='text-decoration:none;'>"
-                            . "<ul class='list-inline mb-0 p-1'>"
+//                            . "<ul class='list-inline mb-0 p-1'>"
 //                            . "<img src=" . $row["avatar"] . " class='' style='width: 22px;' alt='Avatar'>"
 //                            . "<li class='list-inline-item' style='font-size:0.7em; color:#969696;'>" . $row["username"] . "</li>"
-                            . "</ul>"
+//                            . "</ul>"
 //                            . "</a>"
                             . "<div class='item-img-box overflow-hidden'>"
                             . "<a href='../user/upload_item.php?id=" . $row["itemid"] . "'>"
+//                            . "<a href='../user/upload_item.php?status=" . $row["itemActive"] . "?id=". $row['itemid'] ."'>"
+//                            . "<a href='../user/upload_item.php?id=" . $row["itemid"] . "&?status=" . $row['itemActive'] . "'>"
                             . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                             . "</a>"
                             . "</div>"
@@ -221,11 +225,10 @@ if (!isset($_SESSION['loginuser'])) {
         </div>
         <?php include '../include/footer.php'; ?>
     </body>
-    <script src="../bootstrap/plugins/select2/js/select2.full.min.js"></script>
     <script>
-                                function profile() {
-                                    window.location.href = "setting_profile.php";
-                                }
+        function profile() {
+            window.location.href = "setting_profile.php";
+        }
     </script>
     <style>
         /*item*/
@@ -234,7 +237,7 @@ if (!isset($_SESSION['loginuser'])) {
             /*height: 192px;*/
             /*background: #e8e8e8;*/
             /*max-width: 255px;*/
-            max-height: 370px;
+            max-height: 250px;
             background: whitesmoke;
             text-align: center;
             background-size: cover;
@@ -242,8 +245,8 @@ if (!isset($_SESSION['loginuser'])) {
         }
 
         .item-img{
-            min-height: 300px;
-            max-height: 300px;
+            min-height: 250px;
+            max-height: 250px;
             text-align: center;
             background-size: contain;
             background-repeat: no-repeat;

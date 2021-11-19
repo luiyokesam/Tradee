@@ -35,10 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql1 = "SELECT * FROM delivery d, trade t WHERE d.tradeid = t.tradeid AND d.tradeid = '" . $current_data['tradeid'] . "' AND d.deliveryStatus = 'Delivered'";
     $result1 = $dbc->query($sql1);
 
-    echo '<script>alert("' . $sql1 . '");</script>';
+//    echo '<script>alert("' . $sql1 . '");</script>';
 
     if ($result1->num_rows > 1) {
-        while ($row1 = mysqli_fetch_array($result)) {
+        while ($row1 = mysqli_fetch_array($result1)) {
             $sql2 = "UPDATE trade SET status = 'Completed' WHERE tradeid = '" . $row1['tradeid'] . "'";
             ($dbc->query($sql2));
 
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sqlxy = "UPDATE item SET custid = '" . $row1['acceptCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $rowx['itemid'] . "'";
                     ($dbc->query($sqlxy));
 
-                    echo '<script>alert("' . $sqlxy . '");</script>';
+//                    echo '<script>alert("' . $sqlxy . '");</script>';
                 }
             }
 
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sqlyx = "UPDATE item SET custid = '" . $row1['offerCustID'] . "', itemActive = 'Available' WHERE itemid = '" . $rowy['itemid'] . "'";
                     ($dbc->query($sqlyx));
 
-                    echo '<script>alert("' . $sqlyx . '");</script>';
+//                    echo '<script>alert("' . $sqlyx . '");</script>';
                 }
             }
 
@@ -517,12 +517,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             window.location.href = "delivery_list.php";
         }
 
-        //Date picker
-        //        $('#registrationdate').datetimepicker({
-        //            format: 'L'
-        //        });
-
-        //Date and time picker
-        $('#reservationdatetime').datetimepicker({icons: {time: 'far fa-clock'}});
+        $('#reservationdatetime').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm',
+            icons: {time: 'far fa-clock'}
+        });
     </script>
 </html>

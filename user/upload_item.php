@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($Array_Image)) {
                                             echo $Array_Image[0];
                                         }
-                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display">
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display0" name="img_display0">
                                     </div>
 
                                     <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($Array_Image)) {
                                             echo $Array_Image[1];
                                         }
-                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display">
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display1" name="img_display1">
                                     </div>
 
                                     <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
@@ -196,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($Array_Image)) {
                                             echo $Array_Image[2];
                                         }
-                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display">
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display2" name="img_display2">
                                     </div>
 
                                     <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
@@ -204,7 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($Array_Image)) {
                                             echo $Array_Image[3];
                                         }
-                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display">
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display3" name="img_display3">
                                     </div>
 
                                     <div class="product-image-thumb product-small-img mb-3 mr-0 p-1" style="width: 80px; max-width: 80px; height: 80px; max-height: 80px;">
@@ -212,12 +212,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if (isset($Array_Image)) {
                                             echo $Array_Image[4];
                                         }
-                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display">
+                                        ?>" alt="Photo" style="height: auto; max-height: 70px; width: 70px; max-width: 70px" id="img_display4" name="img_display4">
                                     </div>
                                 </div>
 
                                 <div class="col-9 img-container" style="width: 500px; height: 500px">
-                                    <img src="../img/test-shirt/drop_img.png" class="active-image" style="max-width: 500px; max-height: 500px" alt="Product Image">
+                                    <img src="../img/test-shirt/drop_img.png" class="active-image" id="img_display" style="max-width: 500px; max-height: 500px" alt="Product Image">
                                 </div>
                             </div>
 
@@ -233,6 +233,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
 
                             <div class="mb-3 bg-white">
+                                <div class="row align-items-center border-bottom m-0 p-3" style="display: none;">
+                                    <div class="col-md-6 p-2">Item Active</div>
+                                    <div class="col-md-6 p-2">
+                                        <input class="form-control" type="text" id="itemActive" name="itemActive" placeholder="itemActive" readonly value="<?php
+                                        if (isset($current_data)) {
+                                            echo $current_data["itemActive"];
+                                        }
+                                        ?>">
+                                    </div>
+                                </div>
+
                                 <div class="row align-items-center border-bottom m-0 p-3">
                                     <div class="col-md-6 p-2">Name</div>
                                     <div class="col-md-6 p-2">
@@ -408,12 +419,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
 
-                            <div class="float-right p-2">
+                            <div class="float-right ml-2">
                                 <button type="button" class="btn btn-save btn-block" id="btnsave" onclick="editorsave()">Edit</button>
                             </div>
 
-                            <div class="float-sm-right p-2">
+                            <div class="float-sm-right ml-2">
                                 <button type="button" class="btn btn-warning btn-block" onclick="cancel()" id="btncancel" disabled>Cancel</button>
+                            </div>
+
+                            <div class="float-right ml-2">
+                                <button type="button" class="btn btn-dark btn-block" id="btnback" onclick="back()">Back</button>
                             </div>
                         </form>
                     </div>
@@ -440,8 +455,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         function loadform() {
             var params = new window.URLSearchParams(window.location.search);
+
+            if (document.getElementById("itemActive").value === 'Trading' || 'Pending') {
+                document.getElementById("btnsave").style.display = "none";
+                document.getElementById("btncancel").style.display = "none";
+            }
+
+            if (document.getElementById("itemActive").value === 'Available') {
+                document.getElementById("btnsave").style.display = "";
+                document.getElementById("btncancel").style.display = "";
+            }
+
             if (!params.get('id')) {
                 isnew = true;
+                document.getElementById("btnsave").style.display = "";
+                document.getElementById("btncancel").style.display = "";
                 editable();
             }
         }
@@ -462,10 +490,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById("tradeOption").style.borderColor = "";
                 document.getElementById("itemDescription").style.borderColor = "";
 
-                var img = document.getElementById('img_display');
-
                 if (!document.getElementById("img").value || document.getElementById("img").value === "") {
-                    if (img.getAttribute('src') === "") {
+                    if (document.getElementById('img_display').src === "") {
                         document.getElementById("validate_img").style.borderColor = "red";
                         fullfill = false;
                     }
@@ -521,6 +547,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 editable();
             }
+        }
+
+        function back() {
+            window.location.href = "my_profile.php";
         }
 
         function cancel() {
@@ -600,7 +630,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             opacity: 1;
             transition-duration: 0.2s;
         }
-        
+
         .btn-save{
             color: #fff;
             border-color: #7cf279;

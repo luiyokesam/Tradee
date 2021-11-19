@@ -2,6 +2,7 @@
 ob_start();
 session_start();
 require '../include/mysqli_connect.php';
+include '../user/loading.php';
 ?>
 <!doctype html>
 <html lang="en">

@@ -1,20 +1,46 @@
 <?php
 include '../include/header.php';
 
-if (!isset($_SESSION["delivery_details"])) {
-    echo '<script>alert("You have not input your detail at check out/\nRedirect to Check out");window.location.href = "checkout.php";</script>';
+if (!isset($_SESSION["donation_details"])) {
+    echo '<script>alert("You have not input your details at shipping.\nRedirect to home page.");window.location.href = "../php/index.php";</script>';
     exit();
 }
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-//    $sql = "SELECT * FROM donation d, event e WHERE d.eventid = e.eventid AND d.donator = '" . $_SESSION['loginuser']['custid'] . "' AND d.donateid = '$id' LIMIT 1";
-    $sql = "SELECT * FROM event e WHERE e.eventid = '$id' LIMIT 1";
+if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
+    $eventid = $_GET['eventid'];
+    $donateid = $_GET['donateid'];
+    $sql = "SELECT * FROM event e WHERE e.eventid = '$eventid' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
+
+            if ($_SESSION['donation_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
+                if ($_SESSION['donation_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
+                    $shipping_fee = $shipping_fee + 10;
+                }
+                $shipping_fee = $shipping_fee + 20;
+
+                $shipping_fee = number_format($shipping_fee, 2, '.', '');
+            } else {
+                $shipping_fee = 10;
+                $shipping_fee = number_format($shipping_fee, 2, '.', '');
+            }
+
+            if ($_SESSION['donation_details']['packaging'] == 'Plastic boxes') {
+                $packaging_fee = 5;
+            } else if ($_SESSION['donation_details']['packaging'] == 'Bubble wrap') {
+                $packaging_fee = 8;
+            } else if ($_SESSION['donation_details']['packaging'] == 'Seal boxes with tape') {
+                $packaging_fee = 10;
+            }
+            $packaging_fee = number_format($packaging_fee, 2, '.', '');
+
+            $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
+            $tax = number_format($subtotal * 0.06, 2, '.', '');
+            $totalamount = number_format($subtotal + $tax, 2, '.', '');
+
             break;
         }
     } else {
@@ -23,19 +49,19 @@ if (isset($_GET['id'])) {
     }
 }
 
-$sql_donation = "SELECT * FROM donation ORDER BY donateid  DESC LIMIT 1";
-$result_donation = $dbc->query($sql_donation);
-if ($result_donation->num_rows > 0) {
-    while ($row = mysqli_fetch_array($result_donation)) {
-        $latestdonation = ((int) substr($row['donateid '], 1)) + 1;
-        $newdonation = "DO{$latestdonation}";
-        echo '<script>var current_data = null;</script>';
-        break;
-    }
-} else {
-    $newdonation = "DO10001";
-    echo '<script>var current_data = null;</script>';
-}
+//$sql_donation = "SELECT * FROM donation ORDER BY donateid  DESC LIMIT 1";
+//$result_donation = $dbc->query($sql_donation);
+//if ($result_donation->num_rows > 0) {
+//    while ($row = mysqli_fetch_array($result_donation)) {
+//        $latestdonation = ((int) substr($row['donateid '], 1)) + 1;
+//        $newdonation = "DO{$latestdonation}";
+//        echo '<script>var current_data = null;</script>';
+//        break;
+//    }
+//} else {
+//    $newdonation = "DO10001";
+//    echo '<script>var current_data = null;</script>';
+//}
 
 $sql_delivery = "SELECT * FROM donation_delivery ORDER BY donatedeliveryid  DESC LIMIT 1";
 $result_delivery = $dbc->query($sql_delivery);
@@ -54,22 +80,37 @@ if ($result_delivery->num_rows > 0) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql_donation = "INSERT INTO donation(donateid, eventid, donator, donateDate) VALUES ("
             . "'" . $newdonation . "',"
-            . "'" . $_SESSION['delivery_details']['eventid'] . "',"
+            . "'" . $_SESSION['donation_details']['eventid'] . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
-            . "'" . $_SESSION['delivery_details']['donationDate'] . "')"
-            . "'Pending')";
+            . "'" . $_SESSION['donation_details']['donationDate'] . "')";
+
+    foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
+        $sql_donationdetails = "INSERT INTO donation_details(donateid, eventid, itemid, donateDate) VALUES ("
+                . "'" . $newdonation . "',"
+                . "'" . $_SESSION['donation_details']['eventid'] . "',"
+                . "'" . $myitem . "',"
+                . "'" . $_SESSION['donation_details']['donationDate'] . "')"
+                . "'Pending')";
+
+        $dbc->query($sql_mytrade);
+
+        echo '<script>alert("' . $myitem . '");</script>';
+    }
+
+//     <a href="https://wa.me/601111932585" target="_blank">
+
 
     $sql2 = "INSERT INTO donation_delivery(deliveryid, tradeid, senderid, recipientid, username, senderAddress, recipientAddress, itemQuantity, package, remarks, cardno, cardname, shippingfee, packagefee, subTotal, tax, totalAmount, paymentDate, deliveryStatus) VALUES ("
             . "'" . $newid . "',"
-            . "'" . $_SESSION['delivery_details']['tradeid'] . "',"
+            . "'" . $_SESSION['donation_details']['tradeid'] . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
-            . "'" . $_SESSION['delivery_details']['recipientid'] . "',"
-            . "'" . $_SESSION['delivery_details']['username'] . "',"
-            . "'" . $_SESSION['delivery_details']['address1'] . "',"
-            . "'" . $_SESSION['delivery_details']['deliveryCountry'] . "',"
-            . $_SESSION['delivery_details']['itemQuantity'] . ","
-            . "'" . $_SESSION['delivery_details']['packaging'] . "',"
-            . "'" . $_SESSION['delivery_details']['remarks'] . "',"
+            . "'" . $_SESSION['donation_details']['recipientid'] . "',"
+            . "'" . $_SESSION['donation_details']['username'] . "',"
+            . "'" . $_SESSION['donation_details']['address1'] . "',"
+            . "'" . $_SESSION['donation_details']['deliveryCountry'] . "',"
+            . $_SESSION['donation_details']['itemQuantity'] . ","
+            . "'" . $_SESSION['donation_details']['packaging'] . "',"
+            . "'" . $_SESSION['donation_details']['remarks'] . "',"
             . "'" . $_POST["cardno"] . "',"
             . "'" . $_POST["cardname"] . "',"
             . $_POST["shippingfee"] . ","
@@ -85,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($dbc->query($sql)) {
         $sql = "UPDATE trade SET"
                 . " offerPayment = 'Completed'"
-                . " WHERE tradeid ='" . $_SESSION['delivery_details']['tradeid'] . "'";
+                . " WHERE tradeid ='" . $_SESSION['donation_details']['tradeid'] . "'";
         if ($dbc->query($sql)) {
             echo '<script>alert("Successfuly insert!");window.location.href="trade_list.php";</script>';
         } else {
@@ -102,21 +143,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?php
-            echo $newid;
+            echo "{$_SESSION['donation_details']['donateid']}";
 //            if (isset($current_data)) {
 //                echo $current_data["paymentid"];
 //            } else {
 //                echo $newid;
 //            }
-            ?> Barter Delivery - Tradee</title>
+            ?> Donation Delivery - Tradee</title>
     </head>
     <body>
         <div class="bg-navbar mb-3 bg-light">
             <div class="container-lg">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
-                        <li class="breadcrumb-item"><a href="#">Trade List</a></li>
-                        <li class="breadcrumb-item"><a href="#">Trade Offer</a></li>
+                        <li class="breadcrumb-item"><a href="#">Donation</a></li>
                         <li class="breadcrumb-item"><a href="#">Shipping</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Payment</li>
                     </ol>
@@ -127,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container-lg">
             <form method="post" id="form">
                 <div class="row justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="row">
                             <div class="container">
                                 <div class="card">
@@ -183,24 +223,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="paymentDate" maxlength="10" readOnly name="paymentDate">
                                                 </div>
                                             </div>
-
-                                            <div class="col-xl">
-                                                <label class="form-label">Item Quantity</label>
-                                                <input type="text" class="form-control" id="itemQuantity" name="itemQuantity" readonly="" value="<?php
-                                                $count = "SELECT COUNT(itemid) FROM donation d WHERE d.donator = '{$_SESSION['loginuser']['custid']}' AND d.donateid = '{$current_data['donateid']}'";
-                                                $result = $dbc->query($count);
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = mysqli_fetch_array($result)) {
-                                                        echo $row[0];
-                                                    }
-                                                }
-                                                ?>">
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row py-3">
+                                    <div class="col-auto mb-2">
+                                        <a class="btn btn-warning btn-block" href="../user/event_shipping.php?eventid=<?php echo $eventid ?>&donateid=<?php echo $donateid ?>" id="btnback">Back</a>
+                                    </div>
+
                                     <div class="col-auto">
                                         <button class="btn btn-primary btn-block" type="submit" onclick="payment()">Confirm payment</button>
                                     </div>
@@ -211,6 +242,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="col-md-5">
                         <div class="row">
+                            <div class="container-lg">
+                                <div class="card collapsed-card">
+                                    <div class="card-header">
+                                        <div class="card-title">Delivery Summary</div>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body pb-0">
+                                        <div class="row">
+                                            <div class="col-12" id="accordion">
+                                                <?php
+                                                foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
+                                                    $get_inventory = "SELECT * FROM item i WHERE i.itemid = '$myitem'";
+                                                    $result = $dbc->query($get_inventory);
+                                                    if ($result->num_rows > 0) {
+                                                        while ($row = mysqli_fetch_array($result)) {
+                                                            echo "<div class='card card-primary card-outline'>"
+                                                            . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
+                                                            . "<div class='card-header'>"
+                                                            . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
+                                                            . "</div>"
+                                                            . "</a>"
+                                                            . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
+                                                            . "<div class='card-body'>"
+                                                            . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                                            . "</div>"
+//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
+//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
+                                                            . "</div>"
+                                                            . "</div>";
+                                                        }
+                                                    }
+                                                }
+                                                ?>
+
+                                                <!--card sameple-->
+                                                <!--                                                <div class="card card-primary card-outline">
+                                                                                                    <a class="d-block w-100" data-toggle="collapse" href="#collapseOne" aria-expanded="true">
+                                                                                                        <div class="card-header">
+                                                                                                            <h6 class="card-title w-75">Item #1</h6>
+                                                                                                        </div>
+                                                                                                    </a>
+                                                                                                    <div id="collapseOne" class="collapse" data-parent="#accordion" style="">
+                                                                                                        <div class="card-body">
+                                                                                                            <img src="../img/test-shirt/test-shirt-1.jpg" class="img-fluid item-pic" alt="Profile picture">
+                                                                                                        </div>
+                                                                                                        <div>Hi</div>
+                                                                                                    </div>
+                                                                                                </div>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="container">
                                 <div class="card">
                                     <div class="card-header">
@@ -220,7 +310,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="row pb-2" style="font-weight: bolder;">
                                             <div class="col-xl">
                                                 <div class="">Donate to: <?php
-                                                    $count = "SELECT receiver FROM event WHERE eventid = '{$_SESSION['delivery_details']['eventid']}'";
+                                                    $count = "SELECT receiver FROM event WHERE eventid = '{$_SESSION['donation_details']['eventid']}'";
                                                     $result = $dbc->query($count);
                                                     if ($result->num_rows > 0) {
                                                         while ($row = mysqli_fetch_array($result)) {
@@ -244,16 +334,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                                             </div>
                                                                                         </div>-->
 
-                                            <div class="col-xl">
-                                                <div class="">Items: <?php
-                                                    foreach ($_SESSION['delivery_details']['myitem'] as $update_my_item_list) {
-                                                        $count = "SELECT COUNT($update_my_item_list) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
-                                                        $dbc->query($count);
-//                                                        echo '<script>alert("' . $sql . '");</script>';
-                                                    }
-                                                    ?>
-                                                </div>
-                                            </div>
+                                            <!--                                            <div class="col-xl">
+                                                                                            <div class="">Items: <?php
+                                            foreach ($_SESSION['donation_details']['myitem'] as $myitems) {
+                                                $count = "SELECT COUNT($myitems) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
+                                                $dbc->query($count);
+                                                echo $count;
+                                                echo '<script>alert("' . $sql . '");</script>';
+                                            }
+                                            ?>
+                                                                                            </div>
+                                                                                        </div>-->
                                         </div>
 
                                         <table class="table">
@@ -263,180 +354,97 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     <th scope="col" class="table-info">Total (RM)</th>
                                                 </tr>
                                             </thead>
+                                            <tbody style="text-align: left">
+                                                <tr>
+                                                    <td>Shipping fee</td>
+                                                    <td><?php echo $shipping_fee; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Packaging fee</td>
+                                                    <td><?php echo $packaging_fee; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sub Total</td>
+                                                    <td><?php echo $subtotal; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tax (6%)</td>
+                                                    <td><?php echo $tax; ?></td>
+                                                </tr>
+                                                <tr style="font-weight: bolder;">
+                                                    <td>Total Amount</td>
+                                                    <td><?php echo $totalamount; ?></td>
+                                                </tr>
+                                            </tbody>
                                         </table>
-                                        <div class="form-group row py-1 px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Shipping Fee</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="shippingfee" name="shippingfee" required style="border-style: none;" value="<?php
-                                                $shipping_fee = 0;
-                                                if ($_SESSION['delivery_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
-                                                    if ($_SESSION['delivery_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
-                                                        $shipping_fee = $shipping_fee + 10;
-                                                    }
-                                                    $shipping_fee = $shipping_fee + 20;
-
-                                                    $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                                    echo $shipping_fee;
-                                                } else {
-                                                    $shipping_fee = 10;
-                                                    $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                                    echo $shipping_fee;
-                                                }
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Packaging Fee</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="packagingfee" name="packagingfee" required style="border-style: none;" value="<?php
-                                                $packaging_fee = 0;
-                                                if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                                                    $packaging_fee = 5;
-                                                } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                                                    $packaging_fee = 8;
-                                                } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                                                    $packaging_fee = 10;
-                                                }
-                                                $packaging_fee = number_format($packaging_fee, 2, '.', '');
-                                                echo $packaging_fee;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Sub Total</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="subTotal" name="subTotal" required style="border-style: none;" value="<?php
-                                                $subtotal = 0;
-                                                $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
-                                                echo $subtotal;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-1">
-                                            <label class="col-sm-5 col-form-label border-bottom">Tax (6%)</label>
-                                            <div class="col-md-7 border-bottom">
-                                                <input type="text" class="form-control" id="tax" name="tax" required style="border-style: none;" value="<?php
-                                                $tax = 0;
-                                                $tax = number_format($subtotal * 0.06, 2, '.', '');
-                                                echo $tax;
-                                                ?>">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row px-3 mb-0">
-                                            <label class="col-sm-5 col-form-label">Total Amount</label>
-                                            <div class="col-md-7">
-                                                <input type="text" class="form-control" id="totalAmount" name="totalAmount" required style="border-style: none;" value="<?php
-                                                       $totalamount = 0;
-                                                       $totalamount = number_format($subtotal + $tax, 2, '.', '');
-                                                       echo $totalamount;
-                                                       ?>">
-                                            </div>
-                                        </div>
-
-        <!--                                    <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" class="table-info">Fees</th>
-                                                        <th scope="col" class="table-info">Total (RM)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody style="text-align: left">
-                                                    <tr>
-                                                        <td>Shipping fee</td>
-                                                        <td>
-                                        <?php
-                                        $shipping_fee = 0;
-                                        if ($_SESSION['delivery_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
-                                            if ($_SESSION['delivery_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
-                                                $shipping_fee = $shipping_fee + 10;
-                                            }
-                                            $shipping_fee = $shipping_fee + 20;
-
-                                            $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                            echo $shipping_fee;
-                                        } else {
-                                            $shipping_fee = 10;
-                                            $shipping_fee = number_format($shipping_fee, 2, '.', '');
-                                            echo $shipping_fee;
-                                        }
-                                        ?>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Packaging fee</td>
-                                                        <td>
-                                        <?php
-                                        $packaging_fee = 0;
-                                        if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                                            $packaging_fee = 5;
-                                        } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                                            $packaging_fee = 8;
-                                        } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                                            $packaging_fee = 10;
-                                        }
-                                        $packaging_fee = number_format($packaging_fee, 2, '.', '');
-                                        echo $packaging_fee;
-                                        ?>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Sub Total</td>
-                                                        <td>
-                                        <?php
-                                        $subtotal = 0;
-                                        $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
-                                        echo $subtotal;
-                                        ?>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Tax (6%)</td>
-                                                        <td>
-                                        <?php
-                                        $tax = 0;
-                                        $tax = number_format($subtotal * 0.06, 2, '.', '');
-                                        echo $tax;
-                                        ?>
-                                                        </td>
-                                                    </tr>
-                                                    <tr style="font-weight: bolder;">
-                                                        <td>Total Amount</td>
-                                                        <td>
-                                        <?php
-                                        $totalamount = 0;
-                                        $totalamount = number_format($subtotal + $tax, 2, '.', '');
-                                        echo $totalamount;
-                                        ?>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!--                    <div class="col-md-3">
+                                            <div class="row">
+                                                <div class="container-lg">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <div class="" style="font-size:1.2em;">Delivery Summary</div>
+                                                        </div>
+                                                        <div class="card-body pb-0">
+                                                            <div class="row">
+                                                                <div class="col-12" id="accordion">
+                    <?php
+                    foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
+                        $get_inventory = "SELECT * FROM item i WHERE i.itemid = '$myitem'";
+                        $result = $dbc->query($get_inventory);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                echo "<div class='card card-primary card-outline'>"
+                                . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
+                                . "<div class='card-header'>"
+                                . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
+                                . "</div>"
+                                . "</a>"
+                                . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
+                                . "<div class='card-body'>"
+                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                . "</div>"
+//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
+//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
+                                . "</div>"
+                                . "</div>";
+                            }
+                        }
+                    }
+                    ?>
+                    
+                                                                    card sameple
+                                                                                                                    <div class="card card-primary card-outline">
+                                                                                                                        <a class="d-block w-100" data-toggle="collapse" href="#collapseOne" aria-expanded="true">
+                                                                                                                            <div class="card-header">
+                                                                                                                                <h6 class="card-title w-75">Item #1</h6>
+                                                                                                                            </div>
+                                                                                                                        </a>
+                                                                                                                        <div id="collapseOne" class="collapse" data-parent="#accordion" style="">
+                                                                                                                            <div class="card-body">
+                                                                                                                                <img src="../img/test-shirt/test-shirt-1.jpg" class="img-fluid item-pic" alt="Profile picture">
+                                                                                                                            </div>
+                                                                                                                            <div>Hi</div>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>-->
                 </div>
             </form>
         </div>
         <?php include '../include/footer.php'; ?>
     </body>
     <script>
-//        $(document).ready(function () {
-//            $('#packagingForm i').on('change', function () {
-//                var packagingfee=$("[type='radio'] checked").val();
-//                $('#packagingfee').val($("[type='radio']:checked").val());
-//            });
-//        });
-
-//        function calPackaging(price) {
-//            var fee = 0;
-//            price.value = fee;
-////            alert(price.value);
-//            document.getElementById("packagingfee").innerHTML = fee;
-//            document.getElementById("packagingfee") = fee;
-//        }
-
         function payment() {
             var fulfill = true;
             var message = "";

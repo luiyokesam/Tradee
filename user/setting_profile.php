@@ -33,15 +33,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>My profile - Tradee</title>
+        <title>Profile Settings - Tradee</title>
     </head>
     <body class="layout-footer-fixed hold-transition">
         <div class="setting bg-light">
             <div class="container-lg py-3">
                 <form method="post" id="form" enctype="multipart/form-data">
                     <div class="row justify-content-center">
-                        <?php include '../include/sidenav.php'; ?>
-
+                        <?php
+                        $page = 'setting_profile';
+                        include '../include/sidenav.php';
+                        ?>
                         <div class="col-lg-8 col-md-10">
                             <div class="mb-3 border-dark bg-white">
                                 <div class="d-flex bd-highlight p-3 border-bottom align-items-center">

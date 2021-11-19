@@ -41,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="container-lg">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
+                        <li class="breadcrumb-item"><a href="#">Trade List</a></li>
                         <li class="breadcrumb-item"><a href="#">Trade Offer</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Delivery</li>
                     </ol>
@@ -51,11 +52,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container-lg">
             <form id="form"  method="post">
                 <input id="detail" name="detail" style="display: none;">
-                <div class="row justify-content-center pt-3 mb-5">
-                    <div class="col-md-8">
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8 px-4">
                         <div class="border-bottom border-3 pb-2" style="font-size:1.5em;">Shipping</div>
-                        <div class="row justify-content-center pt-3">
-                            <div class="col-md-7">
+                        <div class="row justify-content-center pt-4">
+                            <div class="col-md-7 pr-md-4">
                                 <div class="">
                                     <div class="form-group row" style="display: none;">
                                         <label for="tradeid" class="col-sm-2 col-form-label">Trade ID</label>
@@ -124,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
 
-                                    <div class="form-group row align-items-center mb-1">
+                                    <div class="form-group row align-items-center mb-lg-2 mb-3">
                                         <label for="address2" class="col-sm-2 col-form-label align-items-center">Line 2 <small>Optional</small></label>
                                         <div class="col-sm-10 align-items-center">
                                             <input type="text" class="form-control align-items-center" id="address2" name="address2" value="<?php
@@ -173,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
 
-                                    <div class="">
+                                    <div class="mb-4">
                                         <label for="remarks" class="form-label">Remarks</label>
                                         <textarea class="form-control" id="remarks" name="remarks" rows="5"><?php
                                             if (isset($_SESSION['delivery_details'])) {
@@ -387,12 +388,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     ?>">
                                 </div>
 
-                                <div class="row mt-4">
-                                    <div class="col-sm-auto">
-                                        <button type="button" class="btn btn-warning btn-block" onclick="cancel()" id="btncancel" >Cancel</button>
+                                <div class="row my-4">
+                                    <div class="col-auto mb-2">
+                                        <button type="button" class="btn btn-warning" onclick="cancel()" id="btncancel" >Cancel</button>
                                     </div>
 
-                                    <div class="col-sm-auto">
+                                    <div class="col-auto">
                                         <button class="btn btn-success" onclick="checkout()" type="button">Proceed to payment</button>
                                     </div>
                                 </div>
@@ -400,16 +401,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-lg-4 px-4">
                         <div class="row">
-                            <div class="container">
+                            <div class="container-lg">
                                 <div class="card">
                                     <div class="card-header">
-                                        <div class="" style="font-size:1.2em;">Order Summary</div>
+                                        <div class="" style="font-size:1.2em;">Delivery Summary</div>
                                     </div>
                                     <div class="card-body pb-0">
                                         <div class="row">
-                                            <div class="col-12" id="accordion">
+                                            <div class="col-md-12" id="accordion">
                                                 <?php
                                                 $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['offerCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
                                                 $result = $dbc->query($get_inventory);
@@ -511,9 +512,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 message += "Postcode is required field.\n";
                 fullfill = false;
             } else {
-                if (document.getElementById("postcode").value.length < 5 || document.getElementById("postcode").value.length > 5) {
+//                if (document.getElementById("postcode").value.length < 5 || document.getElementById("postcode").value.length > 5) {
+                if (document.getElementById("postcode").value.length < 5) {
                     fulfill = false;
-                    message += "Postcode is invalid, must be 5 character.\n";
+                    message += "Postcode is invalid, must be greater than 5 character.\n";
                     document.getElementById("postcode").style.borderColor = "red";
                 }
             }
