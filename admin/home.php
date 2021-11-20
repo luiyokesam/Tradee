@@ -1,4 +1,5 @@
 <?php
+$page = 'home';
 include 'navbar.php';
 ?>
 <!DOCTYPE html>

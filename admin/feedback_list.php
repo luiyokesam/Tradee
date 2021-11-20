@@ -1,4 +1,5 @@
 <?php
+$page = 'feedback_list';
 include 'navbar.php';
 ?>
 <!doctype html>

@@ -61,6 +61,7 @@ if (isset($_GET['id'])) {
                         if ($result->num_rows > 0) {
                             while ($row = mysqli_fetch_array($result)) {
                                 $current_offer = $row;
+                                $traderid = $current_offer['custid'];
                                 echo $current_offer['username'];
                                 break;
                             }
@@ -104,7 +105,7 @@ if (isset($_GET['id'])) {
                 <div class="col-lg-2 col-sm-6 col-12 align-content-center">
                     <li class="list-inline-item me-0 trade-desc">Trade count:
                         <?php
-                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE t.acceptCustID = c.custid AND tradeid = '" . $current_data['tradeid'] . "'";
+                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE c.custid = '$traderid' AND (t.acceptCustID = '$traderid' OR t.offerCustID = '$traderid') AND t.tradeid <> '" . $current_data['tradeid'] . "' AND (t.status = 'Rejected' OR t.status = 'Completed')";
                         $result = $dbc->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = mysqli_fetch_array($result)) {

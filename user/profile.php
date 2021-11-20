@@ -12,6 +12,11 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
+            $sqluser = "SELECT * FROM customer WHERE custid = '{$_SESSION['loginuser']['custid']}' AND custid = '{$row['custid']}'";
+            $resultuser = $dbc->query($sqluser);
+            if ($resultuser->num_rows > 0) {
+                echo '<script>window.location.href="../user/my_profile.php";</script>';
+            }
             break;
         }
     } else {
@@ -100,7 +105,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="col-lg-3 profile-pic-box float-start align-items-center justify-content-center text-center">
                     <img src="<?php
                     if (isset($current_data)) {
-                        echo $current_data['avatar'];
+                        if ($current_data['avatar'] != null) {
+                            echo $current_data['avatar'];
+                        } else {
+                            echo "../img/login/default_profile.jpg";
+                        }
                     }
                     ?>" class="rounded-pill img-fluid profile-pic" alt="Profile picture">
                 </div>
@@ -162,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <div class="my-2">
                                         <div style="font-weight: bolder;">Trade Count</div>
                                         <?php
-                                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustid = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                        $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustid = c.custid) AND c.custid = '{$current_data['custid']}' AND (status = 'Rejected' OR status = 'Completed')";
                                         $result = $dbc->query($sql);
                                         if ($result->num_rows > 0) {
                                             while ($row = mysqli_fetch_array($result)) {
@@ -214,7 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-inventory-tab" data-bs-toggle="tab" data-bs-target="#nav-inventory" type="button" role="tab">Inventory</button>
                     <button class="nav-link" id="nav-reviews-tab" data-bs-toggle="tab" data-bs-target="#nav-reviews" type="button" role="tab">Reviews</button>
-                    <button class="nav-link" id="nav-history-tab" data-bs-toggle="tab" data-bs-target="#nav-history" type="button" role="tab">Trade history</button>
+                    <button class="nav-link " id="nav-history-tab" data-bs-toggle="tab" data-bs-target="#nav-history" type="button" role="tab">Trade history</button>
                 </div>
             </nav>
             <div class="tab-content mb-3" id="nav-tabContent">
@@ -274,9 +283,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="tab-pane fade" id="nav-history" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
-                            <div class="row">
-                                <div class="col-md-12">
+                        <div class="content" style="min-height: 320px;">
+                            <div class="card">
+                                <div class="card-body">
                                     <table id="table" class="table table-striped table-bordered" style="width:100%">
                                         <thead>
                                             <tr>
@@ -295,7 +304,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             if ($result) {
                                                 while ($row = $result->fetch_assoc()) {
                                                     if ($row["offerCustID"] == $current_data['custid']) {
-                                                        $color1 = "blue";
+                                                        $color1 = "skyblue";
                                                         $weight1 = 'bolder';
                                                     } else {
                                                         $color1 = "black";
@@ -303,7 +312,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     }
 
                                                     if ($row["acceptCustID"] == $current_data['custid']) {
-                                                        $color2 = "blue";
+                                                        $color2 = "skyblue";
                                                         $weight2 = 'bolder';
                                                     } else {
                                                         $color2 = "black";
@@ -313,19 +322,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     if ($row["status"] === "Pending") {
                                                         $color3 = "yellow";
                                                     } else if ($row["status"] === "Completed") {
-                                                        $color3 = "green";
+                                                        $color3 = "limegreen";
                                                     } else {
                                                         $color3 = "red";
                                                     }
 
                                                     echo "<tr>"
-                                                    . "<td style='text-align: center;'>" . $row["tradeid"] . "</td>"
-                                                    . "<td style='text-align: center; color:" . $color1 . "; font-weight: " . $weight1 . "'>" . $row["offerCustID"] . "</td>"
-                                                    . "<td style='text-align: center; color:" . $color2 . "; font-weight: " . $weight2 . "'>" . $row["acceptCustID"] . "</td>"
-                                                    . "<td style='text-align: center;'>" . $row["date"] . "</td>"
-                                                    . "<td style='text-align: center; font-weight: bolder; color:" . $color3 . "'>" . $row["status"] . "</td>"
+                                                    . "<td style=''>" . $row["tradeid"] . "</td>"
+                                                    . "<td style='color:" . $color1 . "; font-weight: " . $weight1 . "'>" . $row["offerCustID"] . "</td>"
+                                                    . "<td style='color:" . $color2 . "; font-weight: " . $weight2 . "'>" . $row["acceptCustID"] . "</td>"
+                                                    . "<td style=''>" . $row["tradeDate"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color3 . "'>" . $row["status"] . "</td>"
                                                     . "<td>"
-                                                    . "<a class='btn btn-info btn-block' href='trade_offer.php?tradeid=" . $row["tradeid"] . "'><i class='far fa-eye'></i></a></td></tr>";
+                                                    . "<a class='btn btn-info btn-block' href='trade_offer.php?id=" . $row["tradeid"] . "'><i class='far fa-eye'></i></a></td></tr>";
                                                 }
                                             }
                                             ?>

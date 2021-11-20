@@ -1,4 +1,5 @@
 <?php
+$page = 'delivery_list';
 include 'navbar.php';
 
 if (isset($_GET['id'])) {
@@ -103,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="container-fluid">
                     <form id="form" method="post">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-lg-6">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="card card-primary" >
@@ -277,11 +278,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="card card-info collapsed-card">
+                                            <div class="card-header">
+                                                <h3 class="card-title" >Order Summary</h3>
+                                                <div class="card-tools" style="padding-top:10px">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-12" id="accordion">
+                                                        <?php
+                                                        $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['senderid']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                                        $result = $dbc->query($get_inventory);
+                                                        if ($result->num_rows > 0) {
+                                                            while ($row = mysqli_fetch_array($result)) {
+                                                                echo "<div class='card card-primary card-outline'>"
+                                                                . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
+                                                                . "<div class='card-header'>"
+                                                                . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
+                                                                . "</div>"
+                                                                . "</a>"
+                                                                . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
+                                                                . "<div class='card-body'>"
+                                                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                                                . "</div>"
+//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
+//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
+                                                                . "</div>"
+                                                                . "</div>";
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-lg-6">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="card card-warning">
@@ -388,60 +428,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </div>
                                         </div>
 
-                                        <div class="row float-left">
-                                            <div class="col-auto">
-                                                <button type="button" id="btnback" class="btn btn-dark" onclick="back()">Back</button>
-                                            </div>
+                                        <div class="col-auto float-left">
+                                            <button type="button" id="btnback" class="btn btn-dark" onclick="back()">Back</button>
                                         </div>
 
-                                        <div class="row float-md-right">
-                                            <div class="col-md-auto">
-                                                <button type="button" class="btn btn-danger" onclick="cancel()" id="btncancel" disabled>Cancel</button>
-                                            </div>
-                                            <div class="col-md-auto">
-                                                <button type="button" class="btn btn-warning" style="color: whitesmoke;" onclick="editorsave()" id="btnsave">Edit</button>
-                                            </div>
+                                        <div class="col-auto float-right">
+                                            <button type="button" class="btn btn-danger" onclick="cancel()" id="btncancel" disabled>Cancel</button>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card collapsed-card">
-                                    <div class="card-header">
-                                        <h3 class="card-title" >Order Summary</h3>
-                                        <div class="card-tools" style="padding-top:10px">
-                                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="card-body pb-0">
-                                        <div class="row">
-                                            <div class="col-12" id="accordion">
-                                                <?php
-                                                $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['senderid']}' AND d.tradeid = '{$current_data['tradeid']}'";
-                                                $result = $dbc->query($get_inventory);
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = mysqli_fetch_array($result)) {
-                                                        echo "<div class='card card-primary card-outline'>"
-                                                        . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
-                                                        . "<div class='card-header'>"
-                                                        . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
-                                                        . "</div>"
-                                                        . "</a>"
-                                                        . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
-                                                        . "<div class='card-body'>"
-                                                        . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
-                                                        . "</div>"
-//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
-//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
-                                                        . "</div>"
-                                                        . "</div>";
-                                                    }
-                                                }
-                                                ?>
-                                            </div>
+                                        <div class="col-auto float-right">
+                                            <button type="button" class="btn btn-warning" style="color: whitesmoke;" onclick="editorsave()" id="btnsave">Edit</button>
                                         </div>
                                     </div>
                                 </div>

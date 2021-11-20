@@ -1,4 +1,5 @@
 <?php
+$page = 'event_list';
 include 'navbar.php';
 ?>
 <html>

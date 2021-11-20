@@ -15,6 +15,7 @@ if (isset($_GET['id'])) {
             $current_data = $row;
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
 
+            $shipping_fee = 0;
             if ($_SESSION['delivery_details']['deliverycountry'] !== $_SESSION['loginuser']['country']) {
                 if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
                     $shipping_fee = $shipping_fee + 10;

@@ -15,6 +15,7 @@ if (isset($_GET['id'])) {
             $current_data = $row;
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
 
+            $shipping_fee = 0;
             if ($_SESSION['delivery_details']['deliverycountry'] !== $_SESSION['loginuser']['country']) {
                 if ($_SESSION['delivery_details']['deliverystate'] !== $_SESSION['loginuser']['state']) {
                     $shipping_fee = $shipping_fee + 10;
@@ -132,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
                         <li class="breadcrumb-item"><a href="#">Trade List</a></li>
-                        <li class="breadcrumb-item"><a href="#">Trade Offer</a></li>
+                        <li class="breadcrumb-item"><a href="#">Trade Accept</a></li>
                         <li class="breadcrumb-item"><a href="#">Shipping</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Payment</li>
                     </ol>

@@ -19,7 +19,7 @@ if (isset($_GET['id'])) {
             break;
         }
     } else {
-        echo '<script>alert("Extract data error!\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
+        echo '<script>alert("Sorry, the item you looking for has been donated and it will not be allow to trade anymore.");window.location.href = "../php/index.php";</script>';
     }
 }
 
@@ -554,7 +554,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col-lg-4 col-sm-6 mb-1">
                                             <div style="font-weight: bolder;">Trade Count</div>
                                             <?php
-                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustID = c.custid) AND c.custid = '{$current_data['custid']}'";
+                                            $sql = "SELECT COUNT(t.tradeid) NUMBER FROM trade t, customer c WHERE (t.offerCustID = c.custid OR t.acceptCustID = c.custid) AND c.custid = '{$current_data['custid']}' AND (status = 'Rejected' OR status = 'Completed')";
                                             $result = $dbc->query($sql);
                                             if ($result->num_rows > 0) {
                                                 while ($row = mysqli_fetch_array($result)) {

@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($e && $p) {
-        $q = "SELECT * FROM customer WHERE (email='$e' AND pass=SHA1('$p')) AND active IS NULL";
+//        $q = "SELECT * FROM customer WHERE (email='$e' AND pass=SHA1('$p')) AND active IS NULL";
+        $q = "SELECT * FROM customer WHERE (email='$e' AND pass=SHA1('$p')) AND active = 1";
         $r = mysqli_query($dbc, $q) or trigger_error("Query: $q\n<br />MySQL Error: " . mysqli_error($dbc));
 
         if (@mysqli_num_rows($r) == 1) {

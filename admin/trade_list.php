@@ -1,4 +1,5 @@
 <?php
+$page = 'trade_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -42,12 +43,12 @@ include 'navbar.php';
                                 <thead>
                                     <tr>
                                         <th style="width: 11%">Trading ID</th>
-                                        <th style="width: 20%">Offered customer ID</th>
-                                        <th style="width: 20%">Accepted Customer ID</th>
-                                       
-                                       
+                                        <th style="width: 12%">Offered ID</th>
+                                        <th style="width: 12%">Accepted ID</th>
+                                        <th style="width: 14%">Offer Payment</th>
+                                        <th style="width: 14%">Accept Payment</th>
                                         <th style="width: 15%">Traded Date</th>
-                                        <th style="width: 17%">Status</th>
+                                        <th style="width: 12%">Status</th>
                                         <th style="width: auto"></th>
                                     </tr>
                                 </thead>
@@ -57,24 +58,36 @@ include 'navbar.php';
                                     $result = $dbc->query($sql);
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            if ($row["status"] === "Accepted") {
-                                                $color = "blue";
-                                         
-                                            } else {
-                                                $color = "red";
-                                            }
+                                            if ($row["status"] == "Pending") {
+                                                        $color1 = "orange";
+                                                    } else if ($row["status"] == "Trading") {
+                                                        $color1 = "skyblue";
+                                                    } else if ($row["status"] == "Rejected") {
+                                                        $color1 = "red";
+                                                    } else if ($row["status"] == "To Pay") {
+                                                        $color1 = "slateblue";
+                                                    } else if ($row["status"] == "To Ship") {
+                                                        $color1 = "lightsalmon";
+                                                    } else if ($row["status"] == "Completed") {
+                                                        $color1 = "limegreen";
+                                                    } else if ($row["status"] == "Delivered") {
+                                                        $color1 = "limegreen";
+                                                    } else {
+                                                        $color1 = "red";
+                                                    }
 
                                             echo "<tr>"
                                             . "<td><a>" . $row["tradeid"] . "</a></td>"
                                             . "<td><a>" . $row["offerCustID"] . "</a></td>"
                                             . "<td><a>" . $row["acceptCustID"] . "</a></td>"
-                                            . "<td><a>" . $row["date"] . "</a></td>"
-                                      
-                                            . "<td style='color:" . $color . "'><a>" . $row["status"] . "</a></td>"
+                                            . "<td><a>" . $row["offerPayment"] . "</a></td>"
+                                            . "<td><a>" . $row["acceptPayment"] . "</a></td>"
+                                            . "<td><a>" . $row["tradeDate"] . "</a></td>"
+                                            . "<td style='color:" . $color1 . "; font-weight: bolder;'><a>" . $row["status"] . "</a></td>"
                                             . "<td class='project-actions text-right'>"
-                                            . "<a class='btn btn-primary' style='width:100%' href='trade_details.php?id=" . $row["tradeid"] . "'>"
-                                            . "<i class=" . "'fas fa-folder'" . ">"
-                                            . "</i> View</a></td>"
+                                            . "<a class='btn btn-info btn-block' href='trade_details.php?id=" . $row["tradeid"] . "'>"
+                                            . "<i class=" . "'far fa-eye'" . ">"
+                                            . "</i></a></td>"
                                             . "</tr>";
                                         }
                                     }

@@ -4,7 +4,7 @@ include '../include/header.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $img = $_FILES['img']['name'];
     if ($img) {
-        $newimg = "../avatar/$img";
+        $newimg = "../data/avatar/$img";
     } else {
         $newimg = $_SESSION['loginuser']["avatar"];
     }
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['loginuser']['username'] = $_POST['username'];
         $_SESSION['loginuser']['description'] = $_POST['description'];
         if ($img) {
-            move_uploaded_file($_FILES['img']['tmp_name'], "../avatar/$img");
+            move_uploaded_file($_FILES['img']['tmp_name'], "../data/avatar/$img");
         }
         echo '<script>alert("Your profile has been updated.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
     } else {

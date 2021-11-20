@@ -54,7 +54,6 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_GET['id'])) {
-
         if (is_uploaded_file($_FILES["img"]["tmp_name"][0])) {
             $length = count($Array_Image);
             for ($x = 0; $x < $length; $x++) {
@@ -144,13 +143,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php
+        <title>Item <?php
             if (isset($current_data)) {
                 echo $current_data["itemid"];
             } else {
                 echo "Upload New";
             }
-            ?> Item - Tradee</title>
+            ?> - Tradee</title>
     </head>
     <body onload="loadform()">
         <div class="setting bg-light">

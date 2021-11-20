@@ -1,15 +1,6 @@
 <?php
+$page = 'customer_list';
 include 'navbar.php';
-
-//$Array_email = array();
-//$sql1 = "SELECT email FROM customer";
-//$result1 = $dbc->query($sql1);
-//if ($result1->num_rows > 0) {
-//    while ($row = mysqli_fetch_array($result1)) {
-//        array_push($Array_email, $row["email"]);
-//    }
-//}
-//echo '<script>var Array_email = ' . json_encode($Array_email) . ';</script>';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -26,98 +17,50 @@ if (isset($_GET['id'])) {
         echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "customer_list.php";</script>';
     }
 }
-//else {
-//    $sql = "SELECT custid FROM customer ORDER BY custid DESC LIMIT 1";
-//    $result = $dbc->query($sql);
-//    if ($result->num_rows > 0) {
-//        while ($row = mysqli_fetch_array($result)) {
-//            $latestnum = ((int) substr($row['custid'], 1)) + 1;
-//            $newid = "C{$latestnum}";
-//            $title = "New Customer ({$newid})";
-//            echo '<script>var current_data = null;</script>';
-//            $current_data = null;
-//            break;
-//        }
-//    } else {
-//        $newid = "C00001";
-//        $title = "New Customer ({$newid})";
-//    }
-//}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_GET['id'])) {
-
         $img = $_FILES['img']['name'];
         if ($img) {
-            $newimg = "../photo/$img";
+            $newimg = "../data/avatar/$img";
         } else {
-            $newimg = $current_data["img"];
+            $newimg = $current_data["avatar"];
         }
 
-        if ($_POST['ps'] === "" || !isset($_POST['ps'])) {
-            $ps = $current_data['pass'];
-        } else {
-            $ps = $_POST['ps'];
-        }
+//        if ($_POST['ps'] === "" || !isset($_POST['ps'])) {
+//            $ps = $current_data['pass'];
+//        } else {
+//            $ps = $_POST['ps'];
+//        }
 
         $sql = "UPDATE customer SET "
-                . "username='" . $_POST['username'] . "',"
-                . "avatar='" . $newimg . "',"
-                . "contact='" . $_POST['contact'] . "',"
-                . "gender='" . $_POST['gender'] . "',"
-                . "birth='" . $_POST['birth'] . "',"
-                . "email='" . $_POST['email'] . "',"
-                . "address1='" . $_POST['address1'] . "',"
-                . "address2='" . $_POST['address2'] . "',"
-                . "city='" . $_POST['city'] . "',"
-                . "postcode='" . $_POST['postcode'] . "',"
-                . "state='" . $_POST['state'] . "',"
-                . "country='" . $_POST['country'] . "',"
-                . "pass='" . $ps . "',"
-                . "active='" . $_POST['activation'] . "'"
+                . "username = '" . $_POST['username'] . "', "
+                . "avatar = '" . $newimg . "', "
+//                . "contact='" . $_POST['contact'] . "',"
+//                . "gender='" . $_POST['gender'] . "',"
+//                . "birth='" . $_POST['birth'] . "',"
+//                . "email='" . $_POST['email'] . "',"
+//                . "address1='" . $_POST['address1'] . "',"
+//                . "address2='" . $_POST['address2'] . "',"
+//                . "city='" . $_POST['city'] . "',"
+//                . "postcode='" . $_POST['postcode'] . "',"
+//                . "state='" . $_POST['state'] . "',"
+//                . "country='" . $_POST['country'] . "',"
+//                . "pass='" . $ps . "',"
+                . "active = '" . $_POST['activation'] . "' "
                 . "WHERE custid ='" . $current_data['custid'] . "'";
+
+        echo '<script>alert("' . $sql . '");</script>';
 
         if ($dbc->query($sql)) {
             if ($img) {
-                move_uploaded_file($_FILES['img']['tmp_name'], "../photo/$img");
+                move_uploaded_file($_FILES['img']['tmp_name'], "../data/avatar/$img");
             }
-            echo '<script>alert("Successfuly update !");var currentURL = window.location.href;window.location.href = currentURL;</script>';
+            echo '<script>alert("Customer details update successfully.");var currentURL=window.location.href;window.location.href=currentURL;</script>';
         } else {
             echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
         }
-    } 
-//    else {
-//        $img = $_FILES['img']['name'];
-//        if ($img) {
-//            $newimg = "../photo/$img";
-//        }
-//
-//        $sql = "INSERT INTO customer(custid, email, pass, username, avatar, birth, contact, gender, address1, address2, postcode, city, state, country, user_level, registration_date, active) VALUES("
-//                . "'" . $newid . "',"
-//                . "'" . $_POST['email'] . "',"
-//                . "'" . $_POST['ps'] . "',"
-//                . "'" . $_POST['username'] . "',"
-//                . "'" . $newimg . "',"
-//                . "'" . $_POST['birth'] . "',"
-//                . "'" . $_POST['contact'] . "',"
-//                . "'" . $_POST['gender'] . "',"
-//                . "'" . $_POST['address1'] . "',"
-//                . "'" . $_POST['address2'] . "',"
-//                . "'" . $_POST['postcode'] . "',"
-//                . "'" . $_POST['city'] . "',"
-//                . "'" . $_POST['state'] . "',"
-//                . "'" . $_POST['country'] . "',"
-//                . "'" . $_POST['ps'] . "')";
-//
-//        if ($dbc->query($sql)) {
-//            if ($img) {
-//                move_uploaded_file($_FILES['img']['tmp_name'], "../photo/$img");
-//            }
-//            echo '<script>alert("Successfuly insert !");window.location.href = "customer_details.php?id=' . $newid . '";</script>';
-//        } else {
-//            echo '<script>alert("Insert fail !\nContact IT department for maintainence\nRedirect to Customer list");window.location.href = "customer_list.php";</script>';
-//        }
-//    }
+    }
 }
 ?>
 <!doctype html>
@@ -125,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php echo $current_data['custid'] ?> (Customer Details) - Tradee</title>
+        <title>Customer <?php echo $current_data['custid'] ?> - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed"  onload="addnew()">
         <div class="content-wrapper">
@@ -147,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <section class="content">
                 <div class="container-fluid">
-                    <form id="form" method="post">
+                    <form id="form" method="post" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="row">
@@ -163,13 +106,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <div class="col-md-12">
-                                                            <img class="img-fluid mb-12" src="<?php
+                                                            <img class="img-fluid mb-12 rounded-pill" src="<?php
                                                             if (isset($current_data)) {
-                                                                echo $current_data["avatar"];
+                                                                if (($current_data['avatar'] != '')) {
+                                                                    echo $current_data["avatar"];
+                                                                } else {
+                                                                    echo '../img/header/user-icon.png';
+                                                                }
                                                             }
-                                                            ?>" alt="Photo" style="width: 100%; height: 500px; padding-top: 10px" id="img_display" name="img_display">
+                                                            ?>" alt="Photo" style="width: 250px; height: 250px; padding-top: 10px" id="img_display" name="img_display">
                                                         </div>
                                                         <div class="col-md-12" >
                                                             <div class="form-group" style="padding-top: 15px">
@@ -189,8 +136,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             }
                                                             ?>">
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label>Contact :</label>
                                                             <input class="form-control" id="contact" name="contact" readonly value="<?php
@@ -199,9 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             }
                                                             ?>">
                                                         </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="inputGender">Gender</label>
                                                             <select class="custom-select" id="gender" name="gender" disabled>
@@ -219,13 +161,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     }
                                                                 }
                                                                 ?>>Male</option>
+                                                                <option value="" <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["gender"] == "") {
+                                                                        echo "selected";
+                                                                    }
+                                                                }
+                                                                ?>>Not Shown</option>
                                                             </select>
                                                         </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="inputGender">Gender</label>
+                                                            <label for="inputGender">Birthday</label>
                                                             <div class="input-group">
                                                                 <div class="input-group date" id="reservationdate" data-target-input="nearest">
                                                                     <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
@@ -240,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label>Email :</label>
@@ -256,14 +202,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
 
-
                                     <div class="col-md-12">
-                                        <div class="card card-red">
+                                        <div class="card card-red collapsed-card">
                                             <div class="card-header">
                                                 <h3 class="card-title">Reset/Set Password</h3>
                                                 <div class="card-tools" style="padding-top:10px">
                                                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                                        <i class="fas fa-minus"></i>
+                                                        <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -322,7 +267,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             ?>">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label>City :</label>
                                                             <input class="form-control" id="city" name="city" readonly value="<?php
@@ -332,7 +277,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             ?>">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label>Post code :</label>
                                                             <input class="form-control" id="postcode" name="postcode" size="5" maxlength="5" onkeypress="return isNumberKey(event)" readonly value="<?php
@@ -342,7 +287,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             ?>">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label>State :</label>
                                                             <input class="form-control" id="state" name="state" readonly value="<?php
@@ -352,53 +297,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             ?>">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label>Country :</label>
-                                                            <select class="custom-select" id="country" name="country" disabled>
-                                                                <option value="Malaysia">Malaysia</option>
-                                                                <option value="Singapore">Singapore</option>
-                                                                <option value="Thailand">Thailand</option>
-                                                                <option value="Hong Kong">Hong Kong</option>
-                                                                <option value="China">China</option>
-                                                                <option value="America">United States of America</option>
-
+                                                            <input class="form-control" id="country" name="country" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["country"];
+                                                            }
+                                                            ?>">
+<!--                                                            <select class="custom-select" id="country" name="country" disabled>
                                                                 <option value="Malaysia" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["country"] == "Malaysia") {
-                                                                        echo "selected";
-                                                                    }
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "Malaysia") {
+                                                                    echo "selected";
                                                                 }
-                                                                ?>>Malaysia</option>
+                                                            }
+                                                            ?>>Malaysia</option>
                                                                 <option value="Singapore" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["country"] == "Singapore") {
-                                                                        echo "selected";
-                                                                    }
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "Singapore") {
+                                                                    echo "selected";
                                                                 }
-                                                                ?>>Singapore</option>
+                                                            }
+                                                            ?>>Singapore</option>
                                                                 <option value="Thailand" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["country"] == "Thailand") {
-                                                                        echo "selected";
-                                                                    }
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "Thailand") {
+                                                                    echo "selected";
                                                                 }
-                                                                ?>>Thailand</option>
+                                                            }
+                                                            ?>>Thailand</option>
                                                                 <option value="China" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["country"] == "China") {
-                                                                        echo "selected";
-                                                                    }
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "China") {
+                                                                    echo "selected";
                                                                 }
-                                                                ?>>China</option>
+                                                            }
+                                                            ?>>China</option>
                                                                 <option value="Taiwan" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["country"] == "Taiwan") {
-                                                                        echo "selected";
-                                                                    }
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "Taiwan") {
+                                                                    echo "selected";
                                                                 }
-                                                                ?>>Taiwan</option>
-                                                            </select>
+                                                            }
+                                                            ?>>Taiwan</option>
+                                                                <option value="Japan" <?php
+                                                            if (isset($current_data)) {
+                                                                if ($current_data["country"] == "Japan") {
+                                                                    echo "selected";
+                                                                }
+                                                            }
+                                                            ?>>Japan</option>
+                                                            </select>-->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -418,18 +368,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             <select class="custom-select" id="activation" name="activation" disabled>
                                                                 <option value="1" <?php
                                                                 if (isset($current_data)) {
-                                                                    if ($current_data["active"] == 1) {
-                                                                        echo "selected";
-                                                                    }
-                                                                }
-                                                                ?>>Blacklisted</option>
-                                                                <option value="0" <?php
-                                                                if (isset($current_data)) {
-                                                                    if ($current_data["active"] == null) {
+                                                                    if ($current_data["active"] == "1") {
                                                                         echo "selected";
                                                                     }
                                                                 }
                                                                 ?>>Active</option>
+                                                                <option value="0" <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["active"] == 0) {
+                                                                        echo "selected";
+                                                                    }
+                                                                }
+                                                                ?>>Blacklisted</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -477,60 +427,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <i class="fas fa-minus"></i></button>
                                 </div>
                             </div>
-                            
+
                             <div class="card-body">
                                 <table id="orderlisttable" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th style="width: 10%">Order Id</th>
-                                            <th style="width: 10%">Date</th>
-                                            <th style="width: 10%">Amount(RM)</th>
-                                            <th style="width: 10%">Tax(RM)</th>
-                                            <th style="width: 12%">Delivery fees(RM)</th>
-                                            <th style="width: 10%">Net(RM)</th>
-                                            <th style="width: 10%">Delivery status</th>
-                                            <th style="width: 10%">Order status</th>
+                                            <th style="width: 9%">Item ID</th>
+                                            <th style="width: 13%">Item Name</th>
+                                            <th style="width: 10%">Brand</th>
+                                            <th style="width: 11%">Category</th>
+                                            <th style="width: 12%">Trade</th>
+                                            <th style="width: 12%">Option</th>
+                                            <th style="width: 12%">Date</th>
+                                            <th style="width: 10%">Status</th>
                                             <th style="width: auto"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
-//                                        if ($current_data) {
-//                                            $sql = "SELECT * FROM `order` WHERE custid = '" . $current_data["custid"] . "'";
-//                                            $result = $dbc->query($sql);
-//                                            if ($result->num_rows > 0) {
-//                                                while ($row = $result->fetch_assoc()) {
-//                                                    echo "<tr>"
-//                                                    . "<td><a>" . $row["orderid"] . "</a></td>"
-//                                                    . "<td><a>" . $row["order_date"] . "</a></td>"
-//                                                    . "<td><a>" . $row["total_amount"] . "</a></td>"
-//                                                    . "<td><a>" . $row["tax"] . "</a></td>"
-//                                                    . "<td><a>" . $row["delivery_fees"] . "</a></td>"
-//                                                    . "<td><a>" . $row["net_amount"] . "</a></td>"
-//                                                    . "<td><a>" . $row["delivery_status"] . "</a></td>"
-//                                                    . "<td><a>" . $row["order_status"] . "</a></td>"
-//                                                    . "<td class='project-actions text-right'>"
-//                                                    . "<a class='btn btn-primary btn-sm' style='width:100%' href='order_detail.php?action=view&orderid=" . $row["orderid"] . "'>"
-//                                                    . "<i class=" . "'fas fa-folder'" . ">"
-//                                                    . "</i> View</a></td></tr>";
-//                                                }
-//                                            }
-//                                        }
+                                        if ($current_data) {
+                                            $sql = "SELECT * FROM item WHERE custid = '" . $current_data["custid"] . "'";
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    if ($row["itemActive"] == "Pending") {
+                                                        $color1 = "orange";
+                                                    } else if ($row["itemActive"] == "Available") {
+                                                        $color1 = "limegreen";
+                                                    } else if ($row["itemActive"] == "Trading") {
+                                                        $color1 = "red";
+                                                    } else {
+                                                        $color1 = "skyblue";
+                                                    }
+                                                    
+                                                    echo "<tr>"
+                                                    . "<td><a>" . $row["itemid"] . "</a></td>"
+                                                    . "<td><a>" . $row["itemname"] . "</a></td>"
+                                                    . "<td><a>" . $row["brand"] . "</a></td>"
+                                                    . "<td><a>" . $row["catname"] . "</a></td>"
+                                                    . "<td><a>" . $row["tradeItem"] . "</a></td>"
+                                                    . "<td><a>" . $row["tradeOption"] . "</a></td>"
+                                                    . "<td><a>" . $row["postDate"] . "</a></td>"
+                                                    . "<td style='color: " . $color1 . ";font-weight: bolder;'><a>" . $row["itemActive"] . "</a></td>"
+                                                    . "<td class='project-actions text-right'>"
+                                                    . "<a class='btn btn-primary btn-sm' style='width:100%' href='item_details.php?id=" . $row["itemid"] . "'>"
+                                                    . "<i class=" . "'far fa-eye'" . ">"
+                                                    . "</i></a></td></tr>";
+                                                }
+                                            }
+                                        }
                                         ?>
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Order Id</th>
-                                            <th>Date</th>
-                                            <th>Amount(RM)</th>
-                                            <th>Tax(RM)</th>
-                                            <th>Delivery fees(RM)</th>
-                                            <th>Net(RM)</th>
-                                            <th>Delivery status</th>
-                                            <th>Order status</th>
-                                            <th></th>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -557,6 +504,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 var fullfill = true;
                 var message = "";
 
+//                document.getElementById("validate_img").style.borderColor = "";
                 document.getElementById("username").style.borderColor = "";
                 document.getElementById("gender").style.borderColor = "";
                 document.getElementById("contact").style.borderColor = "";
@@ -565,6 +513,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById("reps").style.borderColor = "";
                 document.getElementById("postcode").style.borderColor = "";
 
+//                var img = document.getElementById('img_display');
+//                if (!document.getElementById("img").value || document.getElementById("img").value === "") {
+//                    if (img.getAttribute('src') === "") {
+//                        document.getElementById("validate_img").style.borderColor = "red";
+//                        fullfill = false;
+//                    }
+//                }
                 if (document.getElementById("postcode").value) {
                     if (document.getElementById("postcode").value < 5) {
                         document.getElementById("postcode").style.borderColor = "red";
@@ -585,10 +540,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("contact").style.borderColor = "red";
                     fullfill = false;
                 }
-                if (!document.getElementById("gender").value || document.getElementById("gender").value === "") {
-                    document.getElementById("gender").style.borderColor = "red";
-                    fullfill = false;
-                }
+//                if (!document.getElementById("gender").value || document.getElementById("gender").value === "") {
+//                    document.getElementById("gender").style.borderColor = "red";
+//                    fullfill = false;
+//                }
                 if (!document.getElementById("email").value || document.getElementById("email").value === "") {
                     document.getElementById("email").style.borderColor = "red";
                     fullfill = false;
@@ -701,18 +656,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("btncancel").disabled = false;
             document.getElementById("img").disabled = false;
             document.getElementById("username").readOnly = false;
-            document.getElementById("contact").readOnly = false;
-            document.getElementById("gender").disabled = false;
-            document.getElementById("birth").readOnly = false;
-            document.getElementById("email").readOnly = false;
-            document.getElementById("address1").readOnly = false;
-            document.getElementById("address2").readOnly = false;
-            document.getElementById("city").readOnly = false;
-            document.getElementById("postcode").readOnly = false;
-            document.getElementById("state").readOnly = false;
-            document.getElementById("country").disabled = false;
-            document.getElementById("ps").readOnly = false;
-            document.getElementById("reps").readOnly = false;
+//            document.getElementById("contact").readOnly = false;
+//            document.getElementById("gender").disabled = false;
+//            document.getElementById("birth").readOnly = false;
+//            document.getElementById("email").readOnly = false;
+//            document.getElementById("address1").readOnly = false;
+//            document.getElementById("address2").readOnly = false;
+//            document.getElementById("city").readOnly = false;
+//            document.getElementById("postcode").readOnly = false;
+//            document.getElementById("state").readOnly = false;
+//            document.getElementById("country").disabled = false;
+//            document.getElementById("ps").readOnly = false;
+//            document.getElementById("reps").readOnly = false;
             document.getElementById("activation").disabled = false;
         }
 
@@ -787,7 +742,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             var image = document.getElementById('img_display');
             image.src = URL.createObjectURL(event.target.files[0]);
         };
-        
+
         //Date picker
         $('#reservationdate').datetimepicker({
             format: 'L'

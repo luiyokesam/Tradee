@@ -1,4 +1,5 @@
 <?php
+$page = 'item_list';
 include 'navbar.php';
 ?>
 <html>
@@ -54,7 +55,7 @@ include 'navbar.php';
                                             echo "<tr>"
                                             . "<td contenteditable='true'>" . $row["name"] . "</td>"
                                             . "<td contenteditable='true'>" . $row["description"] . "</td>"
-                                            . "<td class='project-actions'><a class='btn btn-primary btn-block' href='item_type_details.php?id=" . $row["catid"] . "'><i class='fas fa-edit'></i></a></td>"
+                                            . "<td class='project-actions'><a class='btn btn-info btn-block' href='item_type_details.php?id=" . $row["catid"] . "'><i class='fas fa-pen'></i></a></td>"
                                             . "</tr>";
                                         }
                                     }

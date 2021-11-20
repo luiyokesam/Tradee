@@ -41,7 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="container-lg">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb py-2 mb-0">
-                        <li class="breadcrumb-item"><a href="#">Trade Offer</a></li>
+                        <li class="breadcrumb-item"><a href="#">Trade List</a></li>
+                        <li class="breadcrumb-item"><a href="#">Trade Accept</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Delivery</li>
                     </ol>
                 </nav>

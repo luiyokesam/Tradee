@@ -160,7 +160,7 @@ include '../include/header.php';
                     <div class="card" style="border: none; border-radius: 0px; box-shadow: none;">
                         <!--<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>-->
                         <img class="" src="../img/event/event_1.jpg">
-                        <div class="card-body px-0">
+                        <div class="card-body px-0 py-2">
                             <div class="" style="font-size: 1em; font-weight: bold;">1 Jan 2021</div>
                             <div class="" style="font-size: 1em;">Rumah Charis - Home For The Children</div>
                             <div class="card-text py-1" style="font-size: 0.9em;">Lot 10064, Jalan Awan Pintal, Taman Yarl, 58200 Kuala Lumpur.</div>
@@ -185,7 +185,7 @@ include '../include/header.php';
                         echo "<div class='col'>"
                         . "<div class='card' style='border: none; border-radius: 0px; box-shadow: none;'>"
                         . "<img class='event-img' src='../data/event_img/" . $row['eventid'] . "_0'>"
-                        . "<div class='card-body px-0'>"
+                        . "<div class='card-body px-0 py-2'>"
                         . "<div class='' style='font-size: 1em; font-weight: bold;'>" . $row["endEvent"] . "</div>"
                         . "<div class='' style='font-size: 1em;'>" . $row["title"] . "</div>"
                         . "<div class='card-text py-1' style='font-size: 0.9em;'>" . $address . "</div>"

@@ -1,5 +1,5 @@
 <?php
-$page = 'event_list';
+$page = 'donation_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -7,7 +7,7 @@ include 'navbar.php';
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Event List - Tradee</title>
+        <title>Donation List - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed">
         <div class="wrapper">
@@ -55,57 +55,54 @@ include 'navbar.php';
                             <div class="col-md">
                                 <button class="btn btn-dark" onclick="reset_filter()">Reset filter</button>
                             </div>
-
-                            <div class="col-auto px-0">
-                                <button class="btn btn-warning float-right" onclick="location.href = 'event_details.php?action=add'"><i class="fas fa-plus"></i> New Event</button>
-                            </div>
-
-                            <div class="col-auto px-0">
-                                <button class="btn btn-light float-right" onclick="location.href = 'event_type_list.php'"><i class="fas fa-cog"></i></button>
-                            </div>
                         </div>
                     </nav>
 
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Event List</h3>
+                            <h3 class="card-title">Donation List</h3>
                         </div>
                         <div class="card-body">
-                            <table id="eventtable" class="table table-bordered table-striped">
+                            <table id="donationtable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
+                                        <th style="width: 10%">Donate ID</th>
                                         <th style="width: 10%">Event ID</th>
-                                        <th style="width: 12%">Type</th>
-                                        <th style="width: 19%">Title</th>
-                                        <th style="width: 12%">Contact</th>
-                                        <th style="width: 12%">Staff Admin</th>
-                                        <th style="width: 13%">End Date</th>
-                                        <th style="width: 12%">Status</th>
+                                        <th style="width: 13%">Donator</th>
+                                        <th style="width: 10%">Quantity</th>
+                                        <th style="width: 15%">Donation Date</th>
+                                        <th style="width: 15%">Delivery Status</th>
+                                        <th style="width: 15%">Received Date</th>
                                         <th style="width: auto"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $sql = "SELECT * FROM event";
+                                    $sql = "SELECT * FROM donation_delivery";
                                     $result = $dbc->query($sql);
                                     if ($result) {
                                         while ($row = $result->fetch_assoc()) {
-                                            if ($row["status"] == 'Pending') {
-                                                $color = "orange";
-                                            } else if ($row["status"] == 'In-Progress'){
-                                                $color = "limegreen";
+                                            if ($row["deliveryStatus"] == "Pending") {
+                                                $color1 = "orange";
+                                            } else if ($row["deliveryStatus"] == "In Transit") {
+                                                $color1 = "lightsalmon";
+                                            } else if ($row["deliveryStatus"] == "Shipping") {
+                                                $color1 = "skyblue";
+                                            } else if ($row["deliveryStatus"] == "Delivered") {
+                                                $color1 = "limegreen";
                                             } else {
-                                                $color = "red";
+                                                $color1 = "red";
                                             }
-                                            echo "<tr><td><a>" . $row["eventid"] . "</a></td>"
-                                            . "<td><a>" . $row["type"] . "</a></td>"
-                                            . "<td><a>" . $row["title"] . "</a></td>"
-                                            . "<td><a>" . $row["contact"] . "</a></td>"
-                                            . "<td><a>" . $row["adminid"] . "</a></td>"
-                                            . "<td><a>" . $row["endEvent"] . "</a></td>"
-                                            . "<td><a style=" . "'color:" . $color . "; font-weight: bolder;'>" . $row["status"] . "</a></td>"
+
+                                            echo "<td><a>" . $row["donationid"] . "</a></td>"
+                                            . "<td><a>" . $row["eventid"] . "</a></td>"
+                                            . "<td><a>" . $row["donator"] . "</a></td>"
+                                            . "<td><a>" . $row["itemQuantity"] . "</a></td>"
+                                            . "<td><a>" . $row["paymentDate"] . "</a></td>"
+                                            . "<td style='color: " . $color1 . "; font-weight: bolder;'><a>" . $row["deliveryStatus"] . "</a></td>"
+                                            . "<td><a>" . $row["receiveDate"] . "</a></td>"
                                             . "<td class='project-actions text-right'>"
-                                            . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'event_details.php?id=" . $row["eventid"] . "'>"
+                                            . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'donation_details.php?id=" . $row["donationid"] . "'>"
                                             . "<i class=" . "'far fa-eye'" . ">"
                                             . "</i></a></td></tr>";
                                         }
@@ -114,13 +111,13 @@ include 'navbar.php';
                                 </tbody>
                                 <tfoot>
                                     <tr>
+                                        <th>Donate ID</th>
                                         <th>Event ID</th>
-                                        <th>Type</th>
-                                        <th>Receiver</th>
-                                        <th>Contact</th>
-                                        <th>Staff Admin</th>
-                                        <th>End Date</th>
-                                        <th>Status</th>
+                                        <th>Donator</th>
+                                        <th>Quantity</th>
+                                        <th>Donation Date</th>
+                                        <th>Delivery Status</th>
+                                        <th>Received Date</th>
                                         <th></th>
                                     </tr>
                                 </tfoot>
@@ -177,9 +174,9 @@ include 'navbar.php';
             filter();
         }
 
-        $('#eventtable').DataTable({
+        $('#donationtable').DataTable({
             "paging": true,
-            "lengthChange": true,   
+            "lengthChange": true,
             "searching": true,
             "ordering": true,
             "info": true,

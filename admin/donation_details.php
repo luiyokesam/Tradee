@@ -1,15 +1,15 @@
 <?php
-$page = 'trade_list';
+$page = 'event_list';
 include 'navbar.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM trade t, trade_details d WHERE t.tradeid = d.tradeid AND t.tradeid = '$id' LIMIT 1";
+    $sql = "SELECT * FROM donation_delivery d, donation_details t WHERE d.donationid = t.donationid AND d.donationid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
-            $title = "Trading Details - {$current_data['tradeid']}";
+            $title = "Donation Details - {$current_data['tradeid']}";
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
             break;
         }

@@ -1,4 +1,5 @@
 <?php
+$page = 'customer_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -56,9 +57,9 @@ include 'navbar.php';
                                     $result = $dbc->query($sql);
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            if ($row["active"] == null) {
+                                            if ($row["active"] == '1') {
                                                 $active = "Active";
-                                                $color = "blue";
+                                                $color = "limegreen";
                                             } else {
                                                 $active = "Blacklisted";
                                                 $color = "red";

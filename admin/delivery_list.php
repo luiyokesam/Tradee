@@ -1,4 +1,5 @@
 <?php
+$page = 'delivery_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -58,14 +59,16 @@ include 'navbar.php';
                                     $result = $dbc->query($sql);
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            if ($row["deliveryStatus"] === "Pending") {
-                                                $color = "orange";
-                                            } else if ($row["deliveryStatus"] === "Pick Up") {
-                                                $color = "purple";
-                                            } else if ($row["deliveryStatus"] === "Shipping") {
-                                                $color = "blue";
+                                            if ($row["deliveryStatus"] == "Pending") {
+                                                $color1 = "orange";
+                                            } else if ($row["deliveryStatus"] == "In Transit") {
+                                                $color1 = "lightsalmon";
+                                            } else if ($row["deliveryStatus"] == "Shipping") {
+                                                $color1 = "skyblue";
+                                            } else if ($row["deliveryStatus"] == "Delivered") {
+                                                $color1 = "limegreen";
                                             } else {
-                                                $color = "green";
+                                                $color1 = "red";
                                             }
 
                                             echo "<tr>"
@@ -75,7 +78,7 @@ include 'navbar.php';
                                             . "<td><a>" . $row["recipientid"] . "</a></td>"
                                             . "<td><a>" . $row["paymentDate"] . "</a></td>"
                                             . "<td><a>" . $row["receiveDate"] . "</a></td>"
-                                            . "<td style='color:" . $color . "; font-weight: bolder;'><a>" . $row["deliveryStatus"] . "</a></td>"
+                                            . "<td style='color:" . $color1 . "; font-weight: bolder;'><a>" . $row["deliveryStatus"] . "</a></td>"
                                             . "<td class='project-actions text-right'>"
                                             . "<a class='btn btn-info btn-block' href='delivery_details.php?id=" . $row["deliveryid"] . "'>"
                                             . "<i class=" . "'far fa-eye'" . ">"

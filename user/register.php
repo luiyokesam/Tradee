@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Create the activation code:
             $a = md5(uniqid(rand(), true));
 
-            $q = "INSERT INTO customer (custid, email, pass, username, avatar, contact, state, country, active, registration_date) VALUES ('$newid', '$email', SHA1('$password'), '$username', '../avatar/default_profile.jpg', '$contact', '$state', '$country', '$a', NOW())";
+            $q = "INSERT INTO customer (custid, email, pass, username, avatar, contact, state, country, active, registration_date) VALUES ('$newid', '$email', SHA1('$password'), '$username', '../data/avatar/default_profile.jpg', '$contact', '$state', '$country', '$a', NOW())";
             $r = mysqli_query($dbc, $q) or trigger_error("Query: $q\n<br />MySQL Error: " . mysqli_error($dbc));
 
             if (mysqli_affected_rows($dbc) == 1) {

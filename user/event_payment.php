@@ -6,9 +6,9 @@ if (!isset($_SESSION["donation_details"])) {
     exit();
 }
 
-if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
+if ((isset($_GET['eventid'])) && (isset($_GET['donationid']))) {
     $eventid = $_GET['eventid'];
-    $donateid = $_GET['donateid'];
+    $donationid = $_GET['donationid'];
     $sql = "SELECT * FROM event e WHERE e.eventid = '$eventid' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
@@ -16,24 +16,34 @@ if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
             $current_data = $row;
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
 
+//            echo '<script>alert("' . $_SESSION['donation_details']['remarks'] . '");</script>';
+
+            $quantity = 0;
+            foreach ($_SESSION['donation_details']['myitem'] as $myitems) {
+                $count = "SELECT i.itemid FROM item i WHERE i.itemid = '$myitems'";
+                $result = $dbc->query($count);
+                $quantity = $quantity + 1;
+            }
+
+            $shipping_fee = 0;
             if ($_SESSION['donation_details']['deliveryCountry'] !== $_SESSION['loginuser']['country']) {
                 if ($_SESSION['donation_details']['deliveryState'] !== $_SESSION['loginuser']['state']) {
-                    $shipping_fee = $shipping_fee + 10;
+                    $shipping_fee = $shipping_fee + 5;
                 }
-                $shipping_fee = $shipping_fee + 20;
+                $shipping_fee = $shipping_fee + 10;
 
                 $shipping_fee = number_format($shipping_fee, 2, '.', '');
             } else {
-                $shipping_fee = 10;
+                $shipping_fee = 2;
                 $shipping_fee = number_format($shipping_fee, 2, '.', '');
             }
 
             if ($_SESSION['donation_details']['packaging'] == 'Plastic boxes') {
-                $packaging_fee = 5;
+                $packaging_fee = 3;
             } else if ($_SESSION['donation_details']['packaging'] == 'Bubble wrap') {
-                $packaging_fee = 8;
+                $packaging_fee = 5;
             } else if ($_SESSION['donation_details']['packaging'] == 'Seal boxes with tape') {
-                $packaging_fee = 10;
+                $packaging_fee = 8;
             }
             $packaging_fee = number_format($packaging_fee, 2, '.', '');
 
@@ -44,94 +54,57 @@ if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
             break;
         }
     } else {
-//        echo '<script>alert("Extract data fail !\nContact IT department for maintainence")</script>';
-        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "../user/my_profile.php";</script>';
+        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "../php/index.php";</script>';
     }
-}
-
-//$sql_donation = "SELECT * FROM donation ORDER BY donateid  DESC LIMIT 1";
-//$result_donation = $dbc->query($sql_donation);
-//if ($result_donation->num_rows > 0) {
-//    while ($row = mysqli_fetch_array($result_donation)) {
-//        $latestdonation = ((int) substr($row['donateid '], 1)) + 1;
-//        $newdonation = "DO{$latestdonation}";
-//        echo '<script>var current_data = null;</script>';
-//        break;
-//    }
-//} else {
-//    $newdonation = "DO10001";
-//    echo '<script>var current_data = null;</script>';
-//}
-
-$sql_delivery = "SELECT * FROM donation_delivery ORDER BY donatedeliveryid  DESC LIMIT 1";
-$result_delivery = $dbc->query($sql_delivery);
-if ($result_delivery->num_rows > 0) {
-    while ($row = mysqli_fetch_array($result_delivery)) {
-        $latestdelivery = ((int) substr($row['donatedeliveryid '], 1)) + 1;
-        $newdelivery = "DD{$latestdelivery}";
-        echo '<script>var current_data = null;</script>';
-        break;
-    }
-} else {
-    $newdelivery = "DD10001";
-    echo '<script>var current_data = null;</script>';
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql_donation = "INSERT INTO donation(donateid, eventid, donator, donateDate) VALUES ("
-            . "'" . $newdonation . "',"
-            . "'" . $_SESSION['donation_details']['eventid'] . "',"
-            . "'" . $_SESSION['loginuser']['custid'] . "',"
-            . "'" . $_SESSION['donation_details']['donationDate'] . "')";
-
     foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
-        $sql_donationdetails = "INSERT INTO donation_details(donateid, eventid, itemid, donateDate) VALUES ("
-                . "'" . $newdonation . "',"
+        $sql1 = "INSERT INTO donation_details(donationid, eventid, donator, itemid) VALUES ("
+                . "'" . $_SESSION['donation_details']['donationid'] . "',"
                 . "'" . $_SESSION['donation_details']['eventid'] . "',"
-                . "'" . $myitem . "',"
-                . "'" . $_SESSION['donation_details']['donationDate'] . "')"
-                . "'Pending')";
+                . "'" . $_SESSION['loginuser']['custid'] . "',"
+                . "'" . $myitem . "')";
+        $dbc->query($sql1);
 
-        $dbc->query($sql_mytrade);
+//        echo '<script>alert("' . $sql1 . '");</script>';
 
-        echo '<script>alert("' . $myitem . '");</script>';
+        $sql_update = "UPDATE item SET "
+                . "itemActive = 'Donation',"
+                . "custid = '" . $_SESSION['donation_details']['donationid'] . "'"
+                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
+                . " itemid = '" . $myitem . "'";
+        $dbc->query($sql_update);
+
+//        echo '<script>alert("' . $sql_update . '");</script>';
+//        echo '<script>alert("' . $myitem . '");</script>';
     }
 
-//     <a href="https://wa.me/601111932585" target="_blank">
+    $address = "{$_SESSION['donation_details']['address1']}, {$_SESSION['donation_details']['address2']}, {$_SESSION['donation_details']['city']}, {$_SESSION['donation_details']['postcode']}, {$_SESSION['donation_details']['state']}, {$_SESSION['donation_details']['country']}";
 
-
-    $sql2 = "INSERT INTO donation_delivery(deliveryid, tradeid, senderid, recipientid, username, senderAddress, recipientAddress, itemQuantity, package, remarks, cardno, cardname, shippingfee, packagefee, subTotal, tax, totalAmount, paymentDate, deliveryStatus) VALUES ("
-            . "'" . $newid . "',"
-            . "'" . $_SESSION['donation_details']['tradeid'] . "',"
+    $sql2 = "INSERT INTO donation_delivery(donationid, eventid, custid, donator, donatorAddress, itemQuantity, package, remarks, cardno, cardname, shippingfee, packagefee, subTotal, tax, totalAmount, paymentDate, deliveryStatus) VALUES ("
+            . "'" . $_SESSION['donation_details']['donationid'] . "',"
+            . "'" . $_SESSION['donation_details']['eventid'] . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
-            . "'" . $_SESSION['donation_details']['recipientid'] . "',"
             . "'" . $_SESSION['donation_details']['username'] . "',"
-            . "'" . $_SESSION['donation_details']['address1'] . "',"
-            . "'" . $_SESSION['donation_details']['deliveryCountry'] . "',"
-            . $_SESSION['donation_details']['itemQuantity'] . ","
+            . "'" . $address . "',"
+            . "'" . $quantity . "',"
             . "'" . $_SESSION['donation_details']['packaging'] . "',"
             . "'" . $_SESSION['donation_details']['remarks'] . "',"
             . "'" . $_POST["cardno"] . "',"
             . "'" . $_POST["cardname"] . "',"
-            . $_POST["shippingfee"] . ","
-            . $_POST["packagingfee"] . ","
-            . $_POST["subTotal"] . ","
-            . $_POST["tax"] . ","
-            . $_POST["totalAmount"] . ","
+            . $shipping_fee . ","
+            . $packaging_fee . ","
+            . $subtotal . ","
+            . $tax . ","
+            . $totalamount . ","
             . "'" . $_POST["paymentDate"] . "',"
             . "'Pending')";
 
-    echo '<script>alert("' . $sql . '");</script>';
-
-    if ($dbc->query($sql)) {
-        $sql = "UPDATE trade SET"
-                . " offerPayment = 'Completed'"
-                . " WHERE tradeid ='" . $_SESSION['donation_details']['tradeid'] . "'";
-        if ($dbc->query($sql)) {
-            echo '<script>alert("Successfuly insert!");window.location.href="trade_list.php";</script>';
-        } else {
-            echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
-        }
+//    echo '<script>alert("' . $sql2 . '");</script>';
+//    if (($dbc->query($sql1)) && ($dbc->query($sql2)) && ($dbc->query($sql_update))) {
+    if ($dbc->query($sql2)) {
+        echo '<script>alert("Donated successfully. Our delivery will soon be pick up your item.\nThanks for your donation.");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail!\nContact IT department for maintainence")</script>';
     }
@@ -143,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?php
-            echo "{$_SESSION['donation_details']['donateid']}";
+            echo "{$_SESSION['donation_details']['donationid']}";
 //            if (isset($current_data)) {
 //                echo $current_data["paymentid"];
 //            } else {
@@ -164,10 +137,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
-        <div class="container-lg">
+        <div class="container-lg mb-5">
             <form method="post" id="form">
-                <div class="row justify-content-center">
-                    <div class="col-md-5">
+                <div class="row justify-content-center px-md-0 px-3 mb-5">
+                    <div class="col-xl-6 col-lg-7">
                         <div class="row">
                             <div class="container">
                                 <div class="card">
@@ -227,22 +200,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                <div class="row py-3">
-                                    <div class="col-auto mb-2">
-                                        <a class="btn btn-warning btn-block" href="../user/event_shipping.php?eventid=<?php echo $eventid ?>&donateid=<?php echo $donateid ?>" id="btnback">Back</a>
+                                <div class="row mb-lg-5">
+                                    <div class="col-auto mb-lg-5 mb-3">
+                                        <a class="btn btn-warning btn-block" href="../user/event_shipping.php?eventid=<?php echo $eventid ?>&donationid=<?php echo $donationid ?>" id="btnback">Back</a>
                                     </div>
 
-                                    <div class="col-auto">
-                                        <button class="btn btn-primary btn-block" type="submit" onclick="payment()">Confirm payment</button>
+                                    <div class="col-auto mb-lg-5 mb-3">
+                                        <button class="btn btn-primary btn-block" type="button" onclick="payment()">Confirm payment</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-5">
+                    <div class="col-xl-5 col-lg-5">
                         <div class="row">
-                            <div class="container-lg">
+                            <div class="container">
                                 <div class="card collapsed-card">
                                     <div class="card-header">
                                         <div class="card-title">Delivery Summary</div>
@@ -300,6 +273,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="container">
                                 <div class="card">
@@ -314,37 +288,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     $result = $dbc->query($count);
                                                     if ($result->num_rows > 0) {
                                                         while ($row = mysqli_fetch_array($result)) {
-                                                            echo $row['receiver'];
+                                                            $receiver = $row['receiver'];
+                                                            echo $receiver;
                                                         }
                                                     }
                                                     ?>
                                                 </div>
                                             </div>
 
-                                            <!--                                            <div class="col-xl">
-                                                                                            <div class="">Items: <?php
-                                            $count = "SELECT COUNT(t.itemid) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
-                                            $result = $dbc->query($count);
-                                            if ($result->num_rows > 0) {
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo $row['itemQuantity'];
-                                                }
-                                            }
-                                            ?>
-                                                                                            </div>
-                                                                                        </div>-->
-
-                                            <!--                                            <div class="col-xl">
-                                                                                            <div class="">Items: <?php
-                                            foreach ($_SESSION['donation_details']['myitem'] as $myitems) {
-                                                $count = "SELECT COUNT($myitems) itemQuantity FROM trade_details t, customer c WHERE t.custid = c.custid AND c.custid = '{$_SESSION['loginuser']['custid']}' AND t.tradeid = '{$current_data['tradeid']}'";
-                                                $dbc->query($count);
-                                                echo $count;
-                                                echo '<script>alert("' . $sql . '");</script>';
-                                            }
-                                            ?>
-                                                                                            </div>
-                                                                                        </div>-->
+                                            <div class="col-xl">
+                                                <div class="">Items: <?php
+                                                    echo $quantity;
+                                                    ?>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <table class="table">
@@ -382,63 +339,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         </div>
                     </div>
-
-                    <!--                    <div class="col-md-3">
-                                            <div class="row">
-                                                <div class="container-lg">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <div class="" style="font-size:1.2em;">Delivery Summary</div>
-                                                        </div>
-                                                        <div class="card-body pb-0">
-                                                            <div class="row">
-                                                                <div class="col-12" id="accordion">
-                    <?php
-                    foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
-                        $get_inventory = "SELECT * FROM item i WHERE i.itemid = '$myitem'";
-                        $result = $dbc->query($get_inventory);
-                        if ($result->num_rows > 0) {
-                            while ($row = mysqli_fetch_array($result)) {
-                                echo "<div class='card card-primary card-outline'>"
-                                . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
-                                . "<div class='card-header'>"
-                                . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
-                                . "</div>"
-                                . "</a>"
-                                . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
-                                . "<div class='card-body'>"
-                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
-                                . "</div>"
-//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
-//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
-                                . "</div>"
-                                . "</div>";
-                            }
-                        }
-                    }
-                    ?>
-                    
-                                                                    card sameple
-                                                                                                                    <div class="card card-primary card-outline">
-                                                                                                                        <a class="d-block w-100" data-toggle="collapse" href="#collapseOne" aria-expanded="true">
-                                                                                                                            <div class="card-header">
-                                                                                                                                <h6 class="card-title w-75">Item #1</h6>
-                                                                                                                            </div>
-                                                                                                                        </a>
-                                                                                                                        <div id="collapseOne" class="collapse" data-parent="#accordion" style="">
-                                                                                                                            <div class="card-body">
-                                                                                                                                <img src="../img/test-shirt/test-shirt-1.jpg" class="img-fluid item-pic" alt="Profile picture">
-                                                                                                                            </div>
-                                                                                                                            <div>Hi</div>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>-->
                 </div>
             </form>
         </div>
@@ -458,60 +358,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (!document.getElementById("cardno").value || document.getElementById("cardno").value === "") {
                 fulfill = false;
-                message = "Card number is required field !\n";
+                message = "Card number is required field.\n";
                 document.getElementById("cardno").style.borderColor = "red";
             } else {
                 if (document.getElementById("cardno").value.length < 16 || !pattern.test(document.getElementById("cardno").value)) {
                     fulfill = false;
-                    message = "Card number is invalid, 16 digit is required !\n";
+                    message = "Card number is invalid, 16 digit is required.\n";
                     document.getElementById("cardno").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("year").value || document.getElementById("year").value === "") {
                 fulfill = false;
-                message += "Expired year is required field !\n";
+                message += "Expired year is required field.\n";
                 document.getElementById("year").style.borderColor = "red";
             } else {
                 if (document.getElementById("year").value.length < 4 || !pattern.test(document.getElementById("year").value)) {
                     fulfill = false;
-                    message += "Expired year is invalid , Example : 2020 !\n";
+                    message += "Expired year is invalid, example: 2020.\n";
                     document.getElementById("year").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("month").value || document.getElementById("month").value === "") {
                 fulfill = false;
-                message += "Expired month is required field !\n";
+                message += "Expired month is required field.\n";
                 document.getElementById("month").style.borderColor = "red";
             } else {
                 if (document.getElementById("month").value < 2 || !pattern.test(document.getElementById("month").value)) {
                     fulfill = false;
-                    message += "Expired month is invalid, Example: 03!\n";
+                    message += "Expired month is invalid, example: 03.\n";
                     document.getElementById("month").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("cvv").value || document.getElementById("cvv").value === "") {
                 fulfill = false;
-                message += "CVV code is required field !\n";
+                message += "CVV code is required field.\n";
                 document.getElementById("cvv").style.borderColor = "red";
             } else {
                 if (document.getElementById("cvv").value < 3 || !pattern.test(document.getElementById("cvv").value)) {
                     fulfill = false;
-                    message += "CVV code is invalid!\n";
+                    message += "CVV code is invalid.\n";
                     document.getElementById("cvv").style.borderColor = "red";
                 }
             }
 
             if (!document.getElementById("cardname").value || document.getElementById("cardname").value === "") {
                 fulfill = false;
-                message += "Card holder name is required field !\n";
+                message += "Card holder name is required field.\n";
                 document.getElementById("cardname").style.borderColor = "red";
             }
 
             if (fulfill) {
-                if (confirm("Confirm to process payment ?")) {
+                if (confirm("Confirm to donate your item to <?php echo $receiver ?>?")) {
                     document.getElementById("form").submit();
                 }
             } else {

@@ -94,12 +94,30 @@ include '../user/loading.php';
                                         </form>-->
 
                     <?php
+                    echo "<div class='ml-auto'>";
                     if (isset($_SESSION['loginuser'])) {
-                        echo "<div class='ml-auto'>"
-                        . "<a class='' href='../user/trade_list.php' role='button' style='color: #8791aa; margin-right: 5px;'>"
-                        . "<i class='far fa-bell' style='font-size: 1.1em;'></i>"
-                        . "</a>"
-                        . "<a class='' href='' role='button' style='text-decoration: none; color: #8791aa; margin-right: 5px;'>"
+                        $sql = "SELECT * FROM trade WHERE (offerCustID = '" . $_SESSION['loginuser']['custid'] . "' OR acceptCustID = '" . $_SESSION['loginuser']['custid'] . "') AND (acceptPayment = 'Pending' OR offerPayment = 'Pending')";
+                        $result = $dbc->query($sql);
+                        
+                        $sql1 = "SELECT * FROM trade WHERE acceptCustID = '" . $_SESSION['loginuser']['custid'] . "' AND status = 'Pending'";
+                        $result1 = $dbc->query($sql1);
+//                        echo '<script>alert("' . $sql . '");</script>';
+                        if (($result->num_rows > 0) || ($result1->num_rows > 0)) {
+                            echo "<a class='' href='../user/trade_list.php' role='button' style='color: red; margin-right: 5px;'>"
+                            . "<i class='far fa-bell' style='font-size: 1.1em;'></i>"
+                            . "</a>";
+                        } else {
+                            echo "<a class='' href='../user/trade_list.php' role='button' style='color: #8791aa; margin-right: 5px;'>"
+                            . "<i class='far fa-bell' style='font-size: 1.1em;'></i>"
+                            . "</a>";
+                        }
+
+//                            echo "<div class='ml-auto'>"
+////                            . "<a class='' href='../user/trade_list.php' role='button' style='color: $color1; margin-right: 5px;'>"
+//                            . "<a class='' href='../user/trade_list.php' role='button' style='color: #8791aa; margin-right: 5px;'>"
+//                            . "<i class='far fa-bell' style='font-size: 1.1em;'></i>"
+//                            . "</a>"
+                        echo "<a class='' href='' role='button' style='text-decoration: none; color: #8791aa; margin-right: 5px;'>"
                         . "<i class='far fa-heart' style='font-size: 1.1em;'></i>"
                         . "</a>"
                         . "<ul class='navbar-nav me-0' style='display: inline-block;'>"

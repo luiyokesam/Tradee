@@ -24,51 +24,21 @@ if (isset($_GET['id'])) {
     }
 }
 
-$sql = "SELECT * FROM donation ORDER BY donateid DESC LIMIT 1";
+$sql = "SELECT * FROM donation_delivery ORDER BY donationid DESC LIMIT 1";
 $result = $dbc->query($sql);
 if ($result->num_rows > 0) {
     while ($row = mysqli_fetch_array($result)) {
-        $latestnum = ((int) substr($row['donateid'], 1)) + 1;
-        $newid = "DO{$latestnum}";
+        $latestnum = ((int) substr($row['donationid'], 1)) + 1;
+        $newid = "X{$latestnum}";
         $title = "Donation ID - {$newid}";
         echo '<script>var current_data = null;</script>';
         break;
     }
 } else {
-    $newid = "DO10001";
-    $title = "Donate ID - DO10001";
+    $newid = "X10001";
+    $title = "Donate ID - X10001";
     echo '<script>var current_data = null;</script>';
 }
-
-//if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//    $my_items = $_POST['my_item'];
-//    foreach ($my_items as $my_item_list) {
-//        $sql = "INSERT INTO donation(donateid, eventid, donator, itemid, donationDate) VALUES ("
-//                . "'" . $newid . "',"
-//                . "'" . $current_data['eventid'] . "',"
-//                . "'" . $_SESSION['loginuser']['custid'] . "',"
-//                . "'" . $my_item_list . "',"
-//                . "'" . $_POST['donationDate'] . "')";
-//
-//        $dbc->query($sql);
-////        echo '<script>alert("' . $sql . '");</script>';
-//    }
-////    echo '<script>alert("' . $my_item_list . '");</script>';
-//
-//    foreach ($my_items as $update_my_item_list) {
-//        $sql_update = "UPDATE item SET "
-//                . "itemActive = 'Donation',"
-//                . "custid = '$newid'"
-//                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-//                . " itemid = '" . $update_my_item_list . "'";
-//
-//        $dbc->query($sql_update);
-////        echo '<script>alert("' . $sql_update . '");</script>';
-//    }
-////    echo '<script>alert("' . $update_my_item_list . '");</script>';
-//
-//    echo '<script>alert("Thanks for your donation! Wishing you have a nice day.");window.location.href="../user/event_shipping.php?id=' . $newid . '";</script>';
-//}
 ?>
 <!doctype html>
 <html lang="en">
@@ -236,12 +206,12 @@ if ($result->num_rows > 0) {
                             <div class="col-lg-12 col-md-5 mt-2">
                                 <div class='py-1'>
                                     <?php
-                                    echo "<a class='btn btn-block btn-donate-now' style='color: #09B1BA;' href='event_shipping.php?eventid=" . $current_data["eventid"] . "&donateid=".$newid."'>"
+                                    echo "<a class='btn btn-block btn-donate-now' style='color: #09B1BA;' href='event_shipping.php?eventid=" . $current_data["eventid"] . "&donationid=" . $newid . "'>"
                                     . "<i class='far fa-heart' style='color: red;'></i> Donate now"
                                     . "</a>"
                                     ?>
-                                    <!--<a class="btn btn-block btn-donate-now" style="color: #09B1BA;" data-toggle="modal" data-target="#modal-bid-item">-->
-<!--                                        <i class="far fa-heart" style="color: red;"></i> Donate now
+<!--                                    <a class="btn btn-block btn-donate-now" style="color: #09B1BA;" data-toggle="modal" data-target="#modal-bid-item">
+                                        <i class="far fa-heart" style="color: red;"></i> Donate now
                                     </a>-->
                                 </div>
                             </div>
@@ -261,27 +231,25 @@ if ($result->num_rows > 0) {
                                 <thead>
                                     <tr>
                                         <th style="width: 20%">Donate ID</th>
-                                        <th style="width: 20%">Event ID</th>
                                         <th style="width: 20%">Donator</th>
-                                        <th style="width: 20%">Item Name</th>
+                                        <th style="width: 20%">Item Quantity</th>
+                                        <th style="width: 20%">Date</th>
                                         <th style="width: auto"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $sql = "SELECT * FROM donation d, item i, customer c WHERE d.donator = c.custid AND d.itemid = i.itemid AND eventid = '" . $current_data['eventid'] . "'";
+                                    $sql = "SELECT * FROM donation_delivery d WHERE d.eventid = '" . $current_data['eventid'] . "'";
                                     $result = $dbc->query($sql);
                                     if ($result) {
                                         while ($row = $result->fetch_assoc()) {
-                                            echo "<tr><td><a>" . $row["donateid"] . "</a></td>"
-                                            . "<td><a>" . $row["eventid"] . "</a></td>"
-                                            . "<td><a>" . $row["username"] . "</a></td>"
-                                            . "<td><a>" . $row["itemname"] . "</a></td>"
+                                            echo "<tr><td><a>" . $row["donationid"] . "</a></td>"
+                                            . "<td><a>" . $row["donator"] . "</a></td>"
+                                            . "<td><a>" . $row["itemQuantity"] . "</a></td>"
+                                            . "<td><a>" . $row["paymentDate"] . "</a></td>"
                                             . "<td class='project-actions text-right'>"
-//                                            . "<a class = "btn btn-block btn-donate-now" data-toggle = "modal" data-target = "#modal-bid-item">"
-//                                                    . "<a class='btn btn-info btn-block' href='event_details.php?id=" . $row["eventid"] . "'>"
-                                            . "<a class='btn btn-info btn-block' data-toggle='modal' data-target='#" . $row["donateid"] . "'>"
-                                            . "<i class='far fa-eye'>"
+                                            . "<a class='btn btn-light btn-block' href='donation_details.php?id=" . $row["donationid"] . "'>"
+                                            . "<i class='far fa-heart' style='color: red;'>"
                                             . "</i></a></td></tr>";
                                         }
                                     }
@@ -478,12 +446,12 @@ if ($result->num_rows > 0) {
         }
 
         .item-title{
-            font-size:0.8em; 
+            font-size:0.85em; 
             color:#969696;
         }
 
         .item-value{
-            font-size:0.8em; 
+            font-size:0.85em; 
             color: #001226;
         }
 

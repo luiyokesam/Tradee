@@ -16,7 +16,7 @@ if ($result->num_rows > 0) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $img = $_FILES['img']['name'];
     if ($img) {
-        $newimg = "../item_img/$img";
+        $newimg = "../data/feedback/$img";
     }
 
     $sql = "INSERT INTO feedback(feedbackid, custid, tradeid, position, enquirytype, email, comment, feedbackdate, img, status)VALUES("
@@ -30,14 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "'" . $_POST['feedbackdate'] . "',"
             . "'" . $newimg . "',"
             . "'Pending')";
-    
+
     echo '<script>alert("' . $sql . '");</script>';
 
     if ($dbc->query($sql)) {
         if ($img) {
             move_uploaded_file($_FILES['img']['tmp_name'], "../item_img/$img");
         }
-        echo '<script>alert("Successfuly insert !");window.location.href = "contact.php?id=' . $_POST['feedbackid'] . '";</script>';
+        echo '<script>alert("Thanks for your feedback. We will provide feedback to you soon.");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail !\nContact IT department for maintainence")</script>';
     }
@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </svg>
                    </header>
                 <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15934.136098617879!2d101.7289611!3d3.2162248!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x2dc5e067aae3ab84!2sTunku%20Abdul%20Rahman%20University%20College!5e0!3m2!1sen!2smy!4v1622994581220!5m2!1sen!2smy" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>-->
-        
+
         <section class="services text-white" style="background-color: #6de66a;"> 
             <div class="container-lg pt-5">
                 <div class="row align-items-center justify-content-center">
@@ -124,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <div class="col-10 mt-4">
                             <label for="validationTrade" class="form-label">Trade ID</label>
-                            <input name="tradeid" class="form-control" id="validationTrade" placeholder="Trade ID (if any)" required>
+                            <input name="tradeid" class="form-control" id="validationTrade" placeholder="Trade ID (if any)">
                         </div>
 
                         <div class="col-10 mt-4">
@@ -138,10 +138,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-10 mt-4">
                             <label for="formFileMultiple validationFile" class="form-label">Maximum number of attachment is 5. The attachment must be smaller than 4.5MB. Allowed file types: jpg / jpeg / png / pdf / mp4.</label>
                             <div class="form-group">
-                                <img class="img-fluid mb-12" alt="Photo" style="width: 100%; height: 500px; padding-top: 10px; display: none;" id="img_display" name="img_display">
+                                <img class="img-fluid mb-12" alt="Photo" style="width: 100%; height: 500px; padding-top: 10px; display: none;" id="file_display" name="file_display">
                                 <div class="custom-file">
-                                    <input type="file" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="validationFile img" name="img">
-                                    <label class="custom-file-label" id="validate_img">Choose file</label>
+                                    <!--accept="image/*"-->
+                                    <input type="file" accept="*" class="custom-file-input" id="file" name="file">
+                                    <label class="custom-file-label" id="validate_file">Choose file</label>
                                     <div class="invalid-feedback">
                                         Please attach a valid form of file.
                                     </div>
@@ -165,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </form>
                 </div>
             </div>
-            
+
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 220">
             <path fill="#fff" fill-opacity="1" d="M0,96L34.3,106.7C68.6,117,137,139,206,122.7C274.3,107,343,53,411,53.3C480,53,549,107,617,117.3C685.7,128,754,96,823,96C891.4,96,960,128,1029,154.7C1097.1,181,1166,203,1234,202.7C1302.9,203,1371,181,1406,170.7L1440,160L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path>
             </svg>
@@ -179,28 +180,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         var yyyy = today.getFullYear();
         document.getElementById("feedbackdate").value = dd + '/' + mm + '/' + yyyy;
 
-//            let checkbox = document.getElementById("flexCheckIndeterminate");
-//            checkbox.indeterminate = true;
+        function editorsave() {
+            if (document.getElementById("btnsave").textContent === "Upload") {
+                var fullfill = true;
+                var message = "";
+                document.getElementById("validationFile").style.borderColor = "";
+                document.getElementById("itemname").style.borderColor = "";
+                document.getElementById("brand").style.borderColor = "";
+                document.getElementById("catname").style.borderColor = "";
+                document.getElementById("itemCondition").style.borderColor = "";
+                document.getElementById("colour").style.borderColor = "";
+                document.getElementById("size").style.borderColor = "";
+                document.getElementById("value").style.borderColor = "";
+                document.getElementById("tradeItem").style.borderColor = "";
+                document.getElementById("tradeOption").style.borderColor = "";
+                document.getElementById("itemDescription").style.borderColor = "";
 
-        (function () {
-            'use strict'
-            var forms = document.querySelectorAll('.needs-validation')
-            Array.prototype.slice.call(forms)
-                    .forEach(function (form) {
-                        form.addEventListener('submit', function (event) {
-                            if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }
-                            form.classList.add('was-validated')
-                        }, false)
-                    })
-        })
+                if (!document.getElementById("img").value || document.getElementById("img").value === "") {
+                    if (document.getElementById('img_display').src === "") {
+                        document.getElementById("validate_img").style.borderColor = "red";
+                        fullfill = false;
+                    }
+                }
+                if (!document.getElementById("itemname").value || document.getElementById("itemname").value === "") {
+                    document.getElementById("itemname").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("brand").value || document.getElementById("brand").value === "") {
+                    document.getElementById("brand").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("catname").value || document.getElementById("catname").value === "") {
+                    document.getElementById("catname").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("itemCondition").value || document.getElementById("itemCondition").value === "") {
+                    document.getElementById("itemCondition").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("colour").value || document.getElementById("colour").value === "") {
+                    document.getElementById("colour").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("size").value || document.getElementById("size").value === "") {
+                    document.getElementById("size").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("value").value || document.getElementById("value").value === "") {
+                    document.getElementById("value").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("tradeItem").value || document.getElementById("tradeItem").value === "") {
+                    document.getElementById("tradeItem").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("tradeOption").value || document.getElementById("tradeOption").value === "") {
+                    document.getElementById("tradeOption").style.borderColor = "red";
+                    fullfill = false;
+                }
+                if (!document.getElementById("itemDescription").value || document.getElementById("itemDescription").value === "") {
+                    document.getElementById("itemDescription").style.borderColor = "red";
+                    fullfill = false;
+                }
 
-        var loadFile = function (event) {
-            var image = document.getElementById('img_display');
-            image.src = URL.createObjectURL(event.target.files[0]);
-        };
+                if (fullfill) {
+                    if (confirm("Are you sure to upload the item?")) {
+                        document.getElementById("form").submit();
+                    }
+                } else {
+                    alert("Please enter all required information for this items.\n" + message);
+                }
+            }
+        }
+
     </script>
     <style>
         .gradient {

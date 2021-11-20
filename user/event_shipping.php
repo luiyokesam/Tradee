@@ -1,9 +1,9 @@
 <?php
 include '../include/header.php';
 
-if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
+if ((isset($_GET['eventid'])) && (isset($_GET['donationid']))) {
     $eventid = $_GET['eventid'];
-    $donateid = $_GET['donateid'];
+    $donationid = $_GET['donationid'];
     $sql = "SELECT * FROM event e WHERE e.eventid = '$eventid' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
@@ -20,52 +20,9 @@ if ((isset($_GET['eventid'])) && (isset($_GET['donateid']))) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['donation_details'] = json_decode($_POST['detail'], true);
-    echo '<script>window.location.href = "event_payment.php?eventid=' . $eventid . '&donateid=' . $donateid . '";</script>';
+    echo '<script>window.location.href = "event_payment.php?eventid=' . $eventid . '&donationid=' . $donationid . '";</script>';
     exit();
 }
-
-//$sql = "SELECT * FROM donation ORDER BY donateid DESC LIMIT 1";
-//$result = $dbc->query($sql);
-//if ($result->num_rows > 0) {
-//    while ($row = mysqli_fetch_array($result)) {
-//        $latestnum = ((int) substr($row['donateid'], 1)) + 1;
-//        $newid = "DO{$latestnum}";
-//        echo '<script>var current_data = null;</script>';
-//        break;
-//    }
-//} else {
-//    $newid = "DO10001";
-//    echo '<script>var current_data = null;</script>';
-//}
-//if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//    $my_items = $_POST['my_item'];
-//    foreach ($my_items as $my_item_list) {
-//        $sql = "INSERT INTO donation(donateid, eventid, donator, itemid, donationDate) VALUES ("
-//                . "'" . $newid . "',"
-//                . "'" . $current_data['eventid'] . "',"
-//                . "'" . $_SESSION['loginuser']['custid'] . "',"
-//                . "'" . $my_item_list . "',"
-//                . "'" . $_POST['donationDate'] . "')";
-//
-//        $dbc->query($sql);
-////        echo '<script>alert("' . $sql . '");</script>';
-//    }
-////    echo '<script>alert("' . $my_item_list . '");</script>';
-//
-//    foreach ($my_items as $update_my_item_list) {
-//        $sql_update = "UPDATE item SET "
-//                . "itemActive = 'Donation',"
-//                . "custid = '$newid'"
-//                . " WHERE custid ='" . $_SESSION['loginuser']['custid'] . "' AND"
-//                . " itemid = '" . $update_my_item_list . "'";
-//
-//        $dbc->query($sql_update);
-////        echo '<script>alert("' . $sql_update . '");</script>';
-//    }
-////    echo '<script>alert("' . $update_my_item_list . '");</script>';
-//
-//    echo '<script>alert("Thanks for your donation! Wishing you have a nice day.");window.location.href="../user/event_shipping.php?id=' . $newid . '";</script>';
-//}
 ?>
 <!doctype html>
 <html lang="en">
@@ -75,13 +32,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <link rel="stylesheet" href="../bootstrap/plugins/select2/css/select2.min.css">
         <link rel="stylesheet" href="../bootstrap/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
         <title><?php
-echo $current_data['title'];
+            echo $current_data['title'];
 //            if (isset($current_data)) {
 //                echo $current_data["deliveryid"];
 //            } else {
 //                echo $newid;
 //            }
-?> Donation Shipping - Tradee</title>
+            ?> Donation Shipping - Tradee</title>
     </head>
     <body>
         <div class="bg-navbar mb-3 bg-light">
@@ -104,12 +61,12 @@ echo $current_data['title'];
                         <div class="row justify-content-center pt-3">
                             <div class="col-lg-6 pr-md-4">
                                 <div class="">
-                                    <div class="form-group row">
+                                    <div class="form-group row" style="display: none;">
                                         <label for="tradeid" class="col-sm-2 col-form-label">Event</label>
                                         <div class="col-sm-10">
                                             <input type="text" class="form-control" id="eventid" name="eventid" required value="<?php
-            echo $current_data['eventid'];
-?>">
+                                            echo $current_data['eventid'];
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide your name.
                                             </div>
@@ -119,9 +76,9 @@ echo $current_data['title'];
                                     <div class="form-group row" style="display: none;">
                                         <label for="tradeid" class="col-sm-2 col-form-label">Donation</label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="donateid" name="donateid" required value="<?php
-                                            echo $donateid;
-?>">
+                                            <input type="text" class="form-control" id="donationid" name="donationid" required value="<?php
+                                            echo $donationid;
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide your name.
                                             </div>
@@ -152,14 +109,14 @@ echo $current_data['title'];
                                         <label for="username" class="col-sm-2 col-form-label">Name</label>
                                         <div class="col-sm-10">
                                             <input type="text" class="form-control" id="username" name="username" required value="<?php
-                                                if (isset($_SESSION['donation_details'])) {
-                                                    echo $_SESSION["donation_details"]['username'];
-                                                } else {
-                                                    if (isset($_SESSION['loginuser'])) {
-                                                        echo $_SESSION['loginuser']['username'];
-                                                    }
+                                            if (isset($_SESSION['donation_details'])) {
+                                                echo $_SESSION["donation_details"]['username'];
+                                            } else {
+                                                if (isset($_SESSION['loginuser'])) {
+                                                    echo $_SESSION['loginuser']['username'];
                                                 }
-                                                ?>">
+                                            }
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide your name.
                                             </div>
@@ -177,7 +134,7 @@ echo $current_data['title'];
                                                     echo $_SESSION['loginuser']['contact'];
                                                 }
                                             }
-                                                ?>">
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide a valid phone no.
                                             </div>
@@ -196,7 +153,7 @@ echo $current_data['title'];
                                                     echo $_SESSION['loginuser']['address1'];
                                                 }
                                             }
-                                                ?>">
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide a valid address.
                                             </div>
@@ -214,7 +171,7 @@ echo $current_data['title'];
                                                     echo $_SESSION['loginuser']['address2'];
                                                 }
                                             }
-                                                ?>">
+                                            ?>">
                                             <div class="invalid-feedback">
                                                 Please provide a valid address.
                                             </div>
@@ -227,7 +184,7 @@ echo $current_data['title'];
                                             if (isset($_SESSION['donation_details'])) {
                                                 echo $_SESSION['donation_details']['remarks'];
                                             }
-                                                ?></textarea>
+                                            ?></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -237,34 +194,16 @@ echo $current_data['title'];
                                     <label for="city" class="col-sm-2 col-form-label align-items-center">City</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" id="city" name="city" required value="<?php
-                                            if (isset($_SESSION['donation_details'])) {
-                                                echo $_SESSION['donation_details']['city'];
-                                            } else {
-                                                if (isset($_SESSION['loginuser'])) {
-                                                    echo $_SESSION['loginuser']['city'];
-                                                }
-                                            }
-                                                ?>">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid city.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row align-items-center">
-                                    <label for="state" class="col-sm-2 col-form-label align-items-center">State</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="state" name="state" required value="<?php
                                         if (isset($_SESSION['donation_details'])) {
-                                            echo $_SESSION['donation_details']['state'];
+                                            echo $_SESSION['donation_details']['city'];
                                         } else {
                                             if (isset($_SESSION['loginuser'])) {
-                                                echo $_SESSION['loginuser']['state'];
+                                                echo $_SESSION['loginuser']['city'];
                                             }
                                         }
-                                                ?>">
+                                        ?>">
                                         <div class="invalid-feedback">
-                                            Please provide a valid state.
+                                            Please provide a valid city.
                                         </div>
                                     </div>
                                 </div>
@@ -280,9 +219,27 @@ echo $current_data['title'];
                                                 echo $_SESSION['loginuser']['postcode'];
                                             }
                                         }
-                                                ?>">
+                                        ?>">
                                         <div class="invalid-feedback">
                                             Please provide a valid postal code.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row align-items-center">
+                                    <label for="state" class="col-sm-2 col-form-label align-items-center">State</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="state" name="state" required value="<?php
+                                        if (isset($_SESSION['donation_details'])) {
+                                            echo $_SESSION['donation_details']['state'];
+                                        } else {
+                                            if (isset($_SESSION['loginuser'])) {
+                                                echo $_SESSION['loginuser']['state'];
+                                            }
+                                        }
+                                        ?>">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid state.
                                         </div>
                                     </div>
                                 </div>
@@ -298,7 +255,7 @@ echo $current_data['title'];
                                                 echo $_SESSION['loginuser']['country'];
                                             }
                                         }
-                                                ?>">
+                                        ?>">
                                         <div class="invalid-feedback">
                                             Please select a valid country.
                                         </div>
@@ -313,10 +270,10 @@ echo $current_data['title'];
                                                 <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                             </div>
                                             <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="donationDate" maxlength="10" readOnly name="donationDate" value="<?php
-                                        if (isset($_SESSION['donation_details'])) {
-                                            echo $_SESSION['donation_details']['donationDate'];
-                                        }
-                                                ?>">
+                                            if (isset($_SESSION['donation_details'])) {
+                                                echo $_SESSION['donation_details']['donationDate'];
+                                            }
+                                            ?>">
                                         </div>
                                     </div>
                                 </div>
@@ -325,9 +282,29 @@ echo $current_data['title'];
                                     <label class="col-sm-12 p-0">Select packaging method</label>
                                     <div class="col-md-12 px-0 pr-2" style="width: 100%;">
                                         <select class="custom-select" id="packaging" name="packaging">
-                                            <option value="Plastic boxes">Plastic boxes</option>
-                                            <option value="Bubble wrap">Bubble wrap</option>
-                                            <option value="Seal boxes with tape">Seal boxes with tape</option>
+                                            <option value="Plastic boxes" <?php
+                                            if (isset($_SESSION['donation_details'])) {
+                                                if ($_SESSION['donation_details']['packaging'] == "Plastic boxes") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Plastic boxes</option>
+
+                                            <option value="Bubble wrap"<?php
+                                            if (isset($_SESSION['donation_details'])) {
+                                                if ($_SESSION['donation_details']['packaging'] == "Bubble wrap") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Bubble wrap</option>
+
+                                            <option value="Seal boxes with tape"<?php
+                                            if (isset($_SESSION['donation_details'])) {
+                                                if ($_SESSION['donation_details']['packaging'] == "Seal boxes with tape") {
+                                                    echo "selected";
+                                                }
+                                            }
+                                            ?>>Seal boxes with tape</option>
                                         </select>
                                     </div>
                                 </div>
@@ -336,27 +313,27 @@ echo $current_data['title'];
                                     <label class="form-label">Deliver to</label>
                                     <div class="col-12 px-0">
                                         <input type="text" class="form-control" readonly="" value="<?php
-                                            echo "{$current_data['state']}, {$current_data['country']}";
-                                                ?>">
+                                        echo "{$current_data['state']}, {$current_data['country']}";
+                                        ?>">
                                     </div>
                                     <div class="col-11 px-0" style="display: none;">
                                         <input type="text" class="form-control" id="deliveryState" name="deliveryState" readonly="" value="<?php
                                         echo $current_data['state'];
-                                                ?>">
+                                        ?>">
                                     </div>
                                     <div class="col-11 px-0" style="display: none;">
                                         <input type="text" class="form-control" id="deliveryCountry" name="deliveryCountry" readonly="" value="<?php
                                         echo $current_data['country'];
-                                                ?>">
+                                        ?>">
                                     </div>
                                 </div>
 
                                 <div class="row mt-4 mb-5">
-                                    <div class="col-sm-auto">
-                                        <button type="button" class="btn btn-warning btn-block" onclick="cancel()" id="btncancel" >Cancel</button>
+                                    <div class="col-sm-auto mb-3">
+                                        <button type="button" class="btn btn-warning" onclick="cancel()" id="btncancel" >Cancel</button>
                                     </div>
 
-                                    <div class="col-sm-auto">
+                                    <div class="col-sm-auto float-right">
                                         <button class="btn btn-success" onclick="checkout()" type="button">Proceed to payment</button>
                                     </div>
                                 </div>
@@ -388,7 +365,7 @@ echo $current_data['title'];
 
             if (!document.getElementById("myitem").value || document.getElementById("myitem").value === "") {
                 document.getElementById("myitem").style.borderColor = "red";
-                message = "Please select an item that you wanted to donate.\n";
+                message = "Please select at least an item that you wanted to donate.\n";
                 fullfill = false;
             }
             if (!document.getElementById("username").value || document.getElementById("username").value === "") {
@@ -446,7 +423,7 @@ echo $current_data['title'];
                 var donation_details = {
                     myitem: selected,
                     eventid: document.getElementById("eventid").value,
-                    donateid: document.getElementById("donateid").value,
+                    donationid: document.getElementById("donationid").value,
                     username: document.getElementById("username").value,
                     contact: document.getElementById("contact").value,
                     address1: document.getElementById("address1").value,
@@ -471,8 +448,8 @@ echo $current_data['title'];
         }
 
         function cancel() {
-            if (confirm("Confirm to cancel the delivery process?")) {
-                window.location.href = "trade_list.php";
+            if (confirm("Confirm to cancel the donation process?")) {
+                window.location.href = "../php/index.php";
             }
         }
 

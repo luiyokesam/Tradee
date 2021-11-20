@@ -1,4 +1,5 @@
 <?php
+$page = 'item_list';
 include 'navbar.php';
 
 if (isset($_GET['id'])) {
@@ -189,13 +190,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         if ($result->num_rows > 0) {
                                                             while ($row = $result->fetch_assoc()) {
                                                                 if ($row["itemActive"] === "Available") {
-                                                                    $color = "blue";
+                                                                    $color = "limegreen";
                                                                 } else if ($row["itemActive"] === "Pending") {
                                                                     $color = "orange";
                                                                 } else if ($row["itemActive"] === "Trading") {
-                                                                    $color = "green";
-                                                                } else {
                                                                     $color = "red";
+                                                                } else {
+                                                                    $color = "skyblue";
                                                                 }
                                                                 echo "<tr><td><a>" . $row["itemid"] . "</a></td>"
                                                                 . "<td><a>" . $row["custid"] . "</a></td>"

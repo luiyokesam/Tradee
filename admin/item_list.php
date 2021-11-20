@@ -1,4 +1,5 @@
 <?php
+$page = 'item_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -90,13 +91,13 @@ include 'navbar.php';
                                     if ($result) {
                                         while ($row = $result->fetch_assoc()) {
                                             if ($row["itemActive"] === "Available") {
-                                                $color = "green";
+                                                $color = "limegreen";
                                             } else if ($row["itemActive"] === "Pending") {
                                                 $color = "orange";
                                             } else if ($row["itemActive"] === "Trading") {
-                                                $color = "blue";
-                                            } else {
                                                 $color = "red";
+                                            } else {
+                                                $color = "skyblue";
                                             }
                                             echo "<tr><td><a>" . $row["itemid"] . "</a></td>"
                                             . "<td><a>" . $row["custid"] . "</a></td>"

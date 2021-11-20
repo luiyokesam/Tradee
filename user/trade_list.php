@@ -19,19 +19,19 @@ if (isset($_SESSION['loginuser']['userid'])) {
         <div class="container-lg mt-3 mb-5">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
+                    <button class="nav-link " id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
                     <button class="nav-link " id="nav-accept-tab" data-bs-toggle="tab" data-bs-target="#nav-accept" type="button" role="tab">Accept list</button>
                     <button class="nav-link" id="nav-sender-tab" data-bs-toggle="tab" data-bs-target="#nav-sender" type="button" role="tab">Send list</button>
                     <button class="nav-link" id="nav-recipient-tab" data-bs-toggle="tab" data-bs-target="#nav-recipient" type="button" role="tab">Receive list</button>
-                    <button class="nav-link" id="nav-donation-tab" data-bs-toggle="tab" data-bs-target="#nav-donation" type="button" role="tab">Donation list</button>
+                    <button class="nav-link active" id="nav-donation-tab" data-bs-toggle="tab" data-bs-target="#nav-donation" type="button" role="tab">Donation list</button>
                 </div>
             </nav>
 
-            <div class="tab-content" id="nav-tabContent" style="margin-bottom: 75px;">
+            <div class="tab-content" id="nav-tabContent">
                 <!--tab 1-->
-                <div class="tab-pane fade show active" id="nav-offer" role="tabpanel">
+                <div class="tab-pane fade" id="nav-offer" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
+                        <div class="content" style="min-height: 550px;">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Trade Offer List</h3>
@@ -134,7 +134,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 <!--tab 2-->
                 <div class="tab-pane fade" id="nav-accept" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
+                        <div class="content" style="min-height: 550px;">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Trade Accept List</h3>
@@ -238,7 +238,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 <!--tab 3-->
                 <div class="tab-pane fade" id="nav-sender" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
+                        <div class="content" style="min-height: 550px;">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Send List</h3>
@@ -324,7 +324,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 <!--tab 4-->
                 <div class="tab-pane fade" id="nav-recipient" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
+                        <div class="content" style="min-height: 550px;">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Receive List</h3>
@@ -408,9 +408,9 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 </div>
 
                 <!--tab 5-->
-                <div class="tab-pane fade" id="nav-donation" role="tabpanel">
+                <div class="tab-pane fade show active" id="nav-donation" role="tabpanel">
                     <div class="container-lg mt-3">
-                        <div class="content" style="padding-bottom:20%">
+                        <div class="content" style="min-height: 550px;">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Donation List</h3>
@@ -419,67 +419,44 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                     <table id="donationtable" class="table table-striped table-bordered" style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th style="width: 12%;">Trade ID</th>
-                                                <th style="width: 12%;">Trader</th>
-                                                <th style="width: 15%;">His Payment</th>
-                                                <th style="width: 15%;">My Payment</th>
-                                                <th style="width: 14%;">Date</th>
-                                                <th style="width: 12%;">Status</th>
-                                                <th style="width: 10%;"></th>
+                                                <th style="width: 12%;">Donation ID</th>
+                                                <th style="width: 20%;">Event</th>
+                                                <th style="width: 8%;">Item</th>
+                                                <th style="width: 8%;">Total</th>
+                                                <th style="width: 15%;">Donate Date</th>
+                                                <th style="width: 15%;">Receive Date</th>
+                                                <th style="width: 10%;">Status</th>
                                                 <th style="width: auto;"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM trade t, customer c WHERE t.offerCustID = c.custid AND t.acceptCustID = '" . $_SESSION['loginuser']['custid'] . "'";
+                                            $sql = "SELECT * FROM donation_delivery d, event e WHERE d.eventid = e.eventid AND d.custid = '" . $_SESSION['loginuser']['custid'] . "'";
                                             $result = $dbc->query($sql);
                                             if ($result) {
                                                 while ($row = $result->fetch_assoc()) {
                                                     if ($row["status"] == "Pending") {
                                                         $color1 = "orange";
-                                                        $disabled = "none";
                                                     } else if ($row["status"] == "Completed") {
                                                         $color1 = "limegreen";
-                                                        $disabled = "auto";
-                                                    } else if ($row["status"] == "Trading") {
-                                                        $color1 = "skyblue";
-                                                        $disabled = "auto";
-                                                    } else {
-                                                        $color1 = "red";
-                                                        $disabled = "auto";
                                                     }
-
-                                                    if ($row["acceptPayment"] == "Pending") {
-                                                        $color2 = "orange";
-                                                    } else if ($row["acceptPayment"] == "Completed") {
-                                                        $color2 = "limegreen";
-                                                        $disabled = "none";
-                                                    } else {
-                                                        $color2 = "red";
-                                                    }
-
-                                                    if ($row["offerPayment"] == "Pending") {
-                                                        $color3 = "orange";
-                                                    } else if ($row["offerPayment"] == "Completed") {
-                                                        $color3 = "limegreen";
-                                                    } else {
-                                                        $color3 = "skyblue";
+                                                    
+                                                    if ($row["receiveDate"] == "") {
+                                                        $date = "On-Deliver";
+                                                    } else if ($row["status"] == "Completed") {
+                                                        $date = "";
                                                     }
 
                                                     echo "<tr>"
-                                                    . "<td>" . $row["tradeid"] . "</td>"
-                                                    . "<td>" . $row["username"] . "</td>"
-                                                    . "<td style='color: " . $color3 . "; font-weight: bolder;'>" . $row["offerPayment"] . "</td>"
-                                                    . "<td style='color: " . $color2 . "; font-weight: bolder;'>" . $row["acceptPayment"] . "</td>"
-                                                    . "<td>" . $row["date"] . "</td>"
+                                                    . "<td>" . $row["donationid"] . "</td>"
+                                                    . "<td>" . $row["title"] . "</td>"
+                                                    . "<td style=''>" . $row["itemQuantity"] . "</td>"
+                                                    . "<td style=''>" . $row["totalAmount"] . "</td>"
+                                                    . "<td>" . $row["paymentDate"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["receiveDate"] . "" . $date . "</td>"
                                                     . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
                                                     . "<td>"
-                                                    . "<a class='btn btn-block' style='pointer-events: " . $disabled . "' href='accept_delivery_shipping.php?id=" . $row["tradeid"] . "'>"
-                                                    . "<i class='fas fa-truck' style='color:" . $color2 . ";font-size: 1.1em;'></i>"
-                                                    . "</a>"
-                                                    . "</td>"
-                                                    . "<td>"
-                                                    . "<a class='btn btn-info btn-block' href='trade_accept.php?id=" . $row["tradeid"] . "'>"
+                                                    . "<a class='btn btn-info btn-block' href='send_donation.php?id=" . $row["donationid"] . "'>"
                                                     . "<i class='far fa-eye' style='font-size: 1.1em;'></i>"
                                                     . "</a>"
                                                     . "</td>";

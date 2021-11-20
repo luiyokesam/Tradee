@@ -43,7 +43,7 @@ if (!isset($_SESSION['loginuser'])) {
                         if ($_SESSION['loginuser']['avatar'] != null) {
                             echo "<img src='{$_SESSION['loginuser']['avatar']}' class='rounded-pill img-fluid profile-pic' alt='Avatar'>";
                         } else {
-                            echo "<img src='../img/login/anonymous.png' class='rounded-pill img-fluid profile-pic' alt='Avatar'>";
+                            echo "<img src='../img/login/default_profile.jpg' class='rounded-pill img-fluid profile-pic' alt='Avatar'>";
                         }
                     }
                     ?>

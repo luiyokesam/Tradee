@@ -34,7 +34,7 @@ if (!isset($_SESSION['adminid'])) {
         <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
         <link rel="stylesheet" href="../bootstrap/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
         <link rel="stylesheet" href="../bootstrap/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-        
+
         <link rel="shortcut icon" href="../img/icon/admin_favicon.svg" type="image/x-icon">
     </head>
     <body>
@@ -56,94 +56,78 @@ if (!isset($_SESSION['adminid'])) {
             <div class="sidebar">
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item">
+                        <li class="nav-item active">
                             <a href="admin_details.php?id=<?php echo $current_admin["adminid"] ?>" class="nav-link">
                                 <i class="nav-icon fas fa-user-cog"></i>
-                                <p>
-                                    <?php echo $current_admin["name"] ?>
-                                </p>
+                                <p><?php echo $current_admin["name"] ?></p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="home.php" class="nav-link">
+                            <a href="home.php" class="nav-link <?php if ($page == 'home') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
+                                <p>Dashboardx</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="admin_list.php" class="nav-link">
+                            <a href="admin_list.php" class="nav-link <?php if ($page == 'admin_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-users-cog"></i>
-                                <p>
-                                    Admin list
-                                </p>
+                                <p>Admin list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="customer_list.php" class="nav-link">
+                            <a href="customer_list.php" class="nav-link <?php if ($page == 'customer_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-user-friends"></i>
-                                <p>
-                                    Customer list
-                                </p>
+                                <p>Customer list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="item_list.php" class="nav-link">
+                            <a href="item_list.php" class="nav-link <?php if ($page == 'item_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-tasks"></i>
-                                <p>
-                                    Item list
-                                </p>
+                                <p>Item list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="trade_list.php" class="nav-link">
+                            <a href="trade_list.php" class="nav-link <?php if ($page == 'trade_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-sync-alt"></i>
-                                <p>
-                                    Trading list
-                                </p>
+                                <p>Trading list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="delivery_list.php" class="nav-link">
+                            <a href="delivery_list.php" class="nav-link <?php if ($page == 'delivery_list') {echo 'active';}?>">
                                 <!--<i class="nav-icon fas fa-box-open"></i>-->
                                 <!--<i class="nav-icon fas fa-copy"></i>-->
                                 <i class="nav-icon fas fa-truck"></i>
-                                <p>
-                                    Delivery list
-                                </p>
+                                <p>Delivery list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="event_list.php" class="nav-link">
+                            <a href="donation_list.php" class="nav-link <?php if ($page == 'donation_list') {echo 'active';}?>">
+                                <i class="nav-icon far fa-heart"></i>
+                                <p>Donation list</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="event_list.php" class="nav-link <?php if ($page == 'event_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
-                                <p>
-                                    Event list
-                                </p>
+                                <p>Event list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="feedback_list.php" class="nav-link">
+                            <a href="feedback_list.php" class="nav-link <?php if ($page == 'feedback_list') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-comment-alt"></i>
-                                <p>
-                                    Feedback list
-                                </p>
+                                <p>Feedback list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="report.php" class="nav-link">
+                            <a href="report.php" class="nav-link <?php if ($page == 'report') {echo 'active';}?>">
                                 <i class="nav-icon fas fa-chart-pie"></i>
-                                <p>
-                                    Report
-                                </p>
+                                <p>Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php" class="nav-link">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>
-                                    Log out
-                                </p>
+                                <p>Log out</p>
                             </a>
                         </li>
                     </ul>
@@ -172,4 +156,10 @@ if (!isset($_SESSION['adminid'])) {
         <script src="../bootstrap/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
         <script src="../bootstrap/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     </body>
+    <style>
+        .active-now{
+            color: #fff;
+            /*background-color: #c2c7d0;*/   
+        }
+    </style>
 </html>

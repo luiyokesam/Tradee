@@ -1,4 +1,5 @@
 <?php
+$page = 'event_list';
 include 'navbar.php';
 
 $category_array = array();
@@ -374,7 +375,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="col-12 img-container" style="width: 1000px; height: 400px">
-                                                            <img src="../img/event/drop_img.jpg" class="active-image" style="width: 100%; height: 400px;" alt="Product Image">
+                                                            <img src="../img/event/drop_img.jpg" class="active-image" style="max-width: 1000px; max-height: 400px;" alt="Product Image">
                                                         </div>
 
                                                         <div class="col-12 product-image-thumbs mt-3">
@@ -468,26 +469,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <table id="donationtable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th style="width: 22%">Donate ID</th>
-                                                <th style="width: 22%">Event ID</th>
-                                                <th style="width: 22%">Donator</th>
-                                                <th style="width: 22%">Item ID</th>
+                                                <th style="width: 10%">Donate ID</th>
+                                                <th style="width: 10%">Event ID</th>
+                                                <th style="width: 13%">Donator</th>
+                                                <th style="width: 10%">Quantity</th>
+                                                <th style="width: 15%">Donation Date</th>
+                                                <th style="width: 15%">Delivery Status</th>
+                                                <th style="width: 15%">Received Date</th>
                                                 <th style="width: auto"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             if (isset($current_data)) {
-                                                $sql = "SELECT * FROM donation WHERE eventid = '" . $current_data['eventid'] . "'";
+                                                $sql = "SELECT * FROM donation_delivery d WHERE eventid = '" . $current_data['eventid'] . "'";
                                                 $result = $dbc->query($sql);
                                                 if ($result) {
                                                     while ($row = $result->fetch_assoc()) {
-                                                        echo "<td><a>" . $row["donateid"] . "</a></td>"
+                                                        if ($row["deliveryStatus"] == "Pending") {
+                                                            $color1 = "orange";
+                                                        } else if ($row["deliveryStatus"] == "In Transit") {
+                                                            $color1 = "lightsalmon";
+                                                        } else if ($row["deliveryStatus"] == "Shipping") {
+                                                            $color1 = "skyblue";
+                                                        } else if ($row["deliveryStatus"] == "Delivered") {
+                                                            $color1 = "limegreen";
+                                                        } else {
+                                                            $color1 = "red";
+                                                        }
+
+                                                        echo "<td><a>" . $row["donationid"] . "</a></td>"
                                                         . "<td><a>" . $row["eventid"] . "</a></td>"
                                                         . "<td><a>" . $row["donator"] . "</a></td>"
-                                                        . "<td><a>" . $row["itemid"] . "</a></td>"
+                                                        . "<td><a>" . $row["itemQuantity"] . "</a></td>"
+                                                        . "<td><a>" . $row["paymentDate"] . "</a></td>"
+                                                        . "<td style='color: ".$color1."; font-weight: bolder;'><a>" . $row["deliveryStatus"] . "</a></td>"
+                                                        . "<td><a>" . $row["receiveDate"] . "</a></td>"
                                                         . "<td class='project-actions text-right'>"
-                                                        . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'item_details.php?id=" . $row["itemid"] . "'>"
+                                                        . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'donation_details.php?id=" . $row["donationid"] . "'>"
                                                         . "<i class=" . "'far fa-eye'" . ">"
                                                         . "</i></a></td></tr>";
                                                     }

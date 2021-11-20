@@ -1,4 +1,5 @@
 <?php
+$page = 'admin_list';
 include 'navbar.php';
 
 echo '<script>var current_admin = ' . json_encode($current_admin) . ';</script>';
@@ -87,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php echo $current_data['adminid'] ?> (Admin Details) - Tradee</title>
+        <title>Admin <?php echo $current_data['adminid'] ?> - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed" onload="loadform()">
         <div class="content-wrapper">
@@ -190,16 +191,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                     echo "selected";
                                                                 }
                                                                 ?>>None</option>
-                                                                <?php
-                                                                $sql1 = "SELECT name FROM admin WHERE position = 'Manager'";
-                                                                $result1 = $dbc->query($sql1);
-                                                                if ($result1->num_rows > 0) {
-                                                                    while ($row = mysqli_fetch_array($result1)) {
-                                                                        $selected = ($current_data["manager"] == $row['name']) ? "selected" : "";
-                                                                        echo '<option ' . $selected . ' value="' . $row['name'] . '">' . $row['name'] . '</option>';
-                                                                    }
-                                                                }
-                                                                ?>
+                                                                        <?php
+                                                                        $sql1 = "SELECT name FROM admin WHERE position = 'Manager'";
+                                                                        $result1 = $dbc->query($sql1);
+                                                                        if ($result1->num_rows > 0) {
+                                                                            while ($row = mysqli_fetch_array($result1)) {
+                                                                                $selected = ($current_data["manager"] == $row['name']) ? "selected" : "";
+                                                                                echo '<option ' . $selected . ' value="' . $row['name'] . '">' . $row['name'] . '</option>';
+                                                                            }
+                                                                        }
+                                                                        ?>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -367,14 +368,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (!document.getElementById("email").value.match(mailformat)) {
                         document.getElementById("email").style.borderColor = "red";
                         fullfill = false;
-                        message = "Invalid email !\n";
+                        message = "Invalid email!\n";
                     }
                 }
 
                 if (isnew) {
                     if (document.getElementById("ps").value.length < 8) {
                         document.getElementById("ps").style.borderColor = "red";
-                        message = "Password must be more than 8 digit or alphapet !\n"
+                        message = "Password must be more than 8 digit or alphapet.\n"
                         fullfill = false;
                     }
                     if (!document.getElementById("ps").value || document.getElementById("ps").value === "") {
@@ -388,27 +389,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (document.getElementById("ps").value !== document.getElementById("reps").value) {
                         document.getElementById("ps").style.borderColor = "red";
                         document.getElementById("reps").style.borderColor = "red";
-                        message = message + "Password and Re password is not match !\n"
+                        message = message + "Password and Re-password are not match!\n"
                         fullfill = false;
                     }
                 } else {
                     if (document.getElementById("ps").value || document.getElementById("reps").value) {
                         if (document.getElementById("ps").value.length < 8) {
                             document.getElementById("ps").style.borderColor = "red";
-                            message = message + "Password must be more than 8 digit or alphapet !\n"
+                            message = message + "Password must be more than 8 digit or alphapet.\n"
                             fullfill = false;
                         }
                         if (document.getElementById("ps").value !== document.getElementById("reps").value) {
                             document.getElementById("ps").style.borderColor = "red";
                             document.getElementById("reps").style.borderColor = "red";
-                            message = message + "Password and Re password is not match !\n"
+                            message = message + "Password and Re password is not match.\n"
                             fullfill = false;
                         }
                     }
                 }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save ?")) {
+                    if (confirm("Confirm to save?")) {
                         document.getElementById("manager").disabled = false;
                         document.getElementById("position").disabled = false;
                         document.getElementById("activation").disabled = false;
@@ -424,11 +425,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         function cancel() {
             if (isnew) {
-                if (confirm("Confirm to cancel insert new admin and redirect to Admin list ?\n")) {
+                if (confirm("Confirm to cancel insert new admin and redirect to Admin list?\n")) {
                     window.location.href = "admin_list.php";
                 }
             } else {
-                if (confirm("Confirm to unsave current information ?")) {
+                if (confirm("Confirm to unsave current information?")) {
                     window.location.href = currentURL;
                 }
             }
@@ -440,13 +441,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("name").readOnly = false;
             document.getElementById("phone").readOnly = false;
             document.getElementById("email").readOnly = false;
+            if (current_admin.position === "Admin") {
+                document.getElementById("manager").disabled = false;
+            }
             if (current_admin.position === "Manager") {
                 document.getElementById("manager").disabled = false;
                 document.getElementById("position").disabled = false;
                 document.getElementById("activation").disabled = false;
+
+                document.getElementById("ps").readOnly = false;
+                document.getElementById("reps").readOnly = false;
             }
-            document.getElementById("ps").readOnly = false;
-            document.getElementById("reps").readOnly = false;
         }
     </script>
 </html>

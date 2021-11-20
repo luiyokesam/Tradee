@@ -1,4 +1,5 @@
 <?php
+$page = 'admin_list';
 include 'navbar.php';
 ?>
 <!doctype html>
@@ -42,13 +43,13 @@ include 'navbar.php';
                             <table id="table" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%">Admin ID</th>
-                                        <th style="width: 15%">Name</th>
-                                        <th style="width: 15%">Email</th>
+                                        <th style="width: 11%">Admin ID</th>
+                                        <th style="width: 13%">Name</th>
+                                        <th style="width: 23%">Email</th>
                                         <th style="width: 10%">Phone</th>
-                                        <th style="width: 12%">Position</th>
-                                        <th style="width: 15%">Manager</th>
-                                        <th style="width: 10%">Activation</th>
+                                        <th style="width: 9%">Position</th>
+                                        <th style="width: 13%">Manager</th>
+                                        <th style="width: 11%">Activation</th>
                                         <th style="width: auto"></th>
                                     </tr>
                                 </thead>
@@ -60,10 +61,10 @@ include 'navbar.php';
                                         while ($row = $result->fetch_assoc()) {
                                             if ($row["activation"] == true) {
                                                 $active = "Active";
-                                                $color = "blue";
+                                                $color = "limegreen";
                                             } else {
                                                 $active = "Inactive";
-                                                $color = "red";
+                                                $color = "limegreen";
                                             }
                                             echo "<tr><td><a>" . $row["adminid"] . "</a></td>"
                                             . "<td><a>" . $row["name"] . "</a></td>"
@@ -71,7 +72,7 @@ include 'navbar.php';
                                             . "<td><a>" . $row["phone"] . "</a></td>"
                                             . "<td><a>" . $row["position"] . "</a></td>"
                                             . "<td><a>" . $row["manager"] . "</a></td>"
-                                            . "<td><a value =" . $row["activation"] . "  style=" . "'color:" . $color . "; font-weight: bolder;'" . ">" . $active . "</a></td>"
+                                            . "<td><a value =" . $row["activation"] . "  style='color:" . $color . ";font-weight: bolder;'>" . $active . "</a></td>"
                                             . "<td class='project-actions text-right'>"
                                             . "<a class=" . "'btn btn-info btn-block'" . "href=" . "'admin_details.php?id=" . $row["adminid"] . "'>"
                                             . "<i class=" . "'far fa-eye'" . ">"
