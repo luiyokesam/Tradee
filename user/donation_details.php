@@ -3,7 +3,7 @@ include '../include/header.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM donation_details d, event e, customer c, item i WHERE d.donator = c.custid AND d.itemid = i.itemid AND d.eventid = e.eventid AND d.donationid = '$id' LIMIT 1";
+    $sql = "SELECT * FROM donation_details d, event e, customer c, item i WHERE d.custid = c.custid AND d.itemid = i.itemid AND d.eventid = e.eventid AND d.donationid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {

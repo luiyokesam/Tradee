@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "WHERE feedbackid ='" . $current_data['feedbackid'] . "'";
 
     if ($dbc->query($sql)) {
-        echo '<script>alert("Successfuly update!");var currentURL = window.location.href;window.location.href=currentURL;</script>';
+        echo '<script>alert("Successfuly update!");var currentURL=window.location.href;window.location.href=currentURL;</script>';
     } else {
         echo '<script>alert("Update fail!\nContact IT department for maintainence")</script>';
     }
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php echo $current_data['feedbackid'] ?> - Tradee</title>
+        <title>Feedback <?php echo $current_data['feedbackid'] ?> - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed" onload="addnew()">
         <div class="wrapper">
@@ -82,28 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="card-body">
                                     <form method="post" id="form" enctype="multipart/form-data">
                                         <div class="row">
-<!--                                            <div class="col-md-3">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="col-md-12">
-                                                            <img class="img-fluid mb-12" src="<?php
-                                                            if (isset($current_data)) {
-                                                                echo $current_data["file"];
-                                                            }
-                                                            ?>" alt="Photo" style="width: 100%;height:500px;padding-top: 10px" id="img_display" name="img_display">
-                                                        </div>
-                                                        <div class="col-md-12" >
-                                                            <div class="form-group" style="padding-top: 15px">
-                                                                <div class="custom-file">
-                                                                    <input type="file" accept="image/*" onchange="loadFile(event)" class="custom-file-input" id="img" disabled name="img">
-                                                                    <label class="custom-file-label" id="validate_img">Choose file</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>-->
-
                                             <div class="col-md-7">
                                                 <div class="row">
                                                     <div class="col-md-4">
@@ -138,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                             ?>">
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <div class="col-md-6">
                                                         <label>Enquiry :</label>
                                                         <div class="form-group">                                             
@@ -151,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     </div>
 
                                                     <div class="col-md-6">
-                                                        <label>Email:</label>
+                                                        <label>Email :</label>
                                                         <div class="form-group">                                             
                                                             <input class="form-control" id="email" name="email" readOnly value="<?php
                                                             if (isset($current_data)) {
@@ -161,24 +139,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
                                                         <label>Feedback Date :</label>
                                                         <div class="input-group">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                                             </div>
-                                                            <input type="text" class="form-control" name="feedbackdate" placeholder="dd/mm/yyyy" id="release_date" maxlength="10" value="<?php
+                                                            <input type="text" class="form-control" name="feedbackdate" placeholder="dd/mm/yyyy" id="feedbackdate" maxlength="10" value="<?php
                                                             if (isset($current_data)) {
                                                                 echo $current_data["feedbackdate"];
                                                             }
                                                             ?>" readOnly name="feedbackdate">
                                                         </div>
                                                     </div>
+                                                    
+                                                    <div class="col-md-3">
+                                                        <label>Document :</label>
+                                                        <div class="form-group row" style="padding-left: 5px">
+                                                            <a href="<?php echo $current_data['document'] ?>" style="width: 150px;" target="_blank" class="btn btn-info">
+                                                                <i class="fas fa-arrow-circle-down"></i> Download
+                                                            </a>
+                                                        </div>
+                                                    </div>
 
-                                                    <div class="col-md-auto pt-1">
-                                                        <label>Status:</label>
+                                                    <div class="col-md-5">
+                                                        <label>Status :</label>
                                                         <div class="form-group row" style="padding-left: 5px">   
-                                                            <div class="custom-control custom-radio col-md-8">
+                                                            <div class="custom-control custom-radio col-md-auto">
                                                                 <input class="custom-control-input" type="radio" id="customRadio1" name="status" disabled value="Completed"<?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["status"] == 'Completed') {
@@ -189,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                 <label for="customRadio1" class="custom-control-label">Completed</label>
                                                             </div>
 
-                                                            <div class="custom-control custom-radio col-md-4">
+                                                            <div class="custom-control custom-radio col-md-auto">
                                                                 <input class="custom-control-input" type="radio" id="customRadio2" name="status" disabled value="Pending"<?php
                                                                 if (isset($current_data)) {
                                                                     if ($current_data["status"] == 'Pending') {
@@ -218,10 +205,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     </div>
                                                 </div>
                                             </div>
-                                                            
-                                                            
-                                                            <a href="Filedownload.php?feedbackid=<?= $current_data['feedbackid'] ?>" 
-                                               class="btn btn_edit"><i class="fas fa-edit">view</i></a>
                                         </div>
                                     </form>
                                 </div>
@@ -259,12 +242,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </body>
     <script>
         var currentURL = window.location.href;
-
-        var isnew = false;
+        
         function back() {
             var btnoption = document.getElementById("btnsave").textContent;
             if (btnoption === "Save") {
-                if (confirm("Confirm to unsave ?")) {
+                if (confirm("Confirm to unsave the current information?")) {
                     window.location.href = "feedback_list.php";
                 }
             } else {
@@ -277,19 +259,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("btncancel").disabled = false;
             document.getElementById("customRadio1").disabled = false;
             document.getElementById("customRadio2").disabled = false;
-        }
-
-        function addnew() {
-            var params = new window.URLSearchParams(window.location.search);
-            if (!params.get('id')) {
-                isnew = true;
-                editable();
-                var today = new Date();
-                var dd = String(today.getDate()).padStart(2, '0');
-                var mm = String(today.getMonth() + 1).padStart(2, '0');
-                var yyyy = today.getFullYear();
-                document.getElementById("release_date").value = dd + '/' + mm + '/' + yyyy;
-            }
         }
 
         function editorsave() {
@@ -307,7 +276,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function cancel() {
-            if (confirm("Confirm to unsave current information!")) {
+            if (confirm("Confirm to unsave current information?")) {
                 if (isnew) {
                     window.location.href = "feedback_list.php";
                 } else {

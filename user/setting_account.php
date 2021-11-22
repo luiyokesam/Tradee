@@ -67,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <body>
         <div class="setting">
             <div class="container-lg py-3">
-                <input class="form-control" type="text" id="type" name="type" readonly style="display: none;">
                 <div class="row justify-content-center">
                     <?php
                     $page = 'setting_account';
@@ -75,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ?>
                     <div class="col-lg-8 col-md-10">
                         <form method="post" id="form">
+                            <input class="form-control" type="text" id="type" name="type" readonly style="display: none;">
                             <div class="mb-1 bg-white">
                                 <div class="row align-items-center border-bottom m-0 px-3 py-2 pt-3">
                                     <div class="col-md-12" style="font-weight: bolder;">Reset Password</div>
@@ -185,7 +185,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save?")) {
+                    if (confirm("Confirm to update your current password?")) {
                         if (!document.getElementById("pass1").value) {
                             document.getElementById("pass1").value = null;
                         }
@@ -215,7 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save?")) {
+                    if (confirm("Confirm to update your account settings?")) {
                         if (!document.getElementById("contact").value) {
                             document.getElementById("contact").value = null;
                         }
@@ -244,7 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         //Date picker
         $('#registrationdate').datetimepicker({
             format: 'DD/MM/YYYY'
-            
+
         });
     </script>
     <style>

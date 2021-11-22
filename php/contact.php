@@ -14,12 +14,12 @@ if ($result->num_rows > 0) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $img = $_FILES['img']['name'];
-    if ($img) {
-        $newimg = "../data/feedback/$img";
-    }
+    $img = $_FILES['file']['name'];
 
-    $sql = "INSERT INTO feedback(feedbackid, custid, tradeid, position, enquirytype, email, comment, feedbackdate, img, status)VALUES("
+    // image file directory
+    $target = "../data/feedback/" . basename($img);
+
+    $sql = "INSERT INTO feedback(feedbackid, custid, tradeid, position, enquirytype, email, comment, feedbackdate, document, status)VALUES("
             . "'" . $newid . "',"
             . "'" . $_SESSION['loginuser']['custid'] . "',"
             . "'" . $_POST['tradeid'] . "',"
@@ -28,16 +28,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "'" . $_POST['email'] . "',"
             . "'" . $_POST['comment'] . "',"
             . "'" . $_POST['feedbackdate'] . "',"
-            . "'" . $newimg . "',"
+            . "'../data/feedback/" . $img . "',"
+//            . "'" . $img . "',"
             . "'Pending')";
 
     echo '<script>alert("' . $sql . '");</script>';
 
     if ($dbc->query($sql)) {
-        if ($img) {
-            move_uploaded_file($_FILES['img']['tmp_name'], "../item_img/$img");
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
+            echo '<script>alert("Thanks for your feedback. We will provide feedback to you soon.");window.location.href="../php/index.php";</script>';
         }
-        echo '<script>alert("Thanks for your feedback. We will provide feedback to you soon.");window.location.href="../php/index.php";</script>';
     } else {
         echo '<script>alert("Insert fail !\nContact IT department for maintainence")</script>';
     }
@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="col-10 mt-4">
-                            <label for="formFileMultiple validationFile" class="form-label">Maximum number of attachment is 5. The attachment must be smaller than 4.5MB. Allowed file types: jpg / jpeg / png / pdf / mp4.</label>
+                            <label for="formFileMultiple validationFile" class="form-label">Maximum number of attachment is 1. The attachment must be smaller than 4.5MB. Allowed file types: jpg / jpeg / png / pdf / mp4.</label>
                             <div class="form-group">
                                 <img class="img-fluid mb-12" alt="Photo" style="width: 100%; height: 500px; padding-top: 10px; display: none;" id="file_display" name="file_display">
                                 <div class="custom-file">
@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         </div>
 
-                        <div class="col-10 mt-4" style="display: none;">
+                        <div class="col-10 mt-3" style="display: none;">
                             <label class="form-label">Date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -161,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="col-10 mt-4">
-                            <button class="btn btn-outline-light" type="submit">Submit</button>
+                            <button class="btn btn-outline-light" type="button" onclick="editorsave()">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -181,76 +181,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("feedbackdate").value = dd + '/' + mm + '/' + yyyy;
 
         function editorsave() {
-            if (document.getElementById("btnsave").textContent === "Upload") {
+//            if (document.getElementById("btnsave").textContent === "Upload") {
                 var fullfill = true;
                 var message = "";
-                document.getElementById("validationFile").style.borderColor = "";
-                document.getElementById("itemname").style.borderColor = "";
-                document.getElementById("brand").style.borderColor = "";
-                document.getElementById("catname").style.borderColor = "";
-                document.getElementById("itemCondition").style.borderColor = "";
-                document.getElementById("colour").style.borderColor = "";
-                document.getElementById("size").style.borderColor = "";
-                document.getElementById("value").style.borderColor = "";
-                document.getElementById("tradeItem").style.borderColor = "";
-                document.getElementById("tradeOption").style.borderColor = "";
-                document.getElementById("itemDescription").style.borderColor = "";
+//                document.getElementById("validationFile").style.borderColor = "";
+//                document.getElementById("itemname").style.borderColor = "";
+//                document.getElementById("brand").style.borderColor = "";
+//                document.getElementById("catname").style.borderColor = "";
+//                document.getElementById("itemCondition").style.borderColor = "";
+//                document.getElementById("colour").style.borderColor = "";
+//                document.getElementById("size").style.borderColor = "";
+//                document.getElementById("value").style.borderColor = "";
+//                document.getElementById("tradeItem").style.borderColor = "";
+//                document.getElementById("tradeOption").style.borderColor = "";
+//                document.getElementById("itemDescription").style.borderColor = "";
 
-                if (!document.getElementById("img").value || document.getElementById("img").value === "") {
-                    if (document.getElementById('img_display').src === "") {
-                        document.getElementById("validate_img").style.borderColor = "red";
-                        fullfill = false;
-                    }
-                }
-                if (!document.getElementById("itemname").value || document.getElementById("itemname").value === "") {
-                    document.getElementById("itemname").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("brand").value || document.getElementById("brand").value === "") {
-                    document.getElementById("brand").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("catname").value || document.getElementById("catname").value === "") {
-                    document.getElementById("catname").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("itemCondition").value || document.getElementById("itemCondition").value === "") {
-                    document.getElementById("itemCondition").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("colour").value || document.getElementById("colour").value === "") {
-                    document.getElementById("colour").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("size").value || document.getElementById("size").value === "") {
-                    document.getElementById("size").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("value").value || document.getElementById("value").value === "") {
-                    document.getElementById("value").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("tradeItem").value || document.getElementById("tradeItem").value === "") {
-                    document.getElementById("tradeItem").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("tradeOption").value || document.getElementById("tradeOption").value === "") {
-                    document.getElementById("tradeOption").style.borderColor = "red";
-                    fullfill = false;
-                }
-                if (!document.getElementById("itemDescription").value || document.getElementById("itemDescription").value === "") {
-                    document.getElementById("itemDescription").style.borderColor = "red";
-                    fullfill = false;
-                }
+//                if (!document.getElementById("img").value || document.getElementById("img").value === "") {
+//                    if (document.getElementById('img_display').src === "") {
+//                        document.getElementById("validate_img").style.borderColor = "red";
+//                        fullfill = false;
+//                    }
+//                }
+//                if (!document.getElementById("itemname").value || document.getElementById("itemname").value === "") {
+//                    document.getElementById("itemname").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("brand").value || document.getElementById("brand").value === "") {
+//                    document.getElementById("brand").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("catname").value || document.getElementById("catname").value === "") {
+//                    document.getElementById("catname").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("itemCondition").value || document.getElementById("itemCondition").value === "") {
+//                    document.getElementById("itemCondition").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("colour").value || document.getElementById("colour").value === "") {
+//                    document.getElementById("colour").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("size").value || document.getElementById("size").value === "") {
+//                    document.getElementById("size").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("value").value || document.getElementById("value").value === "") {
+//                    document.getElementById("value").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("tradeItem").value || document.getElementById("tradeItem").value === "") {
+//                    document.getElementById("tradeItem").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("tradeOption").value || document.getElementById("tradeOption").value === "") {
+//                    document.getElementById("tradeOption").style.borderColor = "red";
+//                    fullfill = false;
+//                }
+//                if (!document.getElementById("itemDescription").value || document.getElementById("itemDescription").value === "") {
+//                    document.getElementById("itemDescription").style.borderColor = "red";
+//                    fullfill = false;
+//                }
 
                 if (fullfill) {
-                    if (confirm("Are you sure to upload the item?")) {
+                    if (confirm("Confirm to submit the feedback?")) {
                         document.getElementById("form").submit();
                     }
                 } else {
                     alert("Please enter all required information for this items.\n" + message);
                 }
-            }
+//            }
         }
 
     </script>

@@ -26,20 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $r = mysqli_query($dbc, $q) or trigger_error("Query: $q\n<br />MySQL Error: " . mysqli_error($dbc));
 
         if (mysqli_affected_rows($dbc) == 1) { // If it ran OK.
-// Send an email:
+            // Send an email:
             $body = "Your password to log into Tradee has been temporarily changed to '$p'. Please log in using this password and this email address. Then you may change your password to something more familiar.";
             mail($_POST['email'], 'Your temporary password.', $body, 'From: admin@tradee.com');
 
-// Print a message and wrap up:
+            // Print a message and wrap up:
+//            echo '<script>alert("Your password has been changed. You will receive the new, temporary password at the email address with which you registered. Once you have logged in with this password, you may change it by clicking on the "Change Password" link.");window.location.href="../user/logout.php";</script>';
+//            echo '<script>alert("Your password has been changed. You will receive the new, temporary password at the email address with which you registered. Once you have logged in with this password, you may change it by clicking on the "Change Password" link.")</script>';
+//            echo '<script>window.location.href="../user/logout.php";</script>';
             echo '<h3>Your password has been changed. You will receive the new, temporary password at the email address with which you registered. Once you have logged in with this password, you may change it by clicking on the "Change Password" link.</h3>';
             mysqli_close($dbc);
             include ('../include/footer.php');
             exit();
         } else {
-            echo '<p class="error">Your password could not be changed due to a system error. We apologize for any inconvenience.</p>';
+            echo '<script>alert("Your password could not be changed due to a system error. We apologize for any inconvenience.")</script>';
         }
     } else {
-        echo '<p class="error">Please try again.</p>';
+        echo '<script>alert("Please try again.")</script>';
     }
 
     mysqli_close($dbc);

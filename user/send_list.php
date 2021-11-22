@@ -336,7 +336,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
 
-                            <div class="col-12 mt-1">
+                            <?php
+                            if (isset($current_data)) {
+                                if (($current_data['deliveryStatus'] !== 'Delivered')) {
+                                    echo '<div class="col-12 mt-1">
                                 <form method="post" id="form">
                                     <div class="row mb-2" style="display: none;">
                                         <label for="paymentDate" class="form-label">Feedback Date</label>
@@ -365,7 +368,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
                                 </form>
-                            </div>
+                            </div>';
+                                }
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>

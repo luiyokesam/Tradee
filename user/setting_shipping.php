@@ -161,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 //                }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save?")) {
+                    if (confirm("Confirm to update your shipping details?")) {
 //                        if (!document.getElementById("username").value) {
 //                            document.getElementById("username").value = null;
 //                        }

@@ -45,6 +45,7 @@ if ((isset($_GET['eventid'])) && (isset($_GET['donationid']))) {
             } else if ($_SESSION['donation_details']['packaging'] == 'Seal boxes with tape') {
                 $packaging_fee = 8;
             }
+            $packaging_fee = $packaging_fee * $quantity;
             $packaging_fee = number_format($packaging_fee, 2, '.', '');
 
             $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');
@@ -60,7 +61,7 @@ if ((isset($_GET['eventid'])) && (isset($_GET['donationid']))) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     foreach ($_SESSION['donation_details']['myitem'] as $myitem) {
-        $sql1 = "INSERT INTO donation_details(donationid, eventid, donator, itemid) VALUES ("
+        $sql1 = "INSERT INTO donation_details(donationid, eventid, custid, itemid) VALUES ("
                 . "'" . $_SESSION['donation_details']['donationid'] . "',"
                 . "'" . $_SESSION['donation_details']['eventid'] . "',"
                 . "'" . $_SESSION['loginuser']['custid'] . "',"

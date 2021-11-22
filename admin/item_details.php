@@ -81,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($dbc->query($sql)) {
             echo '<script>alert("Item details update successfully.");window.location.href="item_details.php?id=' . $current_data['itemid'] . '";</script>';
-            exit();
         }
     } else {
         echo '<script>alert("Update failed !\nContact IT department for maintainence")</script>';

@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item active"><a href="delivery_list.php">Delivery list</a></li>
-                                <li class="breadcrumb-item">Delivery detail</li>
+                                <li class="breadcrumb-item">Delivery details</li>
                             </ol>
                         </div>
                     </div>
@@ -450,8 +450,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </body>
     <script>
         var currentURL = window.location.href;
-        var isnew = false;
-
+        
         function editorsave() {
             if (document.getElementById("btnsave").textContent === "Save") {
                 var fullfill = true;
@@ -480,7 +479,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         document.getElementById("form").submit();
                     }
                 } else {
-                    alert("Inputs with red border are required field !\n" + message);
+                    alert("Inputs with red border are required field!\n" + message);
                 }
             } else {
                 editable();
@@ -488,14 +487,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function cancel() {
-            if (isnew) {
-                if (confirm("Confirm to cancel insert new delivery and redirect to delivery list ?\n")) {
-                    window.location.href = "delivery_list.php";
-                }
-            } else {
-                if (confirm("Confirm to unsave current information ?")) {
-                    window.location.href = currentURL;
-                }
+            if (confirm("Confirm to unsave current information?")) {
+                window.location.href = currentURL;
             }
         }
 
@@ -515,6 +508,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $('#reservationdatetime').datetimepicker({
             format: 'DD/MM/YYYY HH:mm',
             icons: {time: 'far fa-clock'}
-        });
+        }
+        );
     </script>
 </html>

@@ -442,7 +442,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("phone").readOnly = false;
             document.getElementById("email").readOnly = false;
             if (current_admin.position === "Admin") {
-                document.getElementById("manager").disabled = false;
+                document.getElementById("ps").readOnly = false;
+                document.getElementById("reps").readOnly = false;
             }
             if (current_admin.position === "Manager") {
                 document.getElementById("manager").disabled = false;

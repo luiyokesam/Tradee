@@ -419,15 +419,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
 
                             <div class="float-right ml-2">
-                                <button type="button" class="btn btn-save btn-block" id="btnsave" onclick="editorsave()">Edit</button>
-                            </div>
-
-                            <div class="float-sm-right ml-2">
-                                <button type="button" class="btn btn-warning btn-block" onclick="cancel()" id="btncancel" disabled>Cancel</button>
+                                <button type="button" class="btn btn-save" id="btnsave" onclick="editorsave()">Edit</button>
                             </div>
 
                             <div class="float-right ml-2">
-                                <button type="button" class="btn btn-dark btn-block" id="btnback" onclick="back()">Back</button>
+                                <button type="button" class="btn btn-warning" onclick="cancel()" id="btncancel" disabled>Cancel</button>
+                            </div>
+
+                            <div class="float-right ml-2">
+                                <button type="button" class="btn btn-dark" id="btnback" onclick="back()">Back</button>
                             </div>
                         </form>
                     </div>

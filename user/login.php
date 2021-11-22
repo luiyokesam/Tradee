@@ -1,10 +1,10 @@
 <?php
 include ('../include/header.php');
 
-if (isset($_SESSION['userid'])) {
-    echo '<script>window.location.href = "../user/profile.php";</script>';
-    exit();
-}
+//if (isset($_SESSION['loginuser']['custid'])) {
+//    echo '<script>window.location.href = "../user/profile.php";</script>';
+//    exit();
+//}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //    require (MYSQL);

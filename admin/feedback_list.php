@@ -7,7 +7,7 @@ include 'navbar.php';
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Feedback</title>
+        <title>Feedback - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed">
         <div class="wrapper">
@@ -20,7 +20,7 @@ include 'navbar.php';
                                     <div class="col-md-auto">
                                         <label class="col-form-label">Category :</label>
                                     </div>
-                                    
+
                                     <div class="col-md-auto">
                                         <select class="custom-select" id="status" onchange="category()">
                                             <option value="">All</option>
@@ -42,7 +42,7 @@ include 'navbar.php';
                                     <div class="col-md-auto">
                                         <label class="col-form-label">Status :</label>
                                     </div>
-                                    
+
                                     <div class="col-md-auto">
                                         <select class="custom-select" id="activation" onchange="filter()">
                                             <option value="">All</option>
@@ -84,10 +84,10 @@ include 'navbar.php';
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
                                             if ($row["status"] == "Completed") {
-                                                $status = "Completed";
-                                                $color = "green";
+                                                $color = "limegreen";
+                                            } else if ($row["status"] == "Pending") {
+                                                $color = "orange";
                                             } else {
-                                                $status = "Pending";
                                                 $color = "red";
                                             }
                                             echo "<tr>"
@@ -97,7 +97,7 @@ include 'navbar.php';
                                             . "<td><a>" . $row["enquirytype"] . "</a></td>"
                                             . "<td><a>" . $row["position"] . "</a></td>"
                                             . "<td><a>" . $row["feedbackdate"] . "</a></td>"
-                                            . "<td><a value =" . $row["status"] . "  style=" . "'color:" . $color . "; font-weight: bolder;'>" . $status . "</a></td>"
+                                            . "<td><a style='color:" . $color . "; font-weight: bolder;'>" . $row["status"] . "</a></td>"
                                             . "<td class='project-actions text-right'>"
                                             . "<a class='btn btn-info btn-block' href='feedback_details.php?id=" . $row["feedbackid"] . "'>"
                                             . "<i class=" . "'far fa-eye'" . ">"

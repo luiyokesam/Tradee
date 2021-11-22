@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 . "status='" . $_POST['status'] . "' "
                 . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
 
-        echo '<script>alert("' . $sql . '");</script>';
+//        echo '<script>alert("' . $sql . '");</script>';
         if ($dbc->query($sql)) {
             echo '<script>alert("Trade details updated successfully.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
         } else {
@@ -253,7 +253,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                         <div class="col-md-1">
                                             <div class="form-group">
-                                                <button class="btn btn-primary" style="width:100%" id="btnsave" onclick="editorsave()">Edit</button>
+                                                <button class="btn btn-primary" style="width:100%" id="btnsave" type="button" onclick="editorsave()">Edit</button>
                                             </div>
                                         </div>
                                     </div>

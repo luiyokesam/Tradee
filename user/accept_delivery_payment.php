@@ -29,12 +29,13 @@ if (isset($_GET['id'])) {
             }
 
             if ($_SESSION['delivery_details']['packaging'] == 'Plastic boxes') {
-                $packaging_fee = 5;
+                $packaging_fee = 2;
             } else if ($_SESSION['delivery_details']['packaging'] == 'Bubble wrap') {
-                $packaging_fee = 8;
+                $packaging_fee = 4;
             } else if ($_SESSION['delivery_details']['packaging'] == 'Seal boxes with tape') {
-                $packaging_fee = 10;
+                $packaging_fee = 5;
             }
+            $packaging_fee = $packaging_fee * $_SESSION['delivery_details']['itemQuantity'];
             $packaging_fee = number_format($packaging_fee, 2, '.', '');
 
             $subtotal = number_format($packaging_fee + $shipping_fee, 2, '.', '');

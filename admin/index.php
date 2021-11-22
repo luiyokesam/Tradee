@@ -15,6 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
+            $_SESSION['position'] = $row['position'];
             $_SESSION["adminid"] = $row["adminid"];
             echo '<script>alert("Welcome back , ' . $row["name"] . '")</script>';
             header("location: home.php");

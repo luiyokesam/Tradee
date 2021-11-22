@@ -100,6 +100,32 @@ if (!isset($_SESSION['loginuser'])) {
                                     </div>
                                 </div>
 
+                                <?php
+                                if (isset($_SESSION['loginuser'])) {
+                                    if (($_SESSION['loginuser']['gender'] != "")) {
+                                        echo "<div class='col-md-3 col-sm-4 col-6'>"
+                                        . "<div class='my-2'>"
+                                        . "<div style='font-weight: bolder;'>Gender</div>";
+                                        echo "<div>- {$_SESSION['loginuser']['gender']}</div>"
+                                        . "</div>"
+                                        . "</div>";
+                                    }
+                                }
+                                ?>
+
+                                <?php
+                                if (isset($_SESSION['loginuser'])) {
+                                    if (($_SESSION['loginuser']['birth'] != "")) {
+                                        echo "<div class='col-md-3 col-sm-4 col-6'>"
+                                        . "<div class='my-2'>"
+                                        . "<div style='font-weight: bolder;'>Birth</div>";
+                                        echo "<div>- {$_SESSION['loginuser']['birth']}</div>"
+                                        . "</div>"
+                                        . "</div>";
+                                    }
+                                }
+                                ?>
+
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="my-2">
                                         <div style="font-weight: bolder;">Trade Count</div>
@@ -109,6 +135,7 @@ if (!isset($_SESSION['loginuser'])) {
                                         if ($result->num_rows > 0) {
                                             while ($row = mysqli_fetch_array($result)) {
                                                 $current_offer = $row;
+                                                $count = $current_offer['NUMBER'];
                                                 echo "<div>- {$current_offer['NUMBER']}</div>";
                                                 break;
                                             }
@@ -123,14 +150,16 @@ if (!isset($_SESSION['loginuser'])) {
                                         <?php
                                         $sql = "SELECT MAX(t.tradeDate) DATE FROM trade t, customer c WHERE (t.offerCustID = '{$_SESSION['loginuser']['custid']}') OR (t.acceptCustID = '{$_SESSION['loginuser']['custid']}')";
                                         $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            while ($row = mysqli_fetch_array($result)) {
-                                                $current_offer = $row;
-                                                echo "<div>- {$current_offer['DATE']}</div>";
-                                                break;
+                                        if ($count != 0) {
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $current_offer = $row;
+                                                    echo "<div>- {$current_offer['DATE']}</div>";
+                                                    break;
+                                                }
                                             }
                                         } else {
-                                            echo "<div style='font-weight: lighter;'>- You haven't offer any trade yet.</div>";
+                                            echo "<div style='font-weight: lighter;'>- No trade yet.</div>";
                                         }
                                         ?>
                                     </div>
@@ -138,7 +167,7 @@ if (!isset($_SESSION['loginuser'])) {
                             </div>
                         </div>
 
-                        <div class="col-auto float-right py-3">
+                        <div class="col-auto float-right py-3" style="display: none;">
                             <a class="btn btn-outline-primary" href="../user/upload_auction.php" role="button">Create Auction</a>
                         </div>
                     </div>
@@ -147,7 +176,7 @@ if (!isset($_SESSION['loginuser'])) {
                         <div style="font-weight: bolder;">Description</div>
                         <?php
                         if (isset($_SESSION['loginuser'])) {
-                            if (($_SESSION['loginuser']['description'] !== '')) {
+                            if (($_SESSION['loginuser']['description'] != "")) {
                                 echo "<div>- {$_SESSION['loginuser']['description']}</div>";
                             } else {
                                 echo "<div style='font-weight: lighter;'>- No description yet.</div>";
@@ -208,7 +237,7 @@ if (!isset($_SESSION['loginuser'])) {
                     } else {
                         echo "<div class='text-center p-5' style='height:350px;'>"
                         . "<i class='fas fa-box-open p-5' style='font-size:5em; color: #969696; text-shadow: -2px 8px 4px #000000;'></i>"
-                        . "<div class=''>This member has not upload anything yet</div>"
+                        . "<div class=''>You has not upload anything yet</div>"
                         . "</div>";
                     }
                     ?>

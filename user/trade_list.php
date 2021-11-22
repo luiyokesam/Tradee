@@ -454,7 +454,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                                                     . "<td style=''>" . $row["totalAmount"] . "</td>"
                                                     . "<td>" . $row["paymentDate"] . "</td>"
                                                     . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["receiveDate"] . "" . $date . "</td>"
-                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["status"] . "</td>"
+                                                    . "<td style='font-weight: bolder; color:" . $color1 . "'>" . $row["deliveryStatus"] . "</td>"
                                                     . "<td>"
                                                     . "<a class='btn btn-info btn-block' href='send_donation.php?id=" . $row["donationid"] . "'>"
                                                     . "<i class='far fa-eye' style='font-size: 1.1em;'></i>"

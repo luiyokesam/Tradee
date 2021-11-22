@@ -1,6 +1,7 @@
 <?php
 $page = 'admin_list';
 include 'navbar.php';
+echo '<script>var position = ' . json_encode($current_admin["position"]) . ';</script>';
 ?>
 <!doctype html>
 <html lang="en">
@@ -29,6 +30,7 @@ include 'navbar.php';
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-auto">
                                 <button class="btn btn-primary btn-block" onclick="location.href = 'admin_details.php'" id="btnadd"><i class="fas fa-user-plus"></i> New admin</button>
                             </div>
@@ -101,44 +103,42 @@ include 'navbar.php';
                 </section>
             </div>
         </div>
-    </div>
-    <?php include 'footer.php'; ?>
-</body>
-</html>
-<script>
-
-    function loadform() {
-        if (position === "Admin") {
-            document.getElementById("btnadd").disabled = true;
+        <?php include 'footer.php'; ?>
+    </body>
+    <script>
+        function loadform() {
+            if (position === "Admin") {
+                document.getElementById("btnadd").hidden = true;
+            }
         }
-    }
 
-    $('#table').DataTable({
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true
-    });
+        $('#table').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true
+        });
 
-    function filter() {
-        var activation = document.getElementById("activation").value.toUpperCase();
-        table = document.getElementById("table");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[6];
-            if (td) {
-                var txtValue = td.textContent.toUpperCase() || td.innerText.toUpperCase();
-                if (activation === "") {
-                    tr[i].style.display = "";
-                } else if (txtValue !== activation) {
-                    tr[i].style.display = "none";
-                } else {
-                    tr[i].style.display = "";
+        function filter() {
+            var activation = document.getElementById("activation").value.toUpperCase();
+            table = document.getElementById("table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[6];
+                if (td) {
+                    var txtValue = td.textContent.toUpperCase() || td.innerText.toUpperCase();
+                    if (activation === "") {
+                        tr[i].style.display = "";
+                    } else if (txtValue !== activation) {
+                        tr[i].style.display = "none";
+                    } else {
+                        tr[i].style.display = "";
+                    }
                 }
             }
         }
-    }
-</script>
+    </script>
+</html>

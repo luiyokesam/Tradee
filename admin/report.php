@@ -1,5 +1,5 @@
-
 <?php
+$page = 'report';
 include 'navbar.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -10,19 +10,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($type == "trade") {
-        $sql = "SELECT DISTINCT c.custid, c.username, count(t.tradeid) as tradeqty , t.acceptCustID , t.tradeDate, td.itemid FROM `trade` as t, `trade_details` as td , `customer` as c WHERE t.tradeid = td.tradeid AND str_to_date(tradeDate, '%d/%m/%Y' ) >= str_to_date('$datefrom', '%d/%m/%Y' )AND str_to_date(tradeDate, '%d/%m/%Y' ) <= str_to_date('$dateto', '%d/%m/%Y' ) AND status = 'Completed' AND c.custid = t.offerCustID group by c.custid";
-        $title = "Trade report";
+        $sql = "SELECT DISTINCT c.custid, c.username, count(t.tradeid) as tradeqty, t.acceptCustID , t.tradeDate, td.itemid "
+                . "FROM trade t, trade_details td , customer c "
+                . "WHERE t.tradeid = td.tradeid AND str_to_date(tradeDate, '%d/%m/%Y') >= str_to_date('$datefrom', '%d/%m/%Y') AND "
+                . "str_to_date(tradeDate, '%d/%m/%Y') <= str_to_date('$dateto', '%d/%m/%Y') AND "
+                . "status = 'Completed' AND "
+                . "c.custid = t.offerCustID "
+                . "GROUP BY c.custid";
+
+        $title = "Trades Report";
     } else if ($type == "top_valueitem") {
-        $sql = "SELECT c.custid as custid, c.username,  SUM(i.value) AS totalvalue FROM `customer` as c, `item` as i where c.custid = i.custid group by custid";
-        $title = "Top value item report";
-    } else if ($type == "top_customer") {
-        $sql = "SELECT  d.senderid as id , count(d.senderid) as deliveryqty,SUM(d.totalAmount) AS revenue FROM `customer` as c , `delivery` as d where c.custid = d.senderid group by senderid order by deliveryqty DESC";
-        $title = "Top Customer Sales report";
+        $sql = "SELECT c.custid as custid, c.username, COUNT(i.itemid) AS totalitem, SUM(i.value) AS totalvalue "
+                . "FROM customer c, item i "
+                . "WHERE c.custid = i.custid "
+                . "GROUP BY c.custid";
+
+        $title = "Customer Item Value Report";
+    } else if ($type == "customer_inventory") {
+        $sql = "SELECT * "
+                . "FROM customer";
+
+        $title = "Customers Inventory";
+    } else if ($type == "delivery_report") {
+        $sql = "SELECT d.senderid as id , count(d.senderid) as deliveryqty,SUM(d.totalAmount) AS revenue FROM `customer` as c , `delivery` as d where c.custid = d.senderid group by senderid order by deliveryqty DESC";
+
+        $title = "Delivery Report";
     } else if ($type == "admin_list") {
         $sql = "SELECT * from admin";
+
         $title = "Admin List report";
     } else if ($type == "newuploads") {
-        $sql = "SELECT   c.catid , c.name , count(i.tradeItem) as catqty, i.postDate FROM `item` as i, `category` as c where c.name = i.tradeItem AND str_to_date(postDate, '%d/%m/%Y' ) >= str_to_date('$datefrom', '%d/%m/%Y' )AND str_to_date(postDate, '%d/%m/%Y' ) <= str_to_date('$dateto', '%d/%m/%Y' )  group by i.tradeItem order by catqty DESC";
+        $sql = "SELECT c.catid, c.name, count(i.tradeItem) as catqty, i.postDate FROM `item` as i, `category` as c where c.name = i.tradeItem AND str_to_date(postDate, '%d/%m/%Y' ) >= str_to_date('$datefrom', '%d/%m/%Y' ) AND str_to_date(postDate, '%d/%m/%Y' ) <= str_to_date('$dateto', '%d/%m/%Y' )  group by i.tradeItem order by catqty DESC";
+
         $title = "New uploads report";
     }
 }
@@ -30,88 +49,122 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Report</title>
+        <title>Report - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed">
         <div class="wrapper">
             <div class="content-wrapper">
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="row mb-12">
-                            <div class="col-sm-6">
-                                <h1 class="m-0 text-dark">Report</h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--                <div class="content-header">
+                                    <div class="container-fluid">
+                                        <div class="row mb-12">
+                                            <div class="col-sm-6">
+                                                <h1 class="m-0 text-dark">Report</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>-->
 
-                <section class="content">
+                <section class="content pt-3">
                     <nav class="navbar navbar-expand navbar-light">
-                        <form class="form-inline ml-3"  id="form" method="post">
-                            <div class="input-group input-group-sm">
-                                <label style="padding-left: 10px">Report type : </label>
-                                <div class="form-group" style="padding-left: 10px">
-                                    <select class="custom-select" style="width:200px" name="type" id="type" onchange="changetype(this.value)">
-                                        <option value="trade" <?php
-if (isset($type)) {
-    if ($type == "trade") {
-        echo "selected";
-    }
-}
-?>>Trades Made </option>
-                                        <option value="top_valueitem" <?php
+                        <form class="form-inline" id="form" method="post">
+                            <div class="row">
+                                <div class="col-md-auto">
+                                    <div class="form-group row">
+                                        <div class="col-md-auto">
+                                            <label class="col-form-label">Report Type :</label>
+                                        </div>
+
+                                        <div class="col-md-auto">
+                                            <select class="custom-select" name="type" id="type" onchange="changetype(this.value)">
+                                                <option value="trade" <?php
+                                                if (isset($type)) {
+                                                    if ($type == "trade") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Trade</option>
+
+                                                <option value="top_valueitem" <?php
                                                 if (isset($type)) {
                                                     if ($type == "top_valueitem") {
                                                         echo "selected";
                                                     }
                                                 }
                                                 ?>>Top Value Items</option>
-                                        <option value="top_customer" <?php
+
+                                                <option value="customer_inventory" <?php
                                                 if (isset($type)) {
-                                                    if ($type == "top_customer") {
+                                                    if ($type == "customer_inventory") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Customers Inventory</option>
+
+                                                <option value="delivery_report" <?php
+                                                if (isset($type)) {
+                                                    if ($type == "delivery_report") {
                                                         echo "selected";
                                                     }
                                                 }
                                                 ?>>Top Customer Deliveries</option>
-                                        <option value="admin_list" <?php
+
+                                                <option value="admin_list" <?php
                                                 if (isset($type)) {
                                                     if ($type == "admin_list") {
                                                         echo "selected";
                                                     }
                                                 }
                                                 ?>>Admin List</option>
-                                        <option value="newuploads" <?php
+
+                                                <option value="newuploads" <?php
                                                 if (isset($type)) {
                                                     if ($type == "newuploads") {
                                                         echo "selected";
                                                     }
                                                 }
                                                 ?>>New Uploads</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    </select>
+                                <div class="col-md-auto">
+                                    <div class="form-group row">
+                                        <div class="col-md-auto">
+                                            <label class="col-form-label">Date From :</label>
+                                        </div>
+
+                                        <div class="col-md-auto">
+                                            <input class="form-control" id="datefrom" name="datefrom" placeholder="dd/mm/yyyy" maxlength="10" value="<?php
+                                            if (isset($datefrom)) {
+                                                echo $datefrom;
+                                            }
+                                            ?>">
+                                        </div>
+                                    </div>
                                 </div>
-                                <label style="padding-left: 10px">Date fom : r</label>
-                                <div class="form-group" style="padding-left: 10px">
-                                    <input class="form-control" id="datefrom" name="datefrom" placeholder="dd/mm/yyyy" maxlength="10" value="<?php
-                                        if (isset($datefrom)) {
-                                            echo $datefrom;
-                                        }
-                                                ?>">
+
+                                <div class="col-md-auto">
+                                    <div class="form-group row">
+                                        <div class="col-md-auto">
+                                            <label class="col-form-label">Date From :</label>
+                                        </div>
+
+                                        <div class="col-md-auto">
+                                            <input class="form-control" id="dateto" name="dateto"  placeholder="dd/mm/yyyy" maxlength="10" value="">
+                                        </div>
+                                    </div>
                                 </div>
-                                <label style="padding-left: 10px">Date to : </label>
-                                <div class="form-group" style="padding-left: 10px;padding-right: 10px">
-                                    <input class="form-control" id="dateto" name="dateto"  placeholder="dd/mm/yyyy" maxlength="10" value="">
-                                </div>
-                                <div class="form-group" style="padding-left: 10px;padding-right: 10px">
+
+                                <div class="col-md-auto">
                                     <button class="btn btn-primary" type="button" onclick="generate_report()">Generate</button>
                                 </div>
-<?php
-if (isset($title)) {
-    echo '<button class="btn btn-success" type="button" style="width:150px" onclick="print()">Print report</button>';
-}
-?>
 
-
+                                <?php
+                                if (isset($title)) {
+                                    echo '<button class="btn btn-success" type="button" style="width:150px" onclick="print()">Print report</button>';
+                                }
+                                ?>
                             </div>
                         </form>
                     </nav>
@@ -122,8 +175,7 @@ if (isset($title)) {
                                 if (isset($title)) {
                                     echo $title;
                                 }
-?></h3>
-
+                                ?></h3>
                         </div>
                         <div class="card-body p-0">
                             <table class="table table-striped projects" id="data">
@@ -146,33 +198,53 @@ if (isset($title)) {
                                         <th style="width: 20%;text-align: center">
                                             Date
                                         </th>
-                                    
-                                        
 
                                     </tr>';
                                     } else if ($type == "top_valueitem") {
                                         echo '<tr>
-                                        <th style="width: 33%;text-align: center">
+                                        <th style="width: 25%;text-align: center">
                                             Customer ID
                                         </th>
-                                        <th style="width: 33%;text-align: center">
+                                        <th style="width: 25%;text-align: center">
                                             Username
                                         </th>
-                                        <th style="width: 33%;text-align: center">
+                                        <th style="width: 25%;text-align: center">
+                                            Quantity
+                                        </th>
+                                        <th style="width: 25%;text-align: center">
                                             Total value(RM)
                                         </th>
                                    
                                      </tr>';
-                                    } else if ($type == "top_customer") {
+                                    } else if ($type == "top_valueitem") {
                                         echo '<tr>
-                                        <th style="width: 33%;text-align: center">
+                                        <th style="width: 25%;text-align: center">
                                             Customer ID
                                         </th>
-                                        <th style="width: 33%;text-align: center">
-                                            Delivery (s) Made
+                                        <th style="width: 25%;text-align: center">
+                                            Username
                                         </th>
-                                        <th style="width: 33%;text-align: center">
-                                            Revenue Earned (RM)
+                                        <th style="width: 25%;text-align: center">
+                                            Quantity
+                                        </th>
+                                        <th style="width: 25%;text-align: center">
+                                            Total value(RM)
+                                        </th>
+                                   
+                                     </tr>';
+                                    } else if ($type == "customer_inventory") {
+                                        echo '<tr>
+                                        <th style="width: 25%;text-align: center">
+                                            Customer ID
+                                        </th>
+                                        <th style="width: 25%;text-align: center">
+                                            Item Name
+                                        </th>
+                                        <th style="width: 25%;text-align: center">
+                                            Value
+                                        </th>
+                                        <th style="width: 25%;text-align: center">
+                                            Status
                                         </th>
                                     </tr>';
                                     } else if ($type == "newuploads") {
@@ -215,83 +287,102 @@ if (isset($title)) {
 
                                 </thead>
                                 <tbody>
-                                <?php
-                                if (isset($type)) {
-                                    if ($type == "trade") {
-
-                                        $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            while ($row = $result->fetch_assoc()) {
-                                                echo "<tr>"
-                                                . "<td style='text-align: center'><a>" . $row["custid"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["username"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["tradeqty"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["acceptCustID"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["tradeDate"] . "</a></td>"
-                                                . "</tr>";
+                                    <?php
+                                    if (isset($type)) {
+                                        if ($type == "trade") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo "<tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["custid"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["username"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["tradeqty"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["acceptCustID"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["tradeDate"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
                                             }
-                                        }
-                                    } else if ($type == "top_valueitem") {
-                                        $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            $totalqty = 0;
-                                            $totalamount = 0;
-                                            while ($row = $result->fetch_assoc()) {
-
-                                                $totalamount += $row["totalvalue"];
-                                                echo "<tr>"
-                                                . "<td style='text-align: center'><a>" . $row["custid"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["username"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["totalvalue"] . "</a></td>"
-                                                . "</tr>";
+                                        } else if ($type == "top_valueitem") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                $totalqty = 0;
+                                                $totalamount = 0;
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $totalamount += $row["totalvalue"];
+                                                    echo "<tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["custid"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["username"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["totalitem"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["totalvalue"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
                                             }
-                                        }
-                                    } else if ($type == "top_customer") {
-                                        $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            $totalqty = 0;
-                                            $totalamount = 0;
-                                            while ($row = $result->fetch_assoc()) {
-                                                $totalqty += $row["deliveryqty"];
-                                                $totalamount += $row["revenue"];
-                                                echo "<tr>"
-                                                . "<td style='text-align: center'><a>" . $row["id"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["deliveryqty"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["revenue"] . "</a></td>"
-                                                . "</tr>";
+                                        } else if ($type == "customer_inventory") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                $totalqty = 0;
+                                                $totalamount = 0;
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $sql1 = "SELECT * FROM item WHERE custid = '" . $row['custid'] . "'";
+                                                    $result1 = $dbc->query($sql1);
+                                                    if ($result->num_rows > 0) {
+                                                        while ($row = $result->fetch_assoc()) {
+                                                            
+                                                        }
+                                                    }
+
+                                                    $totalamount += $row["totalvalue"];
+                                                    echo "<tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["custid"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["username"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["totalitem"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["totalvalue"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
                                             }
-                                        }
-                                    } else if ($type == "admin_list") {
-                                        $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-
-                                            while ($row = $result->fetch_assoc()) {
-
-
-                                                echo " <tr>"
-                                                . "<td style='text-align: center'><a>" . $row["adminid"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["name"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["email"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["phone"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["position"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["manager"] . "</a></td>"
-                                                . "</tr>";
+                                        } else if ($type == "delivery_report") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                $totalqty = 0;
+                                                $totalamount = 0;
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $totalqty += $row["deliveryqty"];
+                                                    $totalamount += $row["revenue"];
+                                                    echo "<tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["id"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["deliveryqty"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["revenue"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
                                             }
-                                        }
-                                    } else if ($type == "newuploads") {
-                                        $result = $dbc->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            while ($row = $result->fetch_assoc()) {
-                                                echo " <tr>"
-                                                . "<td style='text-align: center'><a>" . $row["catid"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["name"] . "</a></td>"
-                                                . "<td style='text-align: center'><a>" . $row["catqty"] . "</a></td>"
-                                                . "</tr>";
+                                        } else if ($type == "admin_list") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo " <tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["adminid"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["name"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["email"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["phone"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["position"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["manager"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
+                                            }
+                                        } else if ($type == "newuploads") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo " <tr>"
+                                                    . "<td style='text-align: center'><a>" . $row["catid"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["name"] . "</a></td>"
+                                                    . "<td style='text-align: center'><a>" . $row["catqty"] . "</a></td>"
+                                                    . "</tr>";
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                ?>
+                                    ?>
 
                                 </tbody>
                                 <tfoot>
@@ -300,7 +391,6 @@ if (isset($title)) {
                                         if ($type == "trade") {
                                             echo '<tr><th style="width: 20%;text-align: center">' . $result->num_rows . '</th>
                                         <th style="width: 20%;text-align: center">
-                                            
                                         </th>
                                           <th style="width: 20%;text-align: center">
                                             
@@ -312,13 +402,7 @@ if (isset($title)) {
                                             
                                         </th>
                                           <th style="width: 20%;text-align: center">
-                                            
                                         </th>
-                                        
-                                    
-                                            
-                                        
-                                  
                                         </tr>';
                                         } else if ($type == "top_product") {
                                             echo '<tr><th style="width: 33%;text-align: center">' . $result->num_rows . '</th>
@@ -331,7 +415,7 @@ if (isset($title)) {
                                         </th>
 
                                         </tr>';
-                                        } else if ($type == "top_customer") {
+                                        } else if ($type == "delivery_report") {
                                             echo '<tr><th style="width: 33%;text-align: center"> Total Customers : ' . $result->num_rows . '</th>
 
                                         <th style="width: 33%;text-align: center">
@@ -353,7 +437,7 @@ if (isset($title)) {
             </div>
         </div>
     </div>
-                                    <?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
 </body>
 </html>
 <script>

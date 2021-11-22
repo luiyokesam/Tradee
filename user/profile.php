@@ -167,6 +167,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
+                                <?php
+                                if (isset($current_data)) {
+                                    if (($current_data['gender'] != "")) {
+                                        echo "<div class='col-md-3 col-sm-4 col-6'>"
+                                        . "<div class='my-2'>"
+                                        . "<div style='font-weight: bolder;'>Gender</div>";
+                                        echo "<div>- {$current_data['gender']}</div>"
+                                        . "</div>"
+                                        . "</div>";
+                                    }
+                                }
+                                ?>
+
+                                <?php
+                                if (isset($current_data)) {
+                                    if (($current_data['birth'] != "")) {
+                                        echo "<div class='col-md-3 col-sm-4 col-6'>"
+                                        . "<div class='my-2'>"
+                                        . "<div style='font-weight: bolder;'>Birth</div>";
+                                        echo "<div>- {$current_data['birth']}</div>"
+                                        . "</div>"
+                                        . "</div>";
+                                    }
+                                }
+                                ?>
+
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="my-2">
                                         <div style="font-weight: bolder;">Trade Count</div>
@@ -175,6 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         $result = $dbc->query($sql);
                                         if ($result->num_rows > 0) {
                                             while ($row = mysqli_fetch_array($result)) {
+                                                $count = $row['NUMBER'];
                                                 echo "<div>- {$row['NUMBER']}</div>";
                                                 break;
                                             }
@@ -191,11 +218,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         $result = $dbc->query($sql);
                                         if ($result->num_rows > 0) {
                                             while ($row = mysqli_fetch_array($result)) {
-                                                echo "<div>- {$row['DATE']}</div>";
+                                                if ($row['DATE'] == "") {
+                                                    echo "<div style='font-weight: lighter;'>- No trade completed</div>";
+                                                } else {
+                                                    echo "<div>- {$row['DATE']}</div>";
+                                                }
                                                 break;
                                             }
-                                        } else {
-                                            echo "<div>- You haven't completed any trade yet.</div>";
                                         }
                                         ?>
                                     </div>

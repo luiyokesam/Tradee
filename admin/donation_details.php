@@ -1,35 +1,34 @@
 <?php
-$page = 'event_list';
+$page = 'donation_list';
 include 'navbar.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $sql = "SELECT * FROM donation_delivery d, donation_details t WHERE d.donationid = t.donationid AND d.donationid = '$id' LIMIT 1";
+    $sql = "SELECT * FROM donation_delivery d, donation_details t, event e WHERE d.eventid = e.eventid AND t.eventid = e.eventid AND d.donationid = t.donationid AND d.donationid = '$id' LIMIT 1";
     $result = $dbc->query($sql);
     if ($result->num_rows > 0) {
         while ($row = mysqli_fetch_array($result)) {
             $current_data = $row;
-            $title = "Donation Details - {$current_data['tradeid']}";
+            $title = "Delivery Details - {$current_data['donationid']}";
             echo '<script>var current_data = ' . json_encode($current_data) . ';</script>';
             break;
         }
     } else {
-        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "trade_list.php";</script>';
+        echo '<script>alert("Extract data fail !\nContact IT department for maintainence");window.location.href = "donation_list.php";</script>';
     }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_GET['id'])) {
-        $sql = "UPDATE trade SET "
-                . "status='" . $_POST['status'] . "' "
-                . "WHERE tradeid ='" . $current_data['tradeid'] . "'";
+    $sql = "UPDATE donation_delivery SET "
+            . "receiveDate='" . $_POST['receiveDate'] . "',"
+            . "donatorAddress='" . $_POST['donatorAddress'] . "',"
+            . "deliveryStatus='" . $_POST['deliveryStatus'] . "' "
+            . "WHERE donationid ='" . $current_data['donationid'] . "'";
 
-        echo '<script>alert("' . $sql . '");</script>';
-        if ($dbc->query($sql)) {
-            echo '<script>alert("Trade details updated successfully.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
-        } else {
-            echo '<script>alert("Update fail !\nContact IT department for maintainence")</script>';
-        }
+    if ($dbc->query($sql)) {
+        echo '<script>alert("Delivery details has been updated.");var currentURL = window.location.href;window.location.href = currentURL;</script>';
+    } else {
+        echo '<script>alert("Update fail!\nContact IT department for maintainence")</script>';
     }
 }
 ?>
@@ -38,192 +37,202 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Trade <?php echo $current_data['tradeid'] ?> - Tradee</title>
+        <title>Donation <?php echo $current_data['donationid'] ?> - Tradee</title>
     </head>
     <body class="hold-transition sidebar-mini layout-fixed">
-        <div class="wrapper">
-            <div class="content-wrapper">
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                            </div>
-                            <div class="col-sm-6">
-                                <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item"><a href="trade_list.php">Trading list</a></li>
-                                    <li class="breadcrumb-item active">Trading details</li>
-                                </ol>
-                            </div>
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h4 class="m-0 text-dark" style="font-weight: bold;">Donation ID: <?php
+                                if (isset($current_data)) {
+                                    echo $current_data["donationid"];
+                                }
+                                ?></h4>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item active"><a href="donation_list.php">Donation list</a></li>
+                                <li class="breadcrumb-item">Donation details</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
-
-                <section class="content">
-                    <form method="post" id="form">
+            </div>
+            <section class="content">
+                <div class="container-fluid">
+                    <form id="form" method="post">
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="card card-primary">
-                                    <div class="card-header">
-                                        <h3 style="font-weight: bolder;" class="card-title" id="titleid">Trade ID: <?php echo $current_data['tradeid'] ?></h3>
-                                    </div>
-                                    <div class="card-body pt-2">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="row pt-2">
-                                                    <div class="col-auto">
-                                                        <div class="form-group row">
-                                                            <label for="date" class="col-sm-auto col-form-label">Trade Date:</label>
-                                                            <div class="col-sm-auto">
-                                                                <input type="text" class="form-control" id="date" name="date" readonly value="<?php
+                            <div class="col-lg-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card card-primary" >
+                                            <div class="card-header">
+                                                <h3 class="card-title">Delivery Details</h3>
+                                                <div class="card-tools" style="padding-top:10px">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Event ID:</label>
+                                                            <input class="form-control" id="eventid" name="eventid" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["eventid"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Username:</label>
+                                                            <input class="form-control" id="custid" name="custid" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["custid"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Donator:</label>
+                                                            <input class="form-control" id="donator" name="donator" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["donator"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Receiver:</label>
+                                                            <input class="form-control" id="receiver" name="receiver" readonly value="<?php
+                                                            if (isset($current_data)) {
+                                                                echo $current_data["receiver"];
+                                                            }
+                                                            ?>">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Sender Address :</label>
+                                                            <textarea class="form-control" id="donatorAddress" name="donatorAddress" rows="5" readonly value="" placeholder="Tell us more about yourself"><?php
                                                                 if (isset($current_data)) {
-                                                                    echo $current_data["tradeDate"];
+                                                                    echo $current_data["donatorAddress"];
                                                                 }
-                                                                ?>">
-                                                                <div class="invalid-feedback">
-                                                                    Please provide a valid address.
+                                                                ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Remarks :</label>
+                                                            <textarea class="form-control" id="remarks" name="remarks" rows="5" readonly value="" placeholder="Tell us more about yourself"><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["remarks"];
+                                                                }
+                                                                ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Receive date:</label>
+                                                            <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
+                                                                <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                                                 </div>
+                                                                <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" value="<?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["receiveDate"];
+                                                                }
+                                                                ?>" readOnly name="receiveDate" id="receiveDate">
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-auto">
-                                                        <div class="form-group row">
-                                                            <label for="status" class="col-sm-auto col-form-label">Trade Status:</label>
-                                                            <div class="col-sm-auto">
-                                                                <select class="custom-select" id="status" name="status" disabled>
-                                                                    <option value="Rejected" <?php
-                                                                    if (isset($current_data)) {
-                                                                        if ($current_data["status"] == "Rejected") {
-                                                                            echo "selected";
-                                                                        }
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Delivery status:</label>
+                                                            <select class="custom-select" id="deliveryStatus" name="deliveryStatus" disabled>
+                                                                <option <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["deliveryStatus"] === "Pending") {
+                                                                        echo "selected";
                                                                     }
-                                                                    ?>>Rejected</option>
-                                                                    <option value="Completed" <?php
-                                                                    if (isset($current_data)) {
-                                                                        if ($current_data["status"] == "Completed") {
-                                                                            echo "selected";
-                                                                        }
+                                                                }
+                                                                ?> value="Pick up">Pending</option>
+
+                                                                <option <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["deliveryStatus"] === "In Transit") {
+                                                                        echo "selected";
                                                                     }
-                                                                    ?>>Completed</option>
-                                                                    <option value="Pending" <?php
-                                                                    if (isset($current_data)) {
-                                                                        if ($current_data["status"] == "Pending") {
-                                                                            echo "selected";
-                                                                        }
+                                                                }
+                                                                ?> value="In Transit">In Transit</option>
+
+                                                                <option <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["deliveryStatus"] === "Shipping") {
+                                                                        echo "selected";
                                                                     }
-                                                                    ?>>Pending</option>
-                                                                    <option value="To-Pay" <?php
-                                                                    if (isset($current_data)) {
-                                                                        if ($current_data["status"] == "To-Pay") {
-                                                                            echo "selected";
-                                                                        }
+                                                                }
+                                                                ?> value="Shipping">Shipping</option>
+
+                                                                <option <?php
+                                                                if (isset($current_data)) {
+                                                                    if ($current_data["deliveryStatus"] === "Delivered") {
+                                                                        echo "selected";
                                                                     }
-                                                                    ?>>To-Pay</option>
-                                                                    <option value="To-Ship" <?php
-                                                                    if (isset($current_data)) {
-                                                                        if ($current_data["status"] == "To-Ship") {
-                                                                            echo "selected";
-                                                                        }
-                                                                    }
-                                                                    ?>>To-Ship</option>
-                                                                </select>
-                                                            </div>
+                                                                }
+                                                                ?> value="Delivered">Delivered</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="border px-3 py-2">
-                                                    <div class="row pb-1 border-bottom">
-                                                        <img src="<?php
-                                                        $sql = "SELECT avatar FROM customer WHERE custid = '{$current_data['offerCustID']}'";
-                                                        $result = $dbc->query($sql);
-                                                        if ($result->num_rows > 0) {
-                                                            while ($row = mysqli_fetch_array($result)) {
-                                                                echo $row[0];
-                                                            }
-                                                        }
-                                                        ?>" class="img-fluid profile-pic float-start rounded-pill m-1" style="width: 55px; height: 55px; object-fit: cover;" alt="Profile picture">
-                                                        <div class="align-content-center ml-2 mt-2">
-                                                            <li class="" style="list-style-type:none; font-size:0.9em;">Offer Customer: <?php echo $current_data['offerCustID'] ?></li>
-                                                            <li class="" style="list-style-type:none; font-size:0.9em;">Payment: <?php echo $current_data['offerPayment'] ?></li>
-                                                        </div>
-                                                    </div>
 
-                                                    <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-2 row-cols-1">
-                                                        <?php
-                                                        $get_inventory = "SELECT * FROM trade_details d, item i WHERE d.itemid = i.itemid AND d.custid = '{$current_data['offerCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
-                                                        $result = $dbc->query($get_inventory);
-                                                        if ($result->num_rows > 0) {
-                                                            while ($row = mysqli_fetch_array($result)) {
-                                                                echo "<div class='col px-1 py-2'>"
-                                                                . "<div class='item-img-box overflow-hidden'>"
-                                                                . "<a href='item_details.php?id=" . $row["itemid"] . "' target='_blank'>"
-                                                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
-                                                                . "</a>"
-                                                                . "</div>"
-                                                                . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
-                                                                . "<div class='d-flex bd-highlight align-items-center'>"
-                                                                . "<i class='far fa-heart me-auto' style='font-size:0.9em; display: none;'></i>"
-                                                                . "</div>"
-                                                                . "</div>"
-                                                                . "<ul class='list-inline px-1 mb-0'>"
-                                                                . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
-                                                                . "</ul>"
-                                                                . "</div>";
-                                                            }
-                                                        }
-                                                        ?>
-                                                    </div>
+                                        <div class="card card-info collapsed-card">
+                                            <div class="card-header">
+                                                <h3 class="card-title" >Donation Summary</h3>
+                                                <div class="card-tools" style="padding-top:10px">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
                                                 </div>
                                             </div>
-
-                                            <div class="col-md-6">
-                                                <div class="border px-3 py-2">
-                                                    <div class="row pb-1 border-bottom">
-                                                        <img src="<?php
-                                                        $sql = "SELECT avatar FROM customer WHERE custid = '{$current_data['acceptCustID']}'";
-                                                        $result = $dbc->query($sql);
-                                                        if ($result->num_rows > 0) {
-                                                            while ($row = mysqli_fetch_array($result)) {
-                                                                echo $row[0];
-                                                            }
-                                                        }
-                                                        ?>" class="img-fluid profile-pic float-start rounded-pill m-1" style="width: 55px; height: 55px; object-fit: cover;" alt="Profile picture">
-                                                        <div class="align-content-center ml-2 mt-2">
-                                                            <li class="" style="list-style-type:none; font-size:0.9em;">Accept Customer: <?php echo $current_data['acceptCustID'] ?></li>
-                                                            <li class="" style="list-style-type:none; font-size:0.9em;">Payment: <?php echo $current_data['acceptPayment'] ?></li>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-2 row-cols-1">
+                                            <div class="card-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-12" id="accordion">
                                                         <?php
-                                                        $get_inventory = "SELECT * FROM trade_details d, item i  WHERE d.itemid = i.itemid AND d.custid = '{$current_data['acceptCustID']}' AND d.tradeid = '{$current_data['tradeid']}'";
+                                                        $get_inventory = "SELECT * FROM donation_details d, item i WHERE d.itemid = i.itemid AND d.donationid = '{$current_data['donationid']}'";
                                                         $result = $dbc->query($get_inventory);
                                                         if ($result->num_rows > 0) {
                                                             while ($row = mysqli_fetch_array($result)) {
-                                                                echo "<div class='col px-1 py-2'>"
-                                                                . "<div class='item-img-box overflow-hidden'>"
-                                                                . "<a href='item_details.php?id=" . $row["itemid"] . "' target='_blank'>"
-                                                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
+                                                                echo "<div class='card card-primary card-outline'>"
+                                                                . "<a class='d-block w-100' data-toggle='collapse' href='#" . $row["itemid"] . "' aria-expanded='true'>"
+                                                                . "<div class='card-header'>"
+                                                                . "<div class='card-title w-100'>" . $row["itemname"] . "</div>"
+                                                                . "</div>"
                                                                 . "</a>"
+                                                                . "<div id='" . $row["itemid"] . "' class='collapse' data-parent='#accordion'>"
+                                                                . "<div class='card-body'>"
+                                                                . "<img src='../data/item_img/" . $row['itemid'] . "_0' class='img-fluid item-img' alt='...'>"
                                                                 . "</div>"
-                                                                . "<div class='d-flex bd-highlight align-items-center pt-1 px-1'>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.8em;'>" . $row["itemname"] . "</div>"
-                                                                . "<div class='d-flex bd-highlight align-items-center'>"
-                                                                . "<i class='far fa-heart me-auto' style='font-size:0.9em; display: none;'></i>"
+//                                                    . "<div class='float-left' style='color:#969696;'>" . $row["itemCondition"] . "</div>"
+//                                                    . "<div class='' style='color:#969696;'>" . $row["brand"] . "</div>"
                                                                 . "</div>"
-                                                                . "</div>"
-                                                                . "<ul class='list-inline px-1 mb-0'>"
-                                                                . "<div class='float-right bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["tradeOption"] . "</div>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["itemCondition"] . "</div>"
-                                                                . "<div class='flex-grow-1 bd-highlight' style='font-size:0.7em; color:#969696;'>" . $row["brand"] . "</div>"
-                                                                . "</ul>"
                                                                 . "</div>";
                                                             }
                                                         }
@@ -234,66 +243,162 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="card-footer">
-                                    <div class="row">
-                                        <div class="col-md-1">
-                                            <div class="form-group">
-                                                <button type="button" class="btn btn-dark" style="width:100%" id="btnback" onclick="back()">Back</button>
+                            <div class="col-lg-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card card-warning">
+                                            <div class="card-header">
+                                                <h3 class="card-title" >Transaction Details</h3>
+                                                <div class="card-tools" style="padding-top:10px">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <table id="orderlisttable" class="table table-bordered table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Card Number :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["cardno"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Card Name :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["cardname"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Package :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["package"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Payment Date :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    echo $current_data["paymentDate"];
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Shipping Fee :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["shippingfee"] = number_format($current_data["shippingfee"], 2, '.', '');
+                                                                    echo "RM  {$current_data["shippingfee"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Package Fee :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["packagefee"] = number_format($current_data["packagefee"], 2, '.', '');
+                                                                    echo "RM  {$current_data["packagefee"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Sub Total :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["subTotal"] = number_format($current_data["subTotal"], 2, '.', '');
+                                                                    echo "RM  {$current_data["subTotal"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 30%;text-align: right">Tax :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["tax"] = number_format($current_data["tax"], 2, '.', '');
+                                                                    echo "RM  {$current_data["tax"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="font-weight: bolder;">
+                                                            <td style="width: 30%;text-align: right">Total Amount :</td>
+                                                            <td><?php
+                                                                if (isset($current_data)) {
+                                                                    $current_data["totalAmount"] = number_format($current_data["totalAmount"], 2, '.', '');
+                                                                    echo "RM  {$current_data["totalAmount"]}";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-9"></div>
-
-                                        <div class="col-md-1">
-                                            <div class="form-group">
-                                                <button class="btn btn-warning" style="width:100%" id="btncancel" onclick="cancel()" disabled>Cancel</button>
-                                            </div>
+                                        <div class="col-auto float-left">
+                                            <button type="button" id="btnback" class="btn btn-dark" onclick="back()">Back</button>
                                         </div>
 
-                                        <div class="col-md-1">
-                                            <div class="form-group">
-                                                <button class="btn btn-primary" style="width:100%" id="btnsave" onclick="editorsave()">Edit</button>
-                                            </div>
+                                        <div class="col-auto float-right">
+                                            <button type="button" class="btn btn-danger" onclick="cancel()" id="btncancel" disabled>Cancel</button>
+                                        </div>
+                                        <div class="col-auto float-right">
+                                            <button type="button" class="btn btn-warning" style="color: whitesmoke;" onclick="editorsave()" id="btnsave">Edit</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
-                </section>
-            </div>
+                </div>
+            </section>
         </div>
         <?php include 'footer.php'; ?>
     </body>
     <script>
         var currentURL = window.location.href;
 
-        function back() {
-            window.location.href = "trade_list.php";
-        }
-
-        function editable() {
-            document.getElementById("btncancel").disabled = false;
-            document.getElementById("btnsave").textContent = "Save";
-            document.getElementById("status").disabled = false;
-        }
-
         function editorsave() {
-            var btnoption = document.getElementById("btnsave").textContent;
-            if (btnoption === "Save") {
+            if (document.getElementById("btnsave").textContent === "Save") {
                 var fullfill = true;
-                document.getElementById("status").style.borderColor = "";
+                var message = "";
 
-                if (!document.getElementById("status").value || document.getElementById("status").value === "") {
-                    document.getElementById("status").style.borderColor = "red";
+                document.getElementById("donatorAddress").style.borderColor = "";
+                document.getElementById("receiveDate").style.borderColor = "";
+                document.getElementById("deliveryStatus").style.borderColor = "";
+
+                if (!document.getElementById("donatorAddress").value || document.getElementById("donatorAddress").value === "") {
+                    document.getElementById("donatorAddress").style.borderColor = "red";
                     fullfill = false;
                 }
+//                if (!document.getElementById("receiveDate").value || document.getElementById("receiveDate").value === "") {
+//                    document.getElementById("receiveDate").style.borderColor = "red";
+//                    fullfill = false;
+//                }
 
                 if (fullfill) {
-                    if (confirm("Confirm to save?")) {
+                    if (confirm("Are you confirm to update the donation details?")) {
                         document.getElementById("form").submit();
                     }
+                } else {
+                    alert("Inputs with red border are required field!\n" + message);
                 }
             } else {
                 editable();
@@ -305,28 +410,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 window.location.href = currentURL;
             }
         }
-    </script>
-    <style>
-        /*item*/
-        .item-img-box{
-            /*width: 192px;*/
-            /*height: 192px;*/
-            /*background: #e8e8e8;*/
-            /*max-width: 255px;*/
-            max-height: 250px;
-            background: whitesmoke;
-            text-align: center;
-            background-size: cover;
-            object-fit: cover;
+
+        function editable() {
+            document.getElementById("btnsave").textContent = "Save";
+            document.getElementById("btncancel").disabled = false;
+            document.getElementById("donatorAddress").readOnly = false;
+            document.getElementById("receiveDate").readOnly = false;
+            document.getElementById("deliveryStatus").disabled = false;
         }
 
-        .item-img{
-            min-height: 250px;
-            max-height: 250px;
-            text-align: center;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background: whitesmoke;
+        function back() {
+            window.location.href = "donation_list.php";
         }
-    </style>
+
+        $('#reservationdatetime').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm',
+            icons: {time: 'far fa-clock'}
+        });
+    </script>
 </html>
