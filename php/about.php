@@ -50,7 +50,7 @@ include '../include/header.php';
                         <h3 class="p-3">From two people</h3>
                         <p class="text-description px-3">In 2021, Sam and Chee Kin were thinking of a final year project.
                             They have found a way of implementing barter exchange as a method of cashless payment to gain goods.
-                            The duo knew they were on to something—Vinted was born.
+                            The duo knew they were on to something—Tradee was born.
                         </p>
                     </div>
 
@@ -134,7 +134,7 @@ include '../include/header.php';
                 </div>
                 <div class="row align-items-center justify-content-center mb-2">
                     <div class="col-lg-10">
-                        <div class="text-description pt-3 px-3">In everything we do, we’re still true to Vinted’s initial idea, developed by our
+                        <div class="text-description pt-3 px-3">In everything we do, we’re still true to Tradee’s initial idea, developed by our
                             cofounders Yew Chee Kin and Lui Yoke Sam. Today, we still carry on the company's daily operation and growth.
                             Our mission is also backed by 5 leading venture capital firms from both sides of the Atlantic.
                         </div>

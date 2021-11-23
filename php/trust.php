@@ -15,7 +15,7 @@ include '../include/header.php';
                     <div class="col-lg-6 pt-lg-5 pt-3 px-lg-0 px-2">
                         <div class="display-5 p-3" style="font-size: 1.5em;">We take your safety seriously</div>
                         <div class ="blockquote p-3 pe-0">
-                            Vinted is focused on maintaining a high standard of personal security for our members. 
+                            Tradee is focused on maintaining a high standard of personal security for our members. 
                             We work proactively to create tools and policies that help our community thrive – whether 
                             you’re buying or selling. Here’s what you should know about our key safety processes.
                         </div>
@@ -47,8 +47,8 @@ include '../include/header.php';
                             <div class="py-3 pt-4 px-4 h4">Our support</div>
                             <ul class="d-flex list-unstyled">
                                 <li class="px-4" style="font-size:1.2em;">
-                                    We’ll issue a refund if your item is never shipped, arrives damaged or is not as described within 2 days. 
-                                    Unless agreed otherwise, the buyer covers return fees.
+                                    Now is the time for us to show our support with the traders. Our feedback is always open and we 
+                                    always listen to what the customers says
                                 </li>
                             </ul>
                         </div>
@@ -58,11 +58,11 @@ include '../include/header.php';
                 <div class="col">
                     <div class="card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg" style="background-image: url('../img/trust/refund_policy.jpg');">
                         <div class="d-flex flex-column h-100 text-white text-shadow-1">
-                            <div class="py-3 pt-4 px-4 h4">Refund policy</div>
+                            <div class="py-3 pt-4 px-4 h4">Shipping policy</div>
                             <ul class="d-flex list-unstyled">
                                 <li class="px-4" style="font-size:1.2em;">
-                                    We’ll issue a refund if your item is never shipped, arrives damaged or is not as described 
-                                    within 2 days. Unless agreed otherwise, the buyer covers return fees.
+                                    We’ll issue a shipping fees based on how far the location is on a trader's destination address
+                                    and provide you packaging so your goods wont be damaged
                                 </li>
                             </ul>
                         </div>
@@ -75,7 +75,7 @@ include '../include/header.php';
                             <div class="py-3 px-4 h4">Safe payment</div>
                             <ul class="d-flex list-unstyled">
                                 <li class="px-4" style="font-size:1.2em;">
-                                    All Vinted payments are encrypted. They’re handled by our trusted partner, Stripe, whose secure technology 
+                                    All Tradee payments are encrypted. They’re handled by our trusted partner, Stripe, whose secure technology 
                                     makes sure money is sent and received safely and reliably.
                                 </li>
                             </ul>
@@ -97,7 +97,7 @@ include '../include/header.php';
                 <div class="row align-items-center justify-content-center">
                     <div class="col-lg-5">
                         <h3 class="p-3">Communicate</h3>
-                        <p class="h5 text-description px-3">Vinted’s secure messaging tool helps you find out every detail about 
+                        <p class="h5 text-description px-3">Tradee’s secure messaging tool helps you find out every detail about 
                             the item you’d like to purchase. You can message any member – just remember that you’ll instantly 
                             increase their trust in you by being polite and considerate.
                         </p>
@@ -108,7 +108,7 @@ include '../include/header.php';
 
                     <div class="col-lg-5">
                         <h3 class="p-3">Review</h3>
-                        <p class="h5 text-description px-3">Vinted members can leave feedback for each other only after a completed order –
+                        <p class="h5 text-description px-3">Tradee members can leave feedback for each other only after a completed order –
                             so the feedback you see on people’s profiles is based on actual experiences. Take a close look at the feedback 
                             left by other members, and remember to leave feedback after an order to receive it in return.
                         </p>
@@ -116,7 +116,7 @@ include '../include/header.php';
 
                     <div class="col-lg-5">
                         <h3 class="p-3">Get verified</h3>
-                        <p class="h5 text-description px-3">Vinted’s secure messaging tool helps you find out every detail about the item 
+                        <p class="h5 text-description px-3">Tradee’s secure messaging tool helps you find out every detail about the item 
                             you’d like to purchase. You can message any member – just remember that you’ll instantly increase their 
                             trust in you by being polite and considerate.
                         </p>

@@ -15,7 +15,7 @@ include '../include/header.php';
                     <div class="card">
                         <h1 style="font-size:60px"> Important updates </h1>
                         <p style="font-size:30px; padding-top: 50px; color: #606060"; >Given the situation linked to COVID-19 
-                            and the regulatory provisions for public health and safety, Vinted may be compelled to react. 
+                            and the regulatory provisions for public health and safety, Tradee may be compelled to react. 
                             Please make sure to read our <a  href="https://www.w3.org/"  > dedicated How it work</a > page on changes to policies and shipping 
                             procedures.</p>
                     </div>
@@ -25,12 +25,12 @@ include '../include/header.php';
         <div class="container-sm">
             <div class="row">
                 <div class="col">
-                    <h2 style="font-size:60px; padding-top: 100px"> Vinted Inc. Terms & Conditions of use</h2>   
+                    <h2 style="font-size:60px; padding-top: 100px"> Tradee Inc. Terms & Conditions of use</h2>   
                     <br/><p2 style="font-size:24px;  color: black">Date of last revision: 2 June, 2021</p2>  
                     <br/><br/><p2  style="font-size:24px;  color: #606060">These Terms and Conditions (" Terms ") and the documents referred to in them, 
-                        apply to your use of this website located at the address on the vinted website and/or mobile website called Vinted available for iOS 
+                        apply to your use of this website located at the address on the vinted website and/or mobile website called Tradee available for iOS 
                         and Android devices (each known as the " Site "). If you do not agree to these terms you should not access or view the Site.
-                        This Site is operated by Vinted Inc.,which is a company that do barter trading services</p2>
+                        This Site is operated by Tradee Inc.,which is a company that do barter trading services</p2>
                 </div>
             </div>
             <div class="row">
@@ -69,8 +69,8 @@ include '../include/header.php';
             </div>   
             <div class="row">
                 <div class="columna">ii.</div>
-                <div class="columnb">From time to time Vinted may also make available to the users certain additional-services subject
-                    to charges as indicated in the Shipping fee that is constantly updated by Vinted).</div>
+                <div class="columnb">From time to time Tradee may also make available to the users certain additional-services subject
+                    to charges as indicated in the Shipping fee that is constantly updated by Tradee).</div>
             </div> 
             <div class="row">
                 <div class="columna">iii.</div>
@@ -128,7 +128,7 @@ include '../include/header.php';
             <div class="row">
                 <div class="columna">i.</div>
                 <div class="columnb">Trader may choose to ship via one the
-                    shipping services provided by Vinted as indicated in the website.</div>
+                    shipping services provided by Tradee as indicated in the website.</div>
             </div> 
             <div class="row">
                 <div class="columna">ii.</div>
@@ -141,7 +141,7 @@ include '../include/header.php';
                 <div class="columnb">After you enter into a contract with a trader for the exchange of 
                     one of your Catalog Items we will send to you a confirmation of such exchange. 
                     Trader can ship the Catalog Item that you have trade via one of the shipping services
-                    as chosen by the trader, and if requested by Vinted - enter the tracking number of the package on our site.</div>
+                    as chosen by the trader, and if requested by Tradee - enter the tracking number of the package on our site.</div>
             </div>
             <div class="row">
                 <div class="columna">iv.</div>
@@ -150,7 +150,7 @@ include '../include/header.php';
                     and items which become lost or destroyed, or damaged by a shipping 
                     service provider and/or after delivery to a post-box or alike, unless
                     otherwise clearly stated within specific terms applicable to separate shipping
-                    service offers by Vinted as per the website. Shipping services are provided by third-party 
+                    service offers by Tradee as per the website. Shipping services are provided by third-party 
                     service providers and may be subject to additional terms and conditions imposed by them. Any risk of 
                     loss is carried by traders and third-party service provider.</div>
             </div> 
@@ -160,7 +160,7 @@ include '../include/header.php';
                 <div class="columna">i.</div>
                 <div class="columnb">Payments must be made in the currency specified on the Site and 
                     all prices are inclusive of sales tax (where applicable) and other applicable taxes, 
-                    but exclusive of delivery charges and any other fees for additional services offered by Vinted
+                    but exclusive of delivery charges and any other fees for additional services offered by Tradee
                     that you choose to use. Additional services will be charged following additional terms as indicated
                     in the list.</div>
             </div> 
@@ -173,7 +173,7 @@ include '../include/header.php';
             <div class="row">
                 <div class="columna">iii.</div>
                 <div class="columnb">Payment for Catalog Items is in advance. The trader's
-                    credit or debit card or any other payment method that Vinted may offer upon 
+                    credit or debit card or any other payment method that Tradee may offer upon 
                     its sole discretion of the Site will be charged when the customers enter 
                     into a contract for the purchase of an item under exchange. We will not credit the 
                     trader's account until the customer has accepted the item
@@ -181,11 +181,11 @@ include '../include/header.php';
             </div>
             <div class="row">
                 <div class="columna">iv.</div>
-                <div class="columnb">Vinted may at any point in time in its sole 
+                <div class="columnb">Tradee may at any point in time in its sole 
                     discretion suspend and/or cancel any transaction and/or requested payment 
                     should it have grounds to believe
                     that such transaction may be fraudulent or contrary to 
-                    applicable law or harmful to Vinted and/or any user or third party.</div>
+                    applicable law or harmful to Tradee and/or any user or third party.</div>
             </div> 
             <br/><p2 style="font-size:24px;  color: black">8. ACCESS TO THIS SITE AND ITS SERVICES AND CONTENT</p2> 
             <div class="row">
@@ -304,7 +304,7 @@ include '../include/header.php';
 
             <div class="row">
                 <div class="columna">i.</div>
-                <div class="columnb">Vinted TM is a registered trade mark of Vinted Limited, a Vinted group company.</div>
+                <div class="columnb">Tradee TM is a registered trade mark of Tradee Limited, a Tradee group company.</div>
             </div> 
             <div class="row">
                 <div class="columna">ii.</div>
