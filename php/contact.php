@@ -32,11 +32,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 //            . "'" . $img . "',"
             . "'Pending')";
 
-    echo '<script>alert("' . $sql . '");</script>';
+//    echo '<script>alert("' . $sql . '");</script>';
 
     if ($dbc->query($sql)) {
         if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-            echo '<script>alert("Thanks for your feedback. We will provide feedback to you soon.");window.location.href="../php/index.php";</script>';
+            echo '<script>alert("Thanks for your feedback. We will provide get to you soon.");window.location.href="../php/index.php";</script>';
         }
     } else {
         echo '<script>alert("Insert fail !\nContact IT department for maintainence")</script>';
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <section class="services text-white" style="background-color: #6de66a;"> 
             <div class="container-lg pt-5">
-                <div class="row align-items-center justify-content-center">
+                <div class="row align-items-center justify-content-center" style="text-align: center;">
                     <div class="col-md-12 text-lg-center h1">Barter Customer Service Team</div>
                     <div class="col-md-12 text-lg-center h4">Have a question/problem? Please write here, and we will reply back soonest.</div>
                 </div>
@@ -85,9 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="row align-items-center justify-content-center">
                     <form class="row g-3 needs-validation justify-content-center" method="post" id="form" enctype="multipart/form-data">
                         <div class="col-10 mt-3">
-                            <label for="validationUser" class="form-label">Are you a buyer or seller?</label>
-                            <select class="custom-select" id="validationUser" name="position" required>
-                                <option value="">-Select option-</option>
+                            <label for="position" class="form-label">Are you a buyer or seller?</label>
+                            <select class="custom-select" id="position" name="position" required>
+                                <option value="">-- Select option --</option>
                                 <option value="Seller">Seller</option>
                                 <option value="Buyer">Buyer</option>
                             </select>
@@ -97,9 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="col-10 mt-4">
-                            <label for="validationEnquiry" class="form-label">What is your enquiry about?</label>
-                            <select class="form-select custom-select" id="validationEnquiry" name="enquirytype" required>
-                                <option value="">-Select option-</option>
+                            <label for="enquirytype" class="form-label">What is your enquiry about?</label>
+                            <select class="form-select custom-select" id="enquirytype" name="enquirytype" required>
+                                <option value="">-- Select option --</option>
                                 <option value="Payments & Escrow">Payments & Escrow</option>
                                 <option value="Shipping & Delivery">Shipping & Delivery</option>
                                 <option value="Campaigns & Seller Related">Campaigns & Seller Related</option>
@@ -115,21 +115,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="col-10 mt-4">
-                            <label for="validationEmail" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="validationEmail" placeholder="Your email address" name="email" required>
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" placeholder="Your email address" name="email" required>
                             <div class="invalid-feedback">
                                 Please provide a valid email.
                             </div>
                         </div>
 
                         <div class="col-10 mt-4">
-                            <label for="validationTrade" class="form-label">Trade ID</label>
-                            <input name="tradeid" class="form-control" id="validationTrade" placeholder="Trade ID (if any)">
+                            <label for="tradeid" class="form-label">Trade ID</label>
+                            <input name="tradeid" class="form-control" id="tradeid" placeholder="Trade ID (if any)">
                         </div>
 
                         <div class="col-10 mt-4">
-                            <label for="validationComment" class="form-label">Comment</label>
-                            <textarea class="form-control" id="validationComment" name="comment" rows="5" placeholder="Tell us more about your enquiry/problem" required></textarea>
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" minlength="50" rows="5" placeholder="Tell us more about your enquiry/problem" required></textarea>
                             <div class="invalid-feedback">
                                 Please enter a message in the comment.
                             </div>
@@ -161,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="col-10 mt-4">
-                            <button class="btn btn-outline-light" type="button" onclick="editorsave()">Submit</button>
+                            <button class="btn btn-outline-light" type="button" id="btnsave" onclick="editorsave()">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -181,78 +181,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("feedbackdate").value = dd + '/' + mm + '/' + yyyy;
 
         function editorsave() {
-//            if (document.getElementById("btnsave").textContent === "Upload") {
-                var fullfill = true;
-                var message = "";
-//                document.getElementById("validationFile").style.borderColor = "";
-//                document.getElementById("itemname").style.borderColor = "";
-//                document.getElementById("brand").style.borderColor = "";
-//                document.getElementById("catname").style.borderColor = "";
-//                document.getElementById("itemCondition").style.borderColor = "";
-//                document.getElementById("colour").style.borderColor = "";
-//                document.getElementById("size").style.borderColor = "";
-//                document.getElementById("value").style.borderColor = "";
-//                document.getElementById("tradeItem").style.borderColor = "";
-//                document.getElementById("tradeOption").style.borderColor = "";
-//                document.getElementById("itemDescription").style.borderColor = "";
+            var fullfill = true;
+            var message = "";
+            document.getElementById("validate_file").style.borderColor = "";
+            document.getElementById("position").style.borderColor = "";
+            document.getElementById("enquirytype").style.borderColor = "";
+            document.getElementById("email").style.borderColor = "";
+            document.getElementById("comment").style.borderColor = "";
 
-//                if (!document.getElementById("img").value || document.getElementById("img").value === "") {
-//                    if (document.getElementById('img_display').src === "") {
-//                        document.getElementById("validate_img").style.borderColor = "red";
-//                        fullfill = false;
-//                    }
-//                }
-//                if (!document.getElementById("itemname").value || document.getElementById("itemname").value === "") {
-//                    document.getElementById("itemname").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("brand").value || document.getElementById("brand").value === "") {
-//                    document.getElementById("brand").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("catname").value || document.getElementById("catname").value === "") {
-//                    document.getElementById("catname").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("itemCondition").value || document.getElementById("itemCondition").value === "") {
-//                    document.getElementById("itemCondition").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("colour").value || document.getElementById("colour").value === "") {
-//                    document.getElementById("colour").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("size").value || document.getElementById("size").value === "") {
-//                    document.getElementById("size").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("value").value || document.getElementById("value").value === "") {
-//                    document.getElementById("value").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("tradeItem").value || document.getElementById("tradeItem").value === "") {
-//                    document.getElementById("tradeItem").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("tradeOption").value || document.getElementById("tradeOption").value === "") {
-//                    document.getElementById("tradeOption").style.borderColor = "red";
-//                    fullfill = false;
-//                }
-//                if (!document.getElementById("itemDescription").value || document.getElementById("itemDescription").value === "") {
-//                    document.getElementById("itemDescription").style.borderColor = "red";
-//                    fullfill = false;
-//                }
+            if (!document.getElementById("position").value || document.getElementById("position").value === "") {
+                document.getElementById("position").style.borderColor = "red";
+                message += "Please select your position.\n";
+                fullfill = false;
+            }
+            if (!document.getElementById("enquirytype").value || document.getElementById("enquirytype").value === "") {
+                document.getElementById("enquirytype").style.borderColor = "red";
+                message += "Please select your enquiry.\n";
+                fullfill = false;
+            }
 
-                if (fullfill) {
-                    if (confirm("Confirm to submit the feedback?")) {
-                        document.getElementById("form").submit();
-                    }
-                } else {
-                    alert("Please enter all required information for this items.\n" + message);
+            if (!document.getElementById('email').value || document.getElementById('email').value === "") {
+                document.getElementById('email').style.borderColor = "red";
+                fulfill = false;
+                message += "Email is required.\n";
+            } else {
+                var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                if (!document.getElementById("email").value.match(mailformat)) {
+                    document.getElementById("email").style.borderColor = "red";
+                    fulfill = false;
+                    message += "Invalid email!\n";
                 }
-//            }
-        }
+            }
 
+            if (!document.getElementById("comment").value || document.getElementById("comment").value === "") {
+                fullfill = false;
+                message += "Comment is a required field.\n";
+                document.getElementById("comment").style.borderColor = "red";
+            } else {
+                if (document.getElementById("comment").length < 50) {
+                    fulfill = false;
+                    message += "Your comment must be consist of at least 50 words.\n";
+                    document.getElementById("month").style.borderColor = "red";
+                }
+            }
+            if (!document.getElementById("file").value || document.getElementById("file").value === "") {
+                if (document.getElementById('file').src === "") {
+                    message += "Please input a document as a prove.\n";
+                    document.getElementById("validate_file").style.borderColor = "red";
+                    fullfill = false;
+                }
+            }
+
+            if (fullfill) {
+                if (confirm("Confirm to submit the feedback?")) {
+                    document.getElementById("form").submit();
+                }
+            } else {
+                alert("Please enter all required information for a better feedback.\n" + message);
+            }
+        }
     </script>
     <style>
         .gradient {

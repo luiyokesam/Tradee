@@ -54,16 +54,16 @@ include '../user/loading.php';
                         <div style="font-size: 15px;">
                             <ul class="navbar-nav me-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-header head-higlight pr-0" href="#">Clothing</a>
+                                    <a class="nav-link nav-link-header head-higlight pr-0" href="../php/clothing.php">Clothing</a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-header pr-0" href="#">Accessories</a>
+                                    <a class="nav-link nav-link-header pr-0" href="../php/event.php">Event</a>
                                 </li>
 
-                                <li class="nav-item">
+<!--                                <li class="nav-item">
                                     <a class="nav-link nav-link-header pr-0" href="#">Services</a>
-                                </li>
+                                </li>-->
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle pr-0" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -74,12 +74,12 @@ include '../user/loading.php';
                                         <li class="dropdown-head" style="font-size: 15px;">Policies</li>
                                         <li><a class="dropdown-item nav-link-header" href="../php/privacy.php">Privacy</a></li>
                                         <li><a class="dropdown-item nav-link-header" href="../php/terms.php">Terms</a></li>
-                                        <li><a class="dropdown-item nav-link-header" href="../php/how_it_works.php">How it works</a></li>
+                                        <!--<li><a class="dropdown-item nav-link-header" href="../php/how_it_works.php">How it works</a></li>-->
                                         <li><a class="dropdown-item nav-link-header" href="../php/trust.php">Trust and safety</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li class="dropdown-head" style="font-size: 15px;">Company</li>
                                         <li><a class="dropdown-item nav-link-header" href="../php/about.php">About us</a></li>
-                                        <li><a class="dropdown-item nav-link-header" href="#">Event</a></li>
+                                        <!--<li><a class="dropdown-item nav-link-header" href="#">Event</a></li>-->
                                         <li><a class="dropdown-item nav-link-header" href="../php/contact.php">Contact</a></li>
                                     </ul>
                                 </li>
@@ -133,7 +133,7 @@ include '../user/loading.php';
                         . "</li>"
                         . "</ul>"
                         . "<a class='btn btn-trade-header mr-1' href='../user/upload_item.php' role='button' style='font-size: 14px;'>Upload now</a>"
-                        . "<a class='btn-question' href='#'>"
+                        . "<a class='btn-question' href='../php/how_it_works.php'>"
 //                        . "<i class='far fa-question-circle' style='color: #8791aa; font-size: 1.3em;'></i>"
                         . "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22'><path d='M10.97 8.265a1.45 1.45 0 00-.487.57.75.75 0 01-1.341-.67c.2-.402.513-.826.997-1.148C10.627 6.69 11.244 6.5 12 6.5c.658 0 1.369.195 1.934.619a2.45 2.45 0 011.004 2.006c0 1.033-.513 1.72-1.027 2.215-.19.183-.399.358-.579.508l-.147.123a4.329 4.329 0 00-.435.409v1.37a.75.75 0 11-1.5 0v-1.473c0-.237.067-.504.247-.736.22-.28.486-.517.718-.714l.183-.153.001-.001c.172-.143.324-.27.47-.412.368-.355.569-.676.569-1.136a.953.953 0 00-.404-.806C12.766 8.118 12.384 8 12 8c-.494 0-.814.121-1.03.265zM13 17a1 1 0 11-2 0 1 1 0 012 0z'></path><path fill-rule='evenodd' d='M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z'></path></svg>"
                         . "</a>"

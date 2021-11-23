@@ -490,7 +490,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById("itemDescription").style.borderColor = "";
 
                 if (!document.getElementById("img").value || document.getElementById("img").value === "") {
-                    if (document.getElementById('img_display').src === "") {
+                    if (document.getElementById('img_display0').src === "") {
                         document.getElementById("validate_img").style.borderColor = "red";
                         fullfill = false;
                     }

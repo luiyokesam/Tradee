@@ -42,7 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ////        $gender = NULL;
 //    }
 
-    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['contact'])) {
+    
+//    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['contact'])) {
+    if (preg_match('/^[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$/', $trimmed['contact'])) {
         $contact = mysqli_real_escape_string($dbc, $trimmed['contact']);
     } else {
         echo '<p class="error">Please enter your contact!</p>';
@@ -112,14 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <title>Sign Up - Tradee</title>
     </head>
     <body>
-        <header class="page-header gradient py-5 mt-2">
+        <header class="page-header gradient py-5">
             <div class="container">
                 <div class="row align-items-center justify-content-center">
-                    <div class="col-5">
+                    <div class="col-lg-5 mb-5">
                         <img src="../img/register/worldwide.svg" class="img-fluid" alt="Header image"/>
                     </div>
 
-                    <div class="col-5 border bg-white rounded shadow-lg p-0 mb-2">
+                    <div class="col-lg-5 border bg-white rounded shadow-lg p-0 mb-2">
                         <form action="register.php" method="post" id="quickForm" novalidate="novalidate">
                             <div class="card-body pb-0">
                                 <div class="form-group">
@@ -160,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <label for="inputPassword2">Confirm Password</label>
                                     <input type="password" name="password2" class="form-control" id="inputPassword2" placeholder="Retype password" value="<?php if (isset($trimmed['password2'])) echo $trimmed['password2']; ?>">
                                 </div>
-
 
                                 <label>Location</label>
                                 <div class="row">
@@ -292,6 +293,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             });
         });
+        
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+            if (charCode > 31 && (charCode !== 46 && (charCode < 48 || charCode > 57)))
+                return false;
+            if (charCode === 46 && charCode === ".")
+                return false;
+            if (charCode === ".")
+            {
+                var number = [];
+                number = charCode.split(".");
+                if (number[1].length === decimalPts)
+                    return false;
+            }
+            return true;
+        }
     </script>
     <style>
         .gradient {

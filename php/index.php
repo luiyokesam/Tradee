@@ -1,23 +1,13 @@
 <?php
 require ('../include/config.inc.php');
 include '../include/header.php';
-
-$category_array = array();
-$sql = "SELECT name FROM category";
-$result = $dbc->query($sql);
-if ($result->num_rows > 0) {
-    while ($row = mysqli_fetch_array($result)) {
-        $category_array[] = $row['name'];
-    }
-}
-
 ?>
 <!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Home</title>
+        <title>Home - Tradee</title>
     </head>
     <body class="bg-white">
         <!--        <div id="carouselExampleDark" class="carousel slide" data-bs-ride="carousel">
@@ -58,57 +48,7 @@ if ($result->num_rows > 0) {
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>-->
-
         <div class="container-lg">
-            <div class="row">
-                <div class="col-md-12 mb-0">
-                    <form class="d-flex mt-1 mb-3">
-                        <input class="form-control mr-2" type="text" id="search" placeholder="Search"  value="<?php
-                        if (isset($_GET['search'])) {
-                            echo $_GET['search'];
-                        }
-                        ?>">
-                        <button class="btn btn-info" type="button" id="btnsearch" onclick="search()">Search</button>
-                    </form>
-                </div>
-
-                <div class="col-md-auto mb-0">
-                    <div class="form-group row mb-0">
-                        <div class="col-md-auto">
-                            <label class="col-form-label">Category :</label>
-                        </div>
-
-                        <div class="col-md-auto">
-                            <select class="custom-select" id="category" onchange="category()">
-                                <?php
-                                foreach ($category_array as $selection) {
-                                    $selected = ($current_data["type"] == $selection) ? "selected" : "";
-                                    echo '<option ' . $selected . ' value="' . $selection . '">' . $selection . '</option>';
-                                }
-                                echo '</select>';
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-auto">
-                    <div class="form-group row mb-0">
-                        <div class="col-md-auto">
-                            <label class="col-form-label">Condition :</label>
-                        </div>
-
-                        <div class="col-md-auto">
-                            <select class="custom-select" id="activation" onchange="filter()">
-                                <option value="">All</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mb-2">
                 <!--                <div class="col px-1 py-2">
                                     <a href="../user/profile.php" style="text-decoration:none;">
@@ -144,7 +84,6 @@ if ($result->num_rows > 0) {
                                         <div class="flex-grow-1 bd-highlight" style="font-size:0.7em; color:#969696;">Brand</div>
                                     </ul>
                                 </div>-->
-
                 <?php
                 if (isset($_SESSION['loginuser'])) {
                     $get_inventory = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND i.itemActive = 'Available' AND c.custid <> '{$_SESSION['loginuser']['custid']}' ORDER BY (i.itemid) DESC";

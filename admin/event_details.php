@@ -651,9 +651,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("description").style.borderColor = "red";
                     fullfill = false;
                 }
-                var img = document.getElementById('img_display');
                 if (!document.getElementById("img").value || document.getElementById("img").value === "") {
-                    if (img.getAttribute('src') === "") {
+                    if (document.getElementById('img_display0').src === "") {
                         document.getElementById("validate_img").style.borderColor = "red";
                         fullfill = false;
                     }
