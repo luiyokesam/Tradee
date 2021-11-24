@@ -32,7 +32,7 @@ include '../include/header.php';
                                 </div>-->
 
                 <?php
-                $get_event = "SELECT * FROM event e WHERE (e.status = 'Pending' OR e.status = 'In-Progress')";
+                $get_event = "SELECT * FROM event e WHERE e.status = 'In-Progress' ORDER BY endEvent";
                 $result = $dbc->query($get_event);
                 if ($result->num_rows > 0) {
                     while ($row = mysqli_fetch_array($result)) {

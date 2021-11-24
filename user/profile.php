@@ -145,6 +145,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="row">
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="my-2">
+                                        <div style="font-weight: bolder;">Contact</div>
+                                        <?php
+                                        if (isset($current_data)) {
+                                            echo "<div>- {$current_data['contact']}</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
                                         <div style="font-weight: bolder;">Joined</div>
                                         <?php
                                         if (isset($current_data)) {

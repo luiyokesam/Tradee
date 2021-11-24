@@ -151,7 +151,7 @@ include '../include/header.php';
                 ?>
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 mt-3">
                 <!--                <div class="col">
                                     <div class="card" style="border: none; border-radius: 0px; box-shadow: none;">
                                         <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
@@ -173,7 +173,7 @@ include '../include/header.php';
                                 </div>-->
 
                 <?php
-                $get_event = "SELECT * FROM event e WHERE (e.status = 'Pending' OR e.status = 'In-Progress')";
+                $get_event = "SELECT * FROM event e WHERE e.status = 'In-Progress' ORDER BY endEvent";
                 $result = $dbc->query($get_event);
                 if ($result->num_rows > 0) {
                     while ($row = mysqli_fetch_array($result)) {

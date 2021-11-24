@@ -78,6 +78,17 @@ if (!isset($_SESSION['loginuser'])) {
                             <div class="row">
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="my-2">
+                                        <div style="font-weight: bolder;">Contact</div>
+                                        <?php
+                                        if ($_SESSION['loginuser']) {
+                                            echo "<div>- {$_SESSION['loginuser']['contact']}</div>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="my-2">
                                         <div style="font-weight: bolder;">Joined</div>
                                         <?php
                                         if ($_SESSION['loginuser']) {
