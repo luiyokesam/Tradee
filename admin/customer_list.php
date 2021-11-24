@@ -101,13 +101,13 @@ include 'navbar.php';
                     </div>
                 </section>
 
-                <div class="card-footer">
+<!--                <div class="card-footer">
                     <div class="row">
                         <div class="col-auto">
                             <button class="btn btn-primary btn-block" id="btnsave" onclick="editorsave()" onclick="location.href = 'contactDetails.php'" id="btnadd">Contact</button>
                         </div>
                     </div>
-                </div>
+                </div>-->
             </div>
         </div>
 
