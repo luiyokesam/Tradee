@@ -46,8 +46,8 @@
 
         <div class="container p-5">
             <div>
-                <div class="h1">Vinted - Data Protection Statement</div>
-                <div class="h3">Vinted – Privacy Policy</div>
+                <div class="h1">Tradee - Data Protection Statement</div>
+                <div class="h3">Tradee – Privacy Policy</div>
                 <div class="h5">Date last updated: 2021-05-07</div>
             </div>
             <div class="accordion accordion-flush" id="accordionFlushExample">
@@ -61,15 +61,15 @@
                         <div class="accordion-body">
                             <div>
                                 <div class="privacy-content">This Privacy Policy applies to
-                                    the online platforms Vinted.fr, Vinted.es, Vinted.nl, Vinted.be, Vinted.lu, Vinted.lt, Musumazyliai.
-                                    lt Vinted.cz, Vinted.pl, Vinted.de, Vinted.co.uk, Vinted.com, Kleiderkreisel.de, Kleiderkreisel.at,
-                                    Mamikreisel.de, Mamikreisel.at (“Website”) and to the associated app (“App”). Vinted.fr, Vinted.es,
-                                    Vinted.nl, Vinted.be, Vinted.lu, Vinted.lt, Vinted.cz, Vinted.pl, Vinted.de and Vinted.co.uk online
-                                    platforms are operated by Vinted, UAB, Švitrigailos st. 13, LT-03228 Vilnius, Republic of Lithuania;
+                                    the online platforms Tradee.fr, Tradee.es, Tradee.nl, Tradee.be, Tradee.lu, Tradee.lt, Musumazyliai.
+                                    lt Tradee.cz, Tradee.pl, Tradee.de, Tradee.co.uk, Tradee.com, Kleiderkreisel.de, Kleiderkreisel.at,
+                                    Mamikreisel.de, Mamikreisel.at (“Website”) and to the associated app (“App”). Tradee.fr, Tradee.es,
+                                    Tradee.nl, Tradee.be, Tradee.lu, Tradee.lt, Tradee.cz, Tradee.pl, Tradee.de and Tradee.co.uk online
+                                    platforms are operated by Tradee, UAB, Švitrigailos st. 13, LT-03228 Vilnius, Republic of Lithuania;
                                     Kleiderkreisel.de, Kleiderkreisel.at, Mamikreisel.de, Mamikreisel.at online platforms are operated by
-                                    Kleiderkreisel GmbH, Wallstraße 65, 10179 Berlin, Germany, and Vinted.com online platform is operated by Vinted Inc, a
+                                    Kleiderkreisel GmbH, Wallstraße 65, 10179 Berlin, Germany, and Tradee.com online platform is operated by Tradee Inc, a
                                     company registered in Delaware, with business location at C/o AG Accounting 735 Geary St. #303 San Francisco, CA 94109.
-                                    (hereinafter jointly referred to as “Us”, “We” or “Vinted”). Unless otherwise specified under specific sections, this
+                                    (hereinafter jointly referred to as “Us”, “We” or “Tradee”). Unless otherwise specified under specific sections, this
                                     Privacy Policy applies to all of our Platforms.
                                     More details about how to get in contact with us can be found at the end of this Privacy Policy under no. 7.
                                 </div>
@@ -83,15 +83,15 @@
                                     identifiable natural person such as your name, date of birth, address or email address.
                                 </div>
                                 <div class="privacy-content">Under applicable data protection laws,
-                                    Vinted is obligated to inform you about data processing and Vinted fulfills this obligation within
+                                    Tradee is obligated to inform you about data processing and Tradee fulfills this obligation within
                                     this Privacy Policy. This Privacy Policy and any parts of it are not meant as contractual clauses and
                                     do not become part of the general <a href="https://www.w3.org/">terms and conditions</a> ("GTC") as a contract
                                     that is concluded with registered
-                                    users. Under applicable data protection laws, Vinted can process data that is necessary for the performance of a
+                                    users. Under applicable data protection laws, Tradee can process data that is necessary for the performance of a
                                     contract with you or necessary for taking steps at the request of you prior to entering into a contract (Art. 6 (1) (b) GDPR).
                                     References to the GTC should at all times be understood as information on data processing (Art. 13 and 14 GDPR)
                                     and never as clauses that become part of the GTC. By using the Platform and our services, you enter into a legally
-                                    binding contract between you and Vinted conditions of which are described in the GTC.
+                                    binding contract between you and Tradee conditions of which are described in the GTC.
                                 </div>
                             </div>
                         </div>
@@ -112,7 +112,7 @@
                                 <div class="privacy-content">We collect and use your personal data to
                                     allow you to use our Platform, to provide our services and to perform a contract (GTC) with you and
                                     especially to undertake commercial transactions via the Platform, to use the electronic payment system
-                                    or to leave reviews and communicate with other members. To use these services, you need a Vinted account.
+                                    or to leave reviews and communicate with other members. To use these services, you need a Tradee account.
                                     For this purpose, you must register as a member on the Website or App.
                                 </div>
                                 <div class="privacy-content">Most of your personal data are required to perform
@@ -122,18 +122,18 @@
                                     not provide us with this personal data, we will not be able to comply with legal requirements
                                     and provide our services.
                                 </div>
-                                <div class="privacy-content">Vinted collects
+                                <div class="privacy-content">Tradee collects
                                     your personal data to allow you to use our Platform, to provide
                                     our services and to perform a contract (GTC) with you and keeps it for as
-                                    long as we keep your Vinted account - for 3 months from the date of deletion
-                                    of your Vinted account or for 5 years and 3 months of inactivity on your account.
+                                    long as we keep your Tradee account - for 3 months from the date of deletion
+                                    of your Tradee account or for 5 years and 3 months of inactivity on your account.
                                 </div>
                             </div>
                             <div class="privacy-sub-header">
                                 2.2 To enable registration on the Platform
                             </div>
                             <div class="privacy-content">When you register as a member on the Platform, you must provide the 
-                                following data in order to carry out the registration procedure and access your Vinted account:
+                                following data in order to carry out the registration procedure and access your Tradee account:
                             </div>
                             <div class="privacy-content">
                                 <ol class="" style="list-style-type: upper-roman;">
@@ -153,7 +153,7 @@
                             </div>
                             <div class="privacy-content">Legal basis for the collection and use of data is the performance
                                 of a contract (GTC) to which you are a party (Art. 6 (1) (b) of the GDPR)Personal data collected and used
-                                for this purpose are kept for as long as we keep your Vinted account – for 3 months from the date of deletion of your Vinted
+                                for this purpose are kept for as long as we keep your Tradee account – for 3 months from the date of deletion of your Tradee
                                 account or for 5 years and 3 months of inactivity on your account.
                             </div>
                         </div>
@@ -167,7 +167,7 @@
                     </h2>
                     <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
                         <div class="accordion-body">
-                            <div class="privacy-content">Vinted transfers or shares personal
+                            <div class="privacy-content">Tradee transfers or shares personal
                                 data with service providers only insofar as necessary and allowed in accordance with applicable laws.
                                 Service providers to which your personal data are transferred or shared with for specific purposes are
                                 described under 2 above. In addition, we appoint the following service providers that,
@@ -182,20 +182,20 @@
                             </div>
                             <div class="privacy-content">We transfer personal data to attorneys,
                                 attorney’s assistants, notaries, bailiffs, auditors, consultants, IT service providers,
-                                insurance companies, archiving services that provide services to Vinted.
-                                Additionally, we share data within the Vinted group. Data processed
-                                within the Vinted group are transferred to Vinted, UAB (Lithuania) insofar
-                                as necessary for the management of Vinted group.
+                                insurance companies, archiving services that provide services to Tradee.
+                                Additionally, we share data within the Tradee group. Data processed
+                                within the Tradee group are transferred to Tradee, UAB (Lithuania) insofar
+                                as necessary for the management of Tradee group.
                             </div>
-                            <div class="privacy-content">Vinted is statutorily obligated to provide personal and/or usage data to 
+                            <div class="privacy-content">Tradee is statutorily obligated to provide personal and/or usage data to 
                                 investigative, criminal prosecution or supervisory authorities if and insofar as required for 
-                                the avoidance of risk to the public and for the prosecution of criminal acts. Vinted may share your 
+                                the avoidance of risk to the public and for the prosecution of criminal acts. Tradee may share your 
                                 data with third parties when transferring rights and obligations pertaining to the contractual 
-                                relationship between you and Vinted to such third parties in accordance with the
+                                relationship between you and Tradee to such third parties in accordance with the
                                 <a  href="https://www.w3.org/"  > terms and conditions</a>
                                 in particular in the case of the transfer of a sector of activity, a merger
                                 through the foundation of a new company, a merger through absorption, de-merger or
-                                any change in control affecting Vinted. Prior to such an event Vinted will inform you
+                                any change in control affecting Tradee. Prior to such an event Tradee will inform you
                                 separately about the details of sharing your data and will obtain your consent where legally
                                 necessary.
                             </div>

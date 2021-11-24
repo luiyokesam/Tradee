@@ -16,7 +16,7 @@ include '../include/header.php';
                         <div class="display-5 p-2" style="font-size: 1.5em;">Barter is your community for pre-loved items</div>
                         
                         <div class ="blockquote p-2">
-                            As you all know, Vinted is a cashless transaction where 
+                            As you all know, Tradee is a cashless transaction where 
                             you can get the things you need without money. We understand how money is valueble to you, so we decide to
                             do an exchange transaction for user to get what the need, which is trading.
                         </div>
@@ -86,9 +86,10 @@ include '../include/header.php';
                             <div class="card-body px-0">
                                 <div class="h5">1. List for free</div>
                                 <div class="card-text py-1">
-                                    If you are a guest, your only able to view and unable to trade. Sign up as a customer 
-                                    to start trading. Take photos of your item, describe it, and set your price. 
-                                    Tap “Upload” and your listing is live.
+                                    You may list a bunch of items in your inventory for other trading partners to see.
+                                    An up to five photos is available for upload for an item to place in your invenotry
+                                    so that others would like to have a trade with you
+                                  
                                 </div>
                             </div>
                         </div>
@@ -114,7 +115,7 @@ include '../include/header.php';
                             <div class="card-body px-0">
                                 <div class="h5">3. Trade it!</div>
                                 <div class="card-text py-1">
-                                    Users can sometimes find another way of deliver their items. However, Vinted provide you 
+                                    Users can sometimes find another way of deliver their items. However, Tradee provide you 
                                     with excellence delivering service. Please note that you can only make one delivery 
                                     to one address at a time.
                                     <!--Trade! Box your item, follow the shipping instructions, and make sure you send the item within 5 days.-->
@@ -146,9 +147,11 @@ include '../include/header.php';
                         <div class="card" style="border: none; border-radius: 0px; box-shadow: none;">
                             <img src="../img/how-it-work/browse_product.jpg">
                             <div class="card-body px-0">
-                                <div class="h5">Auctions</div>
+                                <div class="h5">Change Request</div>
                                 <div class="card-text py-1">
-                                    Users that think their items is highly valued, they can start an auction. The winner is decided by the auctioner by review the items that the bidders bid.
+                                    Users that who are not satisfied with the trading request can view your trading partner's item and send a 
+                                   propose request back to them!
+                                    
                                 </div>
                             </div>
                         </div>
@@ -185,7 +188,7 @@ include '../include/header.php';
                 <div class="row">
                     <div class="col">
                         <div>2. Making Deliveries</div>
-                        <div>Users can sometimes find another way of deliver their items. However, Vinted provide you with excellence delivering service.
+                        <div>Users can sometimes find another way of deliver their items. However, Tradee provide you with excellence delivering service.
                             Please note that you can only make one delivery to one address at a time
                         </div>
                         <div>Step 1: Once your request its been accepted, you can make a delivery to the trader</div>
