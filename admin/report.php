@@ -4,7 +4,7 @@ include 'navbar.php';
 
 $sql = "SELECT * FROM admin WHERE position = 'Manager' AND adminid = '{$_SESSION['adminid']}'";
 $result = $dbc->query($sql);
-if ($result->num_rows < 0) {
+if ($result->num_rows < 1) {
     echo '<script>alert("Sorry, you do not have this access.");window.location.href="home.php";</script>';
 }
 
@@ -12,36 +12,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $type = $_POST["type"];
     if (isset($_POST["datefrom"])) {
         $datefrom = $_POST["datefrom"];
-        $dateto = $_POST["dateto"];
     }
 
-//    if ($type == "trade") {
-//        $sql = "SELECT DISTINCT c.custid, c.username, count(t.tradeid) as tradeqty, t.acceptCustID , t.tradeDate, td.itemid "
-//                . "FROM trade t, trade_details td , customer c "
-//                . "WHERE t.tradeid = td.tradeid AND str_to_date(tradeDate, '%d/%m/%Y') >= str_to_date('$datefrom', '%d/%m/%Y') AND "
-//                . "str_to_date(tradeDate, '%d/%m/%Y') <= str_to_date('$dateto', '%d/%m/%Y') AND "
-//                . "status = 'Completed' AND "
-//                . "c.custid = t.offerCustID "
-//                . "GROUP BY c.custid";
-//
-//        $title = "Trades Report";
-//    }
+    if (isset($_POST["dateto"])) {
+        $dateto = $_POST["dateto"];
+    }
+//        echo '<script>alert("' . $sql . '");</script>';
+
     if ($type == "trade_report") {
         $title = "Trades Report";
-        $sql = "SELECT * FROM trade t, customer c "
-                . "WHERE (c.custid = t.offerCustID OR c.custid = t.acceptCustID) AND "
-                . "str_to_date(t.tradeDate, '%d/%m/%Y') >= str_to_date('$datefrom', '%d/%m/%Y') AND "
-                . "str_to_date(t.tradeDate, '%d/%m/%Y') <= str_to_date('$dateto', '%d/%m/%Y')";
+        $sql = "SELECT * FROM trade "
+                . "WHERE str_to_date(tradeDate, '%d/%m/%Y') >= str_to_date('$datefrom', '%d/%m/%Y') AND "
+                . "str_to_date(tradeDate, '%d/%m/%Y') <= str_to_date('$dateto', '%d/%m/%Y')";
+
+//        echo '<script>alert("' . $sql . '");</script>';
+    } else if ($type == "donation_event") {
+        $title = "Donation Event";
+        $sql = "SELECT * FROM event WHERE status = 'Ended' AND str_to_date(endEvent, '%d/%m/%Y') <= str_to_date('$dateto', '%d/%m/%Y') ";
+
+//        echo '<script>alert("' . $sql . '");</script>';
+    } else if ($type == "customer_inventory") {
+        $title = "Customers Inventory";
+        $sql = "SELECT DISTINCT custid, username "
+                . "FROM customer";
+
+//        echo '<script>alert("' . $sql . '");</script>';
     } else if ($type == "top_valueitem") {
         $title = "Customer Item Value Report";
         $sql = "SELECT c.custid as custid, c.username, COUNT(i.itemid) AS totalitem, SUM(i.value) AS totalvalue "
                 . "FROM customer c, item i "
                 . "WHERE c.custid = i.custid "
                 . "GROUP BY c.custid";
-    } else if ($type == "customer_inventory") {
-        $title = "Customers Inventory";
-        $sql = "SELECT DISTINCT custid, username "
-                . "FROM customer";
     } else if ($type == "delivery_report") {
         $title = "Delivery Report";
         $sql = "SELECT d.senderid as id , count(d.senderid) as deliveryqty,SUM(d.totalAmount) AS revenue FROM `customer` as c , `delivery` as d where c.custid = d.senderid group by senderid order by deliveryqty DESC";
@@ -76,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <select class="custom-select" name="type" id="type" onchange="changetype(this.value)">
                                                 <option value="trade_report" <?php
                                                 if (isset($type)) {
-                                                    if ($type == "trade") {
+                                                    if ($type == "trade_report") {
                                                         echo "selected";
                                                     }
                                                 }
@@ -121,6 +122,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     }
                                                 }
                                                 ?>>New Uploads</option>
+
+                                                <option value="donation_event" <?php
+                                                if (isset($type)) {
+                                                    if ($type == "donation_event") {
+                                                        echo "selected";
+                                                    }
+                                                }
+                                                ?>>Donation Event</option>
                                             </select>
                                         </div>
                                     </div>
@@ -145,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-auto">
                                     <div class="form-group row">
                                         <div class="col-md-auto">
-                                            <label class="col-form-label">Date From :</label>
+                                            <label class="col-form-label">Date To :</label>
                                         </div>
 
                                         <div class="col-md-auto">
@@ -182,13 +191,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     if (isset($type)) {
                                         if ($type == "trade_report") {
                                             echo "<tr>"
-                                            . "<th style='width: 12%;'>Trade ID</th>"
-                                            . "<th style='width: 12%;'>Offer Customer</th>"
-                                            . "<th style='width: 12%;'>Offer Item</th>"
-                                            . "<th style='width: 12%;'>Accept Customer</th>"
-                                            . "<th style='width: 12%;'>Accept Item</th>"
-                                            . "<th style='width: auto;'>Date</th>"
-                                            . "<th style='width: 12%;'>Status</th>"
+                                            . "<th style='width: 20%;'>Trade ID</th>"
+                                            . "<th style='width: 20%;'>Customer</th>"
+                                            . "<th style='width: 20%;'>Item</th>"
+                                            . "<th style='width: 20%;'>Date</th>"
+                                            . "<th style='width: 20%;'>Status</th>"
                                             . "</tr>";
                                         } else if ($type == "top_valueitem") {
                                             echo "<tr>"
@@ -206,10 +213,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             . "</tr>";
                                         } else if ($type == "customer_inventory") {
                                             echo "<tr>"
-                                            . "<th style='width: 25%;'>Customer ID</th>"
-                                            . "<th style='width: 25%;'>Item Name</th>"
-                                            . "<th style='width: 25%;'>Value</th>"
-                                            . "<th style='width: 25%;'>Status</th>"
+                                            . "<th style='width: 20%;'>Customer ID</th>"
+                                            . "<th style='width: 20%;'>Username</th>"
+                                            . "<th style='width: 20%;'>Item</th>"
+                                            . "<th style='width: 20%;'>Category</th>"
+                                            . "<th style='width: 20%;'>Brand</th>"
                                             . "</tr>";
                                         } else if ($type == "newuploads") {
                                             echo "<tr>"
@@ -226,6 +234,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             . "<th style='width: 15%;'>Position</th>"
                                             . "<th style='width: 15%;'>Manager</th>"
                                             . "</tr>";
+                                        } else if ($type == "delivery_report") {
+                                            echo "<tr>"
+                                            . "<th style='width: auto;'>Delivery ID</th>"
+                                            . "<th style='width: auto;'>Delivery Quantity</th>"
+                                            . "<th style='width: auto;'>Profits (RM)</th>"
+//                                            . "<th style='width: 15%;'>Donator</th>"
+//                                            . "<th style='width: 15%;'>Item ID</th>"
+//                                            . "<th style='width: auto;'>endEvent</th>"
+//                                            . "<th style='width: 15%;'>status</th>"
+                                            . "</tr>";
+                                        } else if ($type == "donation_event") {
+                                            echo "<tr>"
+                                            . "<th style='width: 15%;'>Event ID</th>"
+                                            . "<th style='width: 15%;'>Title</th>"
+                                            . "<th style='width: 15%;'>Receiver</th>"
+                                            . "<th style='width: 15%;'>Donator</th>"
+                                            . "<th style='width: 15%;'>Item ID</th>"
+                                            . "<th style='width: auto;'>endEvent</th>"
+                                            . "<th style='width: 15%;'>status</th>"
+                                            . "</tr>";
                                         }
                                     }
                                     ?>
@@ -233,24 +261,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <tbody>
                                     <?php
                                     if (isset($type)) {
-                                        if ($type == "trade") {
+                                        if ($type == "trade_report") {
                                             $result = $dbc->query($sql);
                                             if ($result->num_rows > 0) {
                                                 while ($row = $result->fetch_assoc()) {
-                                                    $sql1 = "SELECT * FROM trade_details d WHERE d.tradeid = '{$row['tradeid']} AND d.custid = '{$row['custid']}'";
+                                                    $sql1 = "SELECT * FROM trade_details WHERE tradeid = '{$row['tradeid']}' AND custid = '{$row['acceptCustID']}'";
                                                     $result1 = $dbc->query($sql1);
                                                     $test = true;
                                                     if ($result1->num_rows > 0) {
                                                         while ($row1 = $result1->fetch_assoc()) {
-                                                            echo "<tr>"
-                                                            . "<td><a>" . $row["custid"] . "</a></td>"
-                                                            . "<td><a>" . $row["username"] . "</a></td>"
-                                                            . "<td><a>" . $row["tradeqty"] . "</a></td>"
-                                                            . "<td><a>" . $row["acceptCustID"] . "</a></td>"
-                                                            . "<td><a>" . $row["tradeDate"] . "</a></td>"
-                                                            . "</tr>";
+                                                            if ($test == true) {
+                                                                echo "<tr>"
+                                                                . "<td><a>" . $row1["tradeid"] . "</a></td>"
+                                                                . "<td><a>" . $row["acceptCustID"] . "</a></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td><a>" . $row["tradeDate"] . "</a></td>"
+                                                                . "<td><a>" . $row["status"] . "</a></td>"
+                                                                . "</tr>";
+                                                                $test = false;
+                                                            } else {
+                                                                echo "<tr>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "</tr>";
+                                                            }
                                                         }
                                                     }
+                                                    $sql1 = "SELECT * FROM trade_details WHERE tradeid = '{$row['tradeid']}' AND custid = '{$row['offerCustID']}'";
+                                                    $result1 = $dbc->query($sql1);
+                                                    $test = true;
+                                                    if ($result1->num_rows > 0) {
+                                                        while ($row1 = $result1->fetch_assoc()) {
+                                                            if ($test == true) {
+                                                                echo "<tr>"
+                                                                . "<td></td>"
+                                                                . "<td><a>" . $row["offerCustID"] . "</a></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "</tr>";
+                                                                $test = false;
+                                                            } else {
+                                                                echo "<tr>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "</tr>";
+                                                            }
+                                                        }
+                                                    }
+                                                    echo "<tr>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "</tr>";
                                                 }
                                             }
                                         } else if ($type == "top_valueitem") {
@@ -348,6 +419,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                     . "</tr>";
                                                 }
                                             }
+                                        } else if ($type == "donation_event") {
+                                            $result = $dbc->query($sql);
+                                            if ($result->num_rows >= 0) {
+                                                $countitem = 0;
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $sql1 = "SELECT * FROM donation_details t, item i WHERE t.eventid = '{$row['eventid']}' AND t.itemid = i.itemid";
+                                                    $result1 = $dbc->query($sql1);
+                                                    $test = true;
+                                                    if ($result1->num_rows >= 0) {
+                                                        while ($row1 = $result1->fetch_assoc()) {
+                                                            if ($test == true) {
+                                                                echo "<tr>"
+                                                                . "<td><a>" . $row["eventid"] . "</a></td>"
+                                                                . "<td><a>" . $row["title"] . "</a></td>"
+                                                                . "<td><a>" . $row["receiver"] . "</a></td>"
+                                                                . "<td><a>" . $row1["custid"] . "</a></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td><a>" . $row["endEvent"] . "</a></td>"
+                                                                . "<td><a>" . $row["status"] . "</a></td>"
+                                                                . "</tr>";
+                                                                $test = false;
+                                                            } else {
+                                                                echo "<tr>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "<td><a>" . $row1["custid"] . "</a></td>"
+                                                                . "<td><a>" . $row1["itemid"] . "</a></td>"
+                                                                . "<td></td>"
+                                                                . "<td></td>"
+                                                                . "<td</td>"
+                                                                . "</tr>";
+                                                            }
+                                                        }
+                                                    } else {
+                                                        echo "<tr>"
+                                                        . "<td><a>" . $row["eventid"] . "</a></td>"
+                                                        . "<td><a>" . $row["title"] . "</a></td>"
+                                                        . "<td><a>" . $row["receiver"] . "</a></td>"
+                                                        . "<td></td>"
+                                                        . "<td></td>"
+                                                        . "<td><a>" . $row["endEvent"] . "</a></td>"
+                                                        . "<td><a>" . $row["status"] . "</a></td>"
+                                                        . "</tr>";
+                                                    }
+                                                    echo "<tr>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "<td></td>"
+                                                    . "</tr>";
+                                                }
+                                            } else {
+                                                echo "<tr>"
+                                                . "<td><a>" . $row["eventid"] . "</a></td>"
+                                                . "<td><a>" . $row["title"] . "</a></td>"
+                                                . "<td><a>" . $row["receiver"] . "</a></td>"
+                                                . "<td></td>"
+                                                . "<td></td>"
+                                                . "<td><a>" . $row["endEvent"] . "</a></td>"
+                                                . "<td><a>" . $row["status"] . "</a></td>"
+                                                . "</tr>";
+                                            }
                                         }
                                     }
                                     ?>
@@ -367,10 +504,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "buttons": ["copy", "csv", "excel", "pdf", "print"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
-
         function changetype(value) {
             if (value === "trade_report" || value === "newuploads") {
                 document.getElementById("datefrom").disabled = false;
+                document.getElementById("dateto").disabled = false;
+            } else if (value === "donation_event") {
+                document.getElementById("datefrom").disabled = true;
                 document.getElementById("dateto").disabled = false;
             } else {
                 document.getElementById("datefrom").disabled = true;
@@ -385,7 +524,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             var message = "";
             if ((document.getElementById("type").value === "trade_report") || (document.getElementById("type").value === "newuploads")) {
                 var dateformat = /^\d{2}\/\d{2}\/\d{4}$/;
-
                 if (!document.getElementById("datefrom") || document.getElementById("datefrom") === "") {
                     fulfill = false;
                     message += "Please enter starting date.\n";
@@ -408,11 +546,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 var datefrom = new Date(document.getElementById("datefrom").value);
                 var dateto = new Date(document.getElementById("dateto").value);
-
                 if (datefrom > dateto) {
                     fulfill = false;
                     message += "End date must not be larger than start date!\n";
                 }
+            } else if ((document.getElementById("type").value === "donation_event")) {
+                var dateformat = /^\d{2}\/\d{2}\/\d{4}$/;
+                if (!document.getElementById("dateto") || document.getElementById("dateto") === "") {
+                    fulfill = false;
+                    message += "Please enter end date.\n";
+                } else {
+                    if (!document.getElementById("dateto").value.match(dateformat)) {
+                        fulfill = false;
+                        message += "Invalid end date format!\n";
+                    }
+                }
+
+                var dateto = new Date(document.getElementById("dateto").value);
             }
             if (fulfill) {
                 document.getElementById("form").submit();
@@ -428,7 +578,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 var len = elm.value.length;
-
                 if (len !== 1 || len !== 3) {
                     if (e.keyCode === 47) {
                         e.preventDefault();
@@ -447,11 +596,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         dateInputMask(document.getElementById("datefrom"));
         dateInputMask(document.getElementById("dateto"));
     </script>
-    <!-- jQuery -->
     <script src="../bootstrap/plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
     <script src="../bootstrap/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables  & Plugins -->
     <script src="../bootstrap/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../bootstrap/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="../bootstrap/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -464,11 +610,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../bootstrap/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
     <script src="../bootstrap/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="../bootstrap/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-    <!-- AdminLTE App -->
     <script src="../bootstrap/dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
     <script src="../bootstrap/dist/js/demo.js"></script>
-    <!-- Page specific script -->
     <script src="../bootstrap/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="../bootstrap/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
     <script src="../bootstrap/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>

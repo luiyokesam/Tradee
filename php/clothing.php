@@ -59,7 +59,7 @@ $sql = "SELECT * FROM item i, customer c WHERE i.custid = c.custid AND itemActiv
                                     <option value="">All</option>
                                     <?php
                                     $category_array = array();
-                                    $sql1 = "SELECT name FROM category";
+                                    $sql1 = "SELECT name FROM category WHERE active = '1'";
                                     $result1 = $dbc->query($sql1);
                                     if ($result1->num_rows > 0) {
                                         while ($row1 = mysqli_fetch_array($result1)) {

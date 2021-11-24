@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 . "active = '" . $_POST['activation'] . "' "
                 . "WHERE custid ='" . $current_data['custid'] . "'";
 
-        echo '<script>alert("' . $sql . '");</script>';
+//        echo '<script>alert("' . $sql . '");</script>';
 
         if ($dbc->query($sql)) {
             if ($img) {

@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (preg_match('/^\w{4,20}$/', $trimmed['username'])) {
         $username = mysqli_real_escape_string($dbc, $trimmed['username']);
     } else {
-        echo '<p class="error">Please enter your username!</p>';
+//        echo '<p class="error">Please enter your username!</p>';
     }
 
 //    if (isset($_REQUEST['gender'])) {
@@ -55,10 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($trimmed['password1'] == $trimmed['password2']) {
             $password = mysqli_real_escape_string($dbc, $trimmed['password1']);
         } else {
-            echo '<script>alert("Your password did not match the confirmed password!");</script>';
+//            echo '<script>alert("Your password did not match the confirmed password!");</script>';
         }
     } else {
-        echo '<script>alert("Please enter a valid password!");</script>';
+//        echo '<script>alert("Please enter a valid password!");</script>';
     }
 
     if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['state'])) {

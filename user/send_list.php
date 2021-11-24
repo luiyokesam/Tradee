@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             . "'" . $_POST["feedbackdate"] . "',"
             . "'Pending')";
 
-    echo '<script>alert("' . $sql . '");</script>';
+//    echo '<script>alert("' . $sql . '");</script>';
 
     if ($dbc->query($sql)) {
         echo '<script>alert("Thanks for your feedback. We will make a better arrangement for our service now.");window.location.href="trade_list.php";</script>';
