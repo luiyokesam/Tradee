@@ -74,9 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </form>
 
-                    <p class="mb-1">
+<!--                    <p class="mb-1">
                         <a href="">Forgot password</a>
-                    </p>
+                    </p>-->
                 </div>
             </div>
         </div>

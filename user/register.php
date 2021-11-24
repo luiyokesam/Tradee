@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo '<p class="error">Please enter a valid email address!</p>';
     }
 
-    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['username'])) {
+//    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['username'])) {
+    if (preg_match('/^\w{4,20}$/', $trimmed['username'])) {
         $username = mysqli_real_escape_string($dbc, $trimmed['username']);
     } else {
         echo '<p class="error">Please enter your username!</p>';
@@ -44,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     
 //    if (preg_match('/^[A-Z \'.-]{2,20}$/i', $trimmed['contact'])) {
-    if (preg_match('/^[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$/', $trimmed['contact'])) {
+    if (preg_match('/^[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,11}$/', $trimmed['contact'])) {
         $contact = mysqli_real_escape_string($dbc, $trimmed['contact']);
     } else {
         echo '<p class="error">Please enter your contact!</p>';
@@ -150,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                                 <div class="form-group">
                                     <label for="inputContact">Phone No</label>
-                                    <input type="tel" name="contact" class="form-control" id="inputContact" placeholder="Your contact" value="<?php if (isset($trimmed['contact'])) echo $trimmed['contact']; ?>">
+                                    <input type="tel" name="contact" class="form-control" id="inputContact" placeholder="Your contact" onkeypress="return isNumberKey(event)" value="<?php if (isset($trimmed['contact'])) echo $trimmed['contact']; ?>">
                                 </div>
 
                                 <div class="form-group">
@@ -257,8 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //                        required: "Please select your gender"
 //                    },
                     contact: {
-                        required: "Please enter your contact",
-                        minlength: "Please enter the correct phone number"
+                        required: "Please enter your contact"
                     },
                     password1: {
                         required: "Please provide a password",

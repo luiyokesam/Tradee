@@ -19,17 +19,17 @@ if (isset($_SESSION['loginuser']['userid'])) {
         <div class="container-lg mt-3 mb-5">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link " id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
+                    <button class="nav-link active" id="nav-offer-tab" data-bs-toggle="tab" data-bs-target="#nav-offer" type="button" role="tab">Offer list</button>
                     <button class="nav-link " id="nav-accept-tab" data-bs-toggle="tab" data-bs-target="#nav-accept" type="button" role="tab">Accept list</button>
                     <button class="nav-link" id="nav-sender-tab" data-bs-toggle="tab" data-bs-target="#nav-sender" type="button" role="tab">Send list</button>
                     <button class="nav-link" id="nav-recipient-tab" data-bs-toggle="tab" data-bs-target="#nav-recipient" type="button" role="tab">Receive list</button>
-                    <button class="nav-link active" id="nav-donation-tab" data-bs-toggle="tab" data-bs-target="#nav-donation" type="button" role="tab">Donation list</button>
+                    <button class="nav-link " id="nav-donation-tab" data-bs-toggle="tab" data-bs-target="#nav-donation" type="button" role="tab">Donation list</button>
                 </div>
             </nav>
 
             <div class="tab-content" id="nav-tabContent">
                 <!--tab 1-->
-                <div class="tab-pane fade" id="nav-offer" role="tabpanel">
+                <div class="tab-pane fade show active" id="nav-offer" role="tabpanel">
                     <div class="container-lg mt-3">
                         <div class="content" style="min-height: 550px;">
                             <div class="card">
@@ -408,7 +408,7 @@ if (isset($_SESSION['loginuser']['userid'])) {
                 </div>
 
                 <!--tab 5-->
-                <div class="tab-pane fade show active" id="nav-donation" role="tabpanel">
+                <div class="tab-pane fade" id="nav-donation" role="tabpanel">
                     <div class="container-lg mt-3">
                         <div class="content" style="min-height: 550px;">
                             <div class="card">

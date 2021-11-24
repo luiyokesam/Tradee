@@ -63,37 +63,61 @@ if (!isset($_SESSION['adminid'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="home.php" class="nav-link <?php if ($page == 'home') {echo 'active';}?>">
+                            <a href="home.php" class="nav-link <?php
+                            if ($page == 'home') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="admin_list.php" class="nav-link <?php if ($page == 'admin_list') {echo 'active';}?>">
+                            <a href="admin_list.php" class="nav-link <?php
+                            if ($page == 'admin_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-users-cog"></i>
                                 <p>Admin list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="customer_list.php" class="nav-link <?php if ($page == 'customer_list') {echo 'active';}?>">
+                            <a href="customer_list.php" class="nav-link <?php
+                            if ($page == 'customer_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-user-friends"></i>
                                 <p>Customer list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="item_list.php" class="nav-link <?php if ($page == 'item_list') {echo 'active';}?>">
+                            <a href="item_list.php" class="nav-link <?php
+                            if ($page == 'item_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-tasks"></i>
                                 <p>Item list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="trade_list.php" class="nav-link <?php if ($page == 'trade_list') {echo 'active';}?>">
+                            <a href="trade_list.php" class="nav-link <?php
+                            if ($page == 'trade_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-sync-alt"></i>
                                 <p>Trading list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="delivery_list.php" class="nav-link <?php if ($page == 'delivery_list') {echo 'active';}?>">
+                            <a href="delivery_list.php" class="nav-link <?php
+                            if ($page == 'delivery_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <!--<i class="nav-icon fas fa-box-open"></i>-->
                                 <!--<i class="nav-icon fas fa-copy"></i>-->
                                 <i class="nav-icon fas fa-truck"></i>
@@ -101,29 +125,55 @@ if (!isset($_SESSION['adminid'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="donation_list.php" class="nav-link <?php if ($page == 'donation_list') {echo 'active';}?>">
+                            <a href="donation_list.php" class="nav-link <?php
+                            if ($page == 'donation_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon far fa-heart"></i>
                                 <p>Donation list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="event_list.php" class="nav-link <?php if ($page == 'event_list') {echo 'active';}?>">
+                            <a href="event_list.php" class="nav-link <?php
+                            if ($page == 'event_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
                                 <p>Event list</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="feedback_list.php" class="nav-link <?php if ($page == 'feedback_list') {echo 'active';}?>">
+                            <a href="feedback_list.php" class="nav-link <?php
+                            if ($page == 'feedback_list') {
+                                echo 'active';
+                            }
+                            ?>">
                                 <i class="nav-icon fas fa-comment-alt"></i>
                                 <p>Feedback list</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="report.php" class="nav-link <?php if ($page == 'report') {echo 'active';}?>">
-                                <i class="nav-icon fas fa-chart-pie"></i>
-                                <p>Report</p>
-                            </a>
-                        </li>
+
+                        <?php
+                        $sql = "SELECT * FROM admin WHERE position = 'Manager' AND adminid = '{$_SESSION['adminid']}'";
+                        $result = $dbc->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = mysqli_fetch_array($result)) {
+                                echo "<li class='nav-item'>"
+                                . "<a href='report.php' class='nav-link'";
+                                if ($page == 'report') {
+                                    echo 'active';
+                                }
+                                echo ">"
+                                . "<i class='nav-icon fas fa-chart-pie'></i>"
+                                . "<p>Report</p>"
+                                . "</a>"
+                                . "<li>";
+                            }
+                        }
+                        ?>
+                        
                         <li class="nav-item">
                             <a href="index.php" class="nav-link">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
